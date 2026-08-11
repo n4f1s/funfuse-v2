@@ -64,3 +64,132 @@ Three rules that catch most mistakes:
 The foundation is in place: design system, layout shell, image and motion
 architecture, game catalogue, redirects, sitemap and structured data. The
 homepage is a holding page and the remaining routes are not built yet.
+
+
+
+
+```
+funfuse-v2
+├─ .agents
+│  └─ skills
+│     ├─ design-taste-frontend
+│     │  └─ SKILL.md
+│     ├─ emil-design-eng
+│     │  └─ SKILL.md
+│     └─ review-animations
+│        ├─ SKILL.md
+│        └─ STANDARDS.md
+├─ .claude
+│  ├─ launch.json
+│  └─ skills
+│     ├─ design-taste-frontend
+│     │  └─ SKILL.md
+│     ├─ emil-design-eng
+│     │  └─ SKILL.md
+│     └─ review-animations
+│        ├─ SKILL.md
+│        └─ STANDARDS.md
+├─ AGENTS.md
+├─ CLAUDE.md
+├─ README.md
+├─ docs
+│  ├─ design-system.md
+│  └─ seo-migration.md
+├─ eslint.config.mjs
+├─ next.config.ts
+├─ package.json
+├─ pnpm-lock.yaml
+├─ pnpm-workspace.yaml
+├─ postcss.config.mjs
+├─ public
+├─ skills-lock.json
+├─ src
+│  ├─ app
+│  │  ├─ error.tsx
+│  │  ├─ favicon.ico
+│  │  ├─ globals.css
+│  │  ├─ layout.tsx
+│  │  ├─ not-found.tsx
+│  │  ├─ page.tsx
+│  │  ├─ robots.ts
+│  │  └─ sitemap.ts
+│  ├─ assets
+│  │  ├─ brand
+│  │  │  └─ funfuse-games-logo-wide.png
+│  │  ├─ decorative
+│  │  │  ├─ backgrounds
+│  │  │  │  ├─ game-art-mosaic.png
+│  │  │  │  └─ tropical-beach-scene.png
+│  │  │  ├─ characters
+│  │  │  │  ├─ card-hero-woman-pink.png
+│  │  │  │  ├─ card-player-young-man.png
+│  │  │  │  ├─ casual-boy-red-jacket.png
+│  │  │  │  ├─ cheerful-boys-pair.png
+│  │  │  │  ├─ fantasy-boy-fire-staff.png
+│  │  │  │  └─ traditional-dress-woman.png
+│  │  │  └─ props
+│  │  │     ├─ orange-jeepney.png
+│  │  │     ├─ pencil.png
+│  │  │     ├─ pink-crystal-gem.png
+│  │  │     └─ yellow-lightning-bolt.png
+│  │  └─ games
+│  │     ├─ callbreak-offline
+│  │     │  └─ cover.webp
+│  │     ├─ gin-rummy
+│  │     │  └─ cover.webp
+│  │     ├─ hazari-grand
+│  │     │  ├─ cover.webp
+│  │     │  └─ logo.webp
+│  │     ├─ indian-rummy
+│  │     │  └─ cover.webp
+│  │     ├─ poker-full-house
+│  │     │  └─ cover.webp
+│  │     ├─ poker-rummy
+│  │     │  └─ cover.webp
+│  │     ├─ puzzle-twist
+│  │     │  └─ cover.webp
+│  │     ├─ tarneeb
+│  │     │  └─ cover.webp
+│  │     └─ tongits-legend
+│  │        └─ cover.webp
+│  ├─ components
+│  │  ├─ layout
+│  │  │  ├─ index.ts
+│  │  │  ├─ mobile-nav.tsx
+│  │  │  ├─ site-footer.tsx
+│  │  │  ├─ site-header.tsx
+│  │  │  ├─ site-nav.tsx
+│  │  │  └─ wordmark.tsx
+│  │  ├─ media
+│  │  │  ├─ aspect.ts
+│  │  │  ├─ index.ts
+│  │  │  ├─ media.tsx
+│  │  │  └─ sizes.ts
+│  │  ├─ motion
+│  │  │  ├─ index.ts
+│  │  │  └─ reveal.tsx
+│  │  ├─ seo
+│  │  │  └─ json-ld.tsx
+│  │  └─ ui
+│  │     ├─ button.tsx
+│  │     ├─ container.tsx
+│  │     ├─ index.ts
+│  │     └─ section.tsx
+│  ├─ config
+│  │  ├─ routes.ts
+│  │  └─ site.ts
+│  ├─ content
+│  │  └─ games
+│  │     ├─ games.ts
+│  │     ├─ index.ts
+│  │     └─ types.ts
+│  └─ lib
+│     ├─ cn.ts
+│     ├─ jsonld.ts
+│     ├─ motion
+│     │  ├─ gsap.ts
+│     │  └─ tokens.ts
+│     └─ seo.ts
+└─ tsconfig.json
+
+```
