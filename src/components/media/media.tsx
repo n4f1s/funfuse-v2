@@ -55,8 +55,22 @@ type BaseMediaProps = {
   /** Required for remote images if you want a blur-up transition. */
   blurDataURL?: string;
   rounded?: "none" | "md" | "lg" | "xl" | "2xl" | "full";
-  /** Paint a surface behind the image — use with `fit="contain"` or PNGs. */
-  surface?: boolean;
+  /**
+   * What sits behind the image.
+   *   muted   — the default loading surface, correct for opaque photography.
+   *   surface — a lighter plate, for `fit="contain"` art that needs a card.
+   *   none    — nothing. Required for transparent cutouts: a painted box would
+   *             draw a visible rectangle around art that has no rectangle.
+   */
+  tone?: "muted" | "surface" | "none";
+  /**
+   * Classes for the frame. Sizing and spacing only.
+   *
+   * The frame already sets `relative`, and `cn` joins classes without resolving
+   * Tailwind conflicts, so passing `absolute` or `fixed` here is decided by
+   * stylesheet order rather than by intent. Position the image from a wrapper
+   * element instead.
+   */
   className?: string;
   imageClassName?: string;
   /** Rendered under the image, outside the frame. Never overlaid on it. */
@@ -74,6 +88,12 @@ const roundedClass = {
   xl: "rounded-xl",
   "2xl": "rounded-2xl",
   full: "rounded-full",
+} as const;
+
+const toneClass = {
+  muted: "bg-surface-muted",
+  surface: "bg-surface",
+  none: "",
 } as const;
 
 /**
@@ -102,19 +122,31 @@ export function Media({
   position,
   blurDataURL,
   rounded = "lg",
-  surface = false,
+  tone = "muted",
   className,
   imageClassName,
   caption,
   placeholderLabel,
 }: MediaProps) {
+  // `intrinsic` needs the asset's own dimensions, which only a static import
+  // carries. A remote URL and the empty state have none, so they fall back to a
+  // real named ratio rather than collapsing the box to zero height.
+  const staticSrc = src && typeof src !== "string" ? src : null;
+  const resolvedAspect =
+    aspect === "intrinsic" && !staticSrc ? "wide" : aspect;
+
   const frame = cn(
     "relative isolate overflow-hidden",
-    aspectClass[aspect],
+    aspectClass[resolvedAspect],
     roundedClass[rounded],
-    surface ? "bg-surface" : "bg-surface-muted",
+    toneClass[tone],
     className,
   );
+
+  const frameStyle: CSSProperties | undefined =
+    resolvedAspect === "intrinsic" && staticSrc
+      ? { aspectRatio: `${staticSrc.width} / ${staticSrc.height}` }
+      : undefined;
 
   if (!src) {
     return (
@@ -128,8 +160,13 @@ export function Media({
 
   // Static imports get a build-time blurDataURL from Next automatically; for
   // remote sources we only ask for `blur` when a data URL was supplied.
-  const isStatic = typeof src !== "string";
-  const placeholder = isStatic || blurDataURL ? ("blur" as const) : undefined;
+  //
+  // `tone="none"` means transparent art. The blur placeholder is painted as a
+  // background behind the image, so on a cutout it renders a blurred rectangle
+  // in exactly the space the art was chosen for not having. No placeholder is
+  // the better loading state there.
+  const placeholder =
+    tone !== "none" && (staticSrc || blurDataURL) ? ("blur" as const) : undefined;
 
   const style: CSSProperties = {
     objectFit: fit,
@@ -138,11 +175,12 @@ export function Media({
 
   return (
     <MediaFigure caption={caption}>
-      <div className={frame}>
+      <div className={frame} style={frameStyle}>
         {/* When a blur placeholder exists, Next's own blur-up is the loading
             state and a skeleton underneath would be dead weight. Otherwise the
-            skeleton sits behind the image, and the image covers it on load. */}
-        {placeholder ? null : <MediaSkeleton />}
+            skeleton sits behind the image, and the image covers it on load.
+            Transparent art gets neither: nothing should show through it. */}
+        {placeholder || tone === "none" ? null : <MediaSkeleton />}
         <Image
           src={src}
           alt={decorative ? "" : alt}

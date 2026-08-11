@@ -29,6 +29,31 @@ export const sizePresets = {
   /** Horizontal scroller cards — fixed-ish width at every breakpoint. */
   carouselCard: "(min-width: 768px) 320px, 72vw",
 
+  /** One card in the homepage hero fan. Three overlap, so each is narrow. */
+  heroCard: "(min-width: 1280px) 320px, (min-width: 1024px) 25vw, 42vw",
+
+  /**
+   * Large landscape plate in a horizontal gallery.
+   *
+   * 600px, not 640px, on purpose. At DPR 2 a 640px slot asks for 1280 device
+   * pixels, which lands above Next's 1200 breakpoint and pulls the 1920 file.
+   * 600px asks for 1200 and gets a file roughly a third smaller for a plate
+   * nobody can tell apart. Keep this in step with the card width in
+   * components/home/featured-games.tsx.
+   */
+  galleryPlate: "(min-width: 1024px) 600px, (min-width: 640px) 62vw, 84vw",
+
+  /**
+   * Transparent character cutout used as a decorative anchor. Keep the widths
+   * here and the `w-*` classes on the cutouts in step: the source art tops out
+   * around 566px, so an under-declared slot is visibly soft rather than merely
+   * wasteful.
+   */
+  cutout: "(min-width: 1280px) 352px, (min-width: 1024px) 288px, 240px",
+
+  /** The wide brand lockup. */
+  lockup: "(min-width: 640px) 420px, 264px",
+
   /** Store icon in a listing row. */
   icon: "(min-width: 768px) 88px, 64px",
 

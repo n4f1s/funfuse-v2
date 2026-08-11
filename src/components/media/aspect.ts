@@ -17,13 +17,21 @@ export const aspectClass = {
   hero: "aspect-hero",
   banner: "aspect-banner",
   square: "aspect-square",
+  /**
+   * The asset's own ratio, read from a static import at build time. For cutout
+   * PNGs with transparency there is no correct named ratio: any box that is not
+   * the art's own shape either crops it or surrounds it with dead layout that
+   * still has to be positioned around. Falls back to `wide` for string sources,
+   * which carry no intrinsic size.
+   */
+  intrinsic: "",
   auto: "",
 } as const;
 
 export type AspectName = keyof typeof aspectClass;
 
 /** Numeric ratios, for anything that needs to compute rather than style. */
-export const aspectRatio: Record<Exclude<AspectName, "auto">, number> = {
+export const aspectRatio: Record<Exclude<AspectName, "auto" | "intrinsic">, number> = {
   icon: 1,
   cover: 4 / 5,
   portrait: 3 / 4,

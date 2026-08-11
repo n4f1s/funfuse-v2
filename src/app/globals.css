@@ -384,6 +384,57 @@
     }
   }
 
+  /* A framed piece of game art.
+     The catalogue art is saturated and edge-to-edge, so it needs an edge of its
+     own or it bleeds into the warm canvas. An inset hairline reads as the white
+     border of a printed card; a real border would sit outside the radius and
+     fight the overflow clip. */
+  .plate {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .plate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.4);
+    pointer-events: none;
+  }
+
+  /* Horizontal gallery track. A real scroll container, not a pinned section:
+     it stays keyboard reachable, it never blocks vertical scrolling, and touch
+     gets the platform's own momentum. */
+  .hand-track {
+    position: relative; /* makes child offsetLeft measurable against the track */
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* The track is full-bleed so cards can run off the edge, but the first one
+       still has to line up with the page gutter. Percentages resolve against
+       the parent's width, which already excludes the scrollbar — `100vw` here
+       would sit a scrollbar's width out of alignment on desktop. */
+    padding-inline: max(1.25rem, calc((100% - var(--container-page)) / 2));
+  }
+
+  @media (width >= 40rem) {
+    .hand-track {
+      padding-inline: max(2rem, calc((100% - var(--container-page)) / 2));
+    }
+  }
+
+  .hand-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hand-track > * {
+    scroll-snap-align: center;
+    flex: none;
+  }
+
   /* Hairline that fades at both ends — reads as a seam, not a table border. */
   .rule-soft {
     height: 1px;

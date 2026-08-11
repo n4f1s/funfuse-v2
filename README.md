@@ -63,8 +63,15 @@ Three rules that catch most mistakes:
 
 The foundation is in place: design system, layout shell, image and motion
 architecture, game catalogue, redirects, sitemap and structured data. The
-homepage is a holding page and the remaining routes are not built yet.
+homepage is built. The remaining routes are not.
 
+Homepage sections live in `src/components/home`. Cover artwork is registered in
+`src/content/games/art.ts`, which is deliberately kept out of the
+`src/content/games` barrel: `next.config.ts` imports that barrel in a plain Node
+context, where a static image import cannot resolve.
+
+Game links on the homepage go to Google Play until `/projects/<slug>/` ships.
+That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 

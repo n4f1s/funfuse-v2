@@ -1,8 +1,20 @@
 import { games } from "./games";
-import { categoryLabels, type Game, type GameCategory } from "./types";
+import {
+  categoryLabels,
+  type Game,
+  type GameCategory,
+  type GameRegion,
+} from "./types";
 
 export { games } from "./games";
 export * from "./types";
+
+/**
+ * Artwork lives in `./art`, which is NOT re-exported here on purpose: this
+ * barrel is imported by `next.config.ts` in a plain Node context, and the
+ * static image imports in `./art` would fail to resolve there. Import it
+ * directly as `@/content/games/art`.
+ */
 
 /** Every game, newest known release first, then alphabetical. */
 export function getAllGames(): readonly Game[] {
@@ -15,6 +27,22 @@ export function getGameBySlug(slug: string): Game | undefined {
 
 export function getGamesByCategory(category: GameCategory): Game[] {
   return games.filter((game) => game.category === category);
+}
+
+/**
+ * Distinct regions the catalogue draws from, excluding `international`.
+ *
+ * `international` is a fallback for titles with no single home (Gin Rummy,
+ * Puzzle Twist), so counting it would overstate how many living traditions the
+ * catalogue actually covers. Any figure the site prints about reach is derived
+ * from this, never typed in by hand.
+ */
+export function getGameRegions(): GameRegion[] {
+  const regions = new Set<GameRegion>();
+  for (const game of games) {
+    if (game.region !== "international") regions.add(game.region);
+  }
+  return [...regions];
 }
 
 /** Categories that actually have titles, with counts, for listing filters. */

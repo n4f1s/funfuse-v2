@@ -1,6 +1,11 @@
 "use client";
 
-import { useRef, type ElementType, type ReactNode } from "react";
+import {
+  useRef,
+  type CSSProperties,
+  type ElementType,
+  type ReactNode,
+} from "react";
 
 import { cn } from "@/lib/cn";
 import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
@@ -38,6 +43,18 @@ type RevealProps = {
   /** Viewport position that fires the animation (ScrollTrigger syntax). */
   start?: string;
   className?: string;
+  /**
+   * For layout values a class cannot express, such as a track count computed
+   * from content. Never put animated properties here: GSAP owns transform and
+   * opacity on this element.
+   */
+  style?: CSSProperties;
+  /**
+   * Pass `role="list"` whenever `as="ul"`. Tailwind's reset removes the list
+   * marker, and Safari drops the list role along with it, so a `<ul>` that
+   * carries real list content has to say so again.
+   */
+  role?: string;
 };
 
 export function Reveal({
@@ -48,6 +65,8 @@ export function Reveal({
   delay = 0,
   start = "top 85%",
   className,
+  style,
+  role,
 }: RevealProps) {
   const scope = useRef<HTMLElement>(null);
 
@@ -107,6 +126,8 @@ export function Reveal({
   return (
     <Tag
       ref={scope}
+      style={style}
+      role={role}
       className={cn(stagger ? "reveal-stagger" : "will-reveal", className)}
     >
       {children}
