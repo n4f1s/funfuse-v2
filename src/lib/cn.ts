@@ -1,0 +1,37 @@
+type ClassValue =
+  | string
+  | number
+  | null
+  | undefined
+  | false
+  | ClassValue[]
+  | Record<string, boolean | null | undefined>;
+
+/**
+ * Joins class names. Deliberately dependency-free.
+ *
+ * Note: this does NOT de-duplicate conflicting Tailwind utilities the way
+ * `tailwind-merge` does. Components here take a `className` that *adds* to the
+ * base classes; if a component needs a real variant, add a variant prop rather
+ * than relying on override order.
+ */
+export function cn(...inputs: ClassValue[]): string {
+  const out: string[] = [];
+
+  for (const input of inputs) {
+    if (!input) continue;
+
+    if (typeof input === "string" || typeof input === "number") {
+      out.push(String(input));
+    } else if (Array.isArray(input)) {
+      const nested = cn(...input);
+      if (nested) out.push(nested);
+    } else {
+      for (const [key, value] of Object.entries(input)) {
+        if (value) out.push(key);
+      }
+    }
+  }
+
+  return out.join(" ");
+}

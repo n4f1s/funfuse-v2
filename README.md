@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FunFuse Games
 
-## Getting Started
+Marketing site for FunFuse Games, an independent mobile studio with 19 shipped
+card and board games. Replaces the WordPress site at
+[funfusegames.com](https://funfusegames.com).
 
-First, run the development server:
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS 4 ·
+GSAP.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command          | What it does                              |
+| ---------------- | ----------------------------------------- |
+| `pnpm dev`       | Development server                        |
+| `pnpm build`     | Production build                          |
+| `pnpm start`     | Serve the production build                |
+| `pnpm typecheck` | `tsc --noEmit`                            |
+| `pnpm lint`      | ESLint                                    |
+| `pnpm check`     | typecheck, lint and build in one pass      |
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+| Variable               | Default                     | Notes                                                                 |
+| ---------------------- | --------------------------- | --------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | `https://funfusegames.com`  | Canonical origin. Set it on preview deploys so they de-index themselves and emit their own canonicals. |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Where things are
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/app/          routes, metadata files, error boundaries
+src/components/   layout · media · motion · seo · ui
+src/config/       site facts, navigation, route registry, redirects
+src/content/      the game catalogue
+src/lib/          seo, json-ld, motion tokens, gsap setup
+docs/             design system and SEO migration
+```
 
-## Deploy on Vercel
+## Read before contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [`AGENTS.md`](AGENTS.md) — working rules for this repo. Also loaded as
+  `CLAUDE.md`.
+- [`docs/design-system.md`](docs/design-system.md) — tokens, type, colour,
+  radius, motion.
+- [`docs/seo-migration.md`](docs/seo-migration.md) — the old URL inventory and
+  where each one goes.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Three rules that catch most mistakes:
+
+1. Images go through `<Media>`, never `next/image` directly.
+2. Game facts come from `src/content/games`, never a hardcoded string.
+3. GSAP only. Never Framer Motion.
+
+## Status
+
+The foundation is in place: design system, layout shell, image and motion
+architecture, game catalogue, redirects, sitemap and structured data. The
+homepage is a holding page and the remaining routes are not built yet.
