@@ -377,7 +377,7 @@ export function ContactTable({
     >
       {/* Clips the fall: the deck starts above the felt and has to arrive over
           the top edge rather than hang in the page above it. */}
-      <div className="contact-board bg-surface border-line absolute inset-0 overflow-hidden rounded-[1.5rem] border shadow-sm md:rounded-[2rem]">
+      <div className="contact-board bg-surface border-line absolute inset-0 overflow-hidden">
         {/* Warmth where the hand lands, so the felt reads as lit rather than
             as a flat white panel. One hue, low chroma: this is depth. */}
         <div className="absolute inset-0 bg-[radial-gradient(58%_56%_at_50%_62%,var(--color-brand-50),transparent_70%)]" />

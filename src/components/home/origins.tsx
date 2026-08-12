@@ -59,12 +59,12 @@ export function Origins() {
   ));
 
   return (
-    <Section tone="sunken" density="tight" bleed>
+    <Section tone="accent" bleed>
       <Container>
         <Reveal as="div" y="lg" className="max-w-xl">
           <h2 className="text-h2 text-heading font-semibold tracking-tightest">
             Played at these tables first
-
+            
           </h2>
           <p className="text-muted mt-4 text-lg">
             None of these games were invented here. Each one belongs to the
