@@ -442,6 +442,130 @@
     flex: none;
   }
 
+  /* Mini Trick Table — the homepage's autoplaying demo table.
+     ------------------------------------------------------------------------
+     Every number below arrives as a custom property, inlined by the scene from
+     src/components/home/trick-table-round.ts. That file stays the single
+     source of truth for the geometry: a card's size and home slot, a seat's
+     chip, the pile its won tricks stack on, and the resting pose of all
+     sixteen cards. Only the breakpoint lives here.
+
+     The scene has two compositions: three seats on a portrait board below md,
+     four around a wide table from md up. Cards and seats that only exist in
+     the wide one are hidden rather than conditionally rendered, so one server
+     render serves both. */
+  .trick-stage {
+    aspect-ratio: var(--board-compact);
+  }
+
+  .trick-board {
+    /* Makes cqw a percentage of the board, so a rank stays the same size
+       relative to the card it is printed on at every viewport. */
+    container-type: inline-size;
+  }
+
+  .trick-card,
+  .trick-deck {
+    position: absolute;
+    left: var(--card-x-compact);
+    top: var(--card-y-compact);
+    width: var(--card-w-compact);
+    aspect-ratio: 5 / 7;
+  }
+
+  .trick-anchor {
+    position: absolute;
+    left: var(--anchor-x-compact);
+    top: var(--anchor-y-compact);
+  }
+
+  .trick-pile {
+    position: absolute;
+    left: var(--anchor-x-compact);
+    top: var(--anchor-y-compact);
+    width: calc(var(--card-w-compact) * 0.62);
+    aspect-ratio: 5 / 7;
+    /* The `translate` property, not a transform: GSAP owns transform on this
+       element for the bump when a trick lands on it. */
+    translate: -50% -50%;
+  }
+
+  .trick-wide-only {
+    display: none;
+  }
+
+  /* Not a utility class on the element: the resting rule below has to be able
+     to light one card up, and a Tailwind `opacity-0` sits in a later layer
+     than anything written here. Hidden rather than transparent, so sixteen
+     blurred rectangles are never rasterized to show nothing. GSAP's autoAlpha
+     writes both properties, so it can still fade one in. */
+  .trick-glow {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  @media (width >= 48rem) {
+    .trick-stage {
+      aspect-ratio: var(--board-wide);
+    }
+
+    .trick-card,
+    .trick-deck {
+      left: var(--card-x-wide);
+      top: var(--card-y-wide);
+      width: var(--card-w-wide);
+    }
+
+    .trick-anchor {
+      left: var(--anchor-x-wide);
+      top: var(--anchor-y-wide);
+    }
+
+    .trick-pile {
+      left: var(--anchor-x-wide);
+      top: var(--anchor-y-wide);
+      width: calc(var(--card-w-wide) * 0.62);
+    }
+
+    .trick-wide-only {
+      display: block;
+    }
+  }
+
+  /* The resting tableau: first trick complete, hands a card short, the winning
+     card lit. It is the state no script can reach, so it has to be a table
+     worth looking at rather than an empty felt or a stack of card backs.
+     Anything that runs the timeline overwrites these inline. */
+  @media (prefers-reduced-motion: reduce) and (width < 48rem),
+    (scripting: none) and (width < 48rem) {
+    .trick-card {
+      transform: var(--rest-compact);
+    }
+
+    .trick-card[data-rest-lit="compact"] .trick-glow {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (width >= 48rem),
+    (scripting: none) and (width >= 48rem) {
+    .trick-card {
+      transform: var(--rest-wide);
+    }
+
+    .trick-card[data-rest-lit="wide"] .trick-glow {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .trick-card[data-rest-face="up"] .trick-flip {
+      transform: rotateY(180deg);
+    }
+  }
+
   /* Hairline that fades at both ends — reads as a seam, not a table border. */
   .rule-soft {
     height: 1px;
