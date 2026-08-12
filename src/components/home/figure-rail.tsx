@@ -39,15 +39,7 @@ export function FigureRail({
       const figures = gsap.utils.toArray<HTMLElement>("[data-figure]", root);
       const media = gsap.matchMedia();
 
-      // `set` before `clearPreState`, and both inside a layout effect, so the
-      // inline start values have replaced the CSS ones before the first paint.
-      // A `from()` tween would read its destination off the pre-state class
-      // and animate each element back to where it already is.
       media.add(MOTION_QUERY.ok, () => {
-        gsap.set(rules, { scaleX: 0, transformOrigin: "left center" });
-        gsap.set(figures, { opacity: 0, y: travel.lg });
-        clearPreState(root);
-
         const timeline = gsap.timeline({
           scrollTrigger: { trigger: root, start: "top 85%", once: true },
           onStart: () =>
@@ -57,17 +49,20 @@ export function FigureRail({
         });
 
         timeline
-          .to(rules, {
-            scaleX: 1,
+          .from(rules, {
+            scaleX: 0,
+            transformOrigin: "left center",
+            immediateRender: false,
             duration: duration.reveal * 1.2,
             ease: ease.entrance,
             stagger: stagger.base * 1.5,
           })
-          .to(
+          .from(
             figures,
             {
-              opacity: 1,
-              y: 0,
+              opacity: 0,
+              y: travel.lg,
+              immediateRender: false,
               duration: duration.reveal,
               ease: ease.entrance,
               stagger: stagger.base * 1.5,
@@ -83,10 +78,8 @@ export function FigureRail({
         };
       });
 
-      // Reduced motion: the row is simply there. The CSS escapes in
-      // globals.css already drew it before this ran.
+      // Reduced motion: the row is simply there.
       media.add(MOTION_QUERY.reduced, () => {
-        clearPreState(root);
         gsap.set(rules, { clearProps: "all" });
         gsap.set(figures, { clearProps: "all" });
       });
@@ -101,12 +94,6 @@ export function FigureRail({
       {children}
     </div>
   );
-}
-
-function clearPreState(root: HTMLElement) {
-  for (const node of root.querySelectorAll(".will-draw, .will-reveal")) {
-    node.classList.remove("will-draw", "will-reveal");
-  }
 }
 
 /**

@@ -82,12 +82,13 @@ export function Reveal({
       const media = gsap.matchMedia();
 
       media.add(MOTION_QUERY.ok, () => {
-        // `from` renders its start values immediately, and useGSAP runs in a
-        // layout effect, so the inline opacity lands before the first paint.
-        // Only then is the CSS pre-state class dropped — no flash either way.
+        // The readable server state is the fallback. Delaying the `from`
+        // render until ScrollTrigger actually starts means an unavailable or
+        // never-fired trigger cannot leave content hidden in production.
         const tween = gsap.from(targets, {
           opacity: 0,
           y: distance,
+          immediateRender: false,
           delay,
           duration: duration.reveal,
           ease: ease.entrance,

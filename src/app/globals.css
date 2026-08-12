@@ -460,50 +460,15 @@
    ========================================================================== */
 
 @layer utilities {
-  /* Applied by <Reveal> so the very first paint already has the pre-animation
-     state — setting it from JS would flash the content visible first. The two
-     escapes below mean the content is never permanently hidden if GSAP never
-     runs. */
-  .will-reveal {
-    opacity: 0;
-  }
-
-  .reveal-stagger > * {
-    opacity: 0;
-  }
-
-  @media (prefers-reduced-motion: reduce), (scripting: none) {
-    .will-reveal,
-    .reveal-stagger > * {
-      opacity: 1;
-    }
-  }
-
-  /* Same idea for a rule that draws itself in: the collapsed state has to be
-     in the first paint, not written by JS after it. The escape leaves the
-     rule fully drawn when the animation will never run. */
-  .will-draw {
-    transform: scaleX(0);
-    transform-origin: left center;
-  }
-
-  @media (prefers-reduced-motion: reduce), (scripting: none) {
-    .will-draw {
-      transform: none;
-    }
-  }
-
-  /* Vertical counterpart, for a rail that draws downward instead of across —
-     the game detail page's How to Play progress spine. */
+  /* These classes mark elements that a client motion island may enhance.
+     They deliberately have no visual pre-state: server HTML must remain
+     readable when JavaScript, GSAP, or ScrollTrigger is unavailable. The
+     motion islands apply their start values only as a live trigger begins. */
+  .will-reveal,
+  .reveal-stagger > *,
+  .will-draw,
   .will-draw-y {
-    transform: scaleY(0);
-    transform-origin: top center;
-  }
-
-  @media (prefers-reduced-motion: reduce), (scripting: none) {
-    .will-draw-y {
-      transform: none;
-    }
+    opacity: 1;
   }
 
   /* Marks an element that GSAP will transform. Applied for the duration of

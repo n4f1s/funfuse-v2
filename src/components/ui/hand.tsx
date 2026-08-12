@@ -63,6 +63,7 @@ export function Hand({
           y: 56,
           rotate: -3,
           scale: 0.94,
+          immediateRender: false,
           transformOrigin: "50% 100%",
           duration: 0.9,
           ease: ease.entrance,
@@ -79,8 +80,8 @@ export function Hand({
             }),
         });
 
-        // `from` writes its start values in this layout effect, so the inline
-        // opacity is in place before the class comes off. No flash either way.
+        // The cards remain readable until their live ScrollTrigger starts.
+        // Animation is enhancement, never the only way to reveal a card.
         clear();
 
         return () => {

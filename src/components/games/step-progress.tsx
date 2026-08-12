@@ -43,12 +43,6 @@ export function StepProgress({
       const media = gsap.matchMedia();
 
       media.add(MOTION_QUERY.ok, () => {
-        // Set the JS-controlled starting values before the CSS pre-state
-        // class comes off, exactly as `FigureRail` does — GSAP owns the
-        // number from here, so the tween below never has to infer a start
-        // point from a computed transform.
-        if (spine) gsap.set(spine, { scaleY: 0, transformOrigin: "top center" });
-
         const timeline = gsap.timeline({
           scrollTrigger: { trigger: root, start: "top 80%", once: true },
           onStart: () => gsap.set(steps, { willChange: "transform, opacity" }),
@@ -59,8 +53,10 @@ export function StepProgress({
         });
 
         if (spine) {
-          timeline.to(spine, {
-            scaleY: 1,
+          timeline.from(spine, {
+            scaleY: 0,
+            transformOrigin: "top center",
+            immediateRender: false,
             duration: duration.reveal * 1.6,
             ease: ease.entrance,
           });
@@ -71,14 +67,13 @@ export function StepProgress({
           {
             opacity: 0,
             y: travel.lg,
+            immediateRender: false,
             duration: duration.reveal,
             ease: ease.entrance,
             stagger: stagger.base * 1.8,
           },
           spine ? 0.15 : 0,
         );
-
-        clearPreState(root);
 
         return () => {
           timeline.scrollTrigger?.kill();
@@ -87,7 +82,6 @@ export function StepProgress({
       });
 
       media.add(MOTION_QUERY.reduced, () => {
-        clearPreState(root);
         if (spine) gsap.set(spine, { clearProps: "all" });
         gsap.set(steps, { opacity: 1, y: 0, clearProps: "willChange" });
       });
@@ -114,10 +108,4 @@ export function StepProgress({
       {children}
     </ol>
   );
-}
-
-function clearPreState(root: HTMLElement) {
-  root.querySelectorAll(".will-draw-y").forEach((node) => {
-    node.classList.remove("will-draw-y");
-  });
 }

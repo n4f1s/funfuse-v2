@@ -50,12 +50,6 @@ export function Counter({
       const media = gsap.matchMedia();
 
       media.add(MOTION_QUERY.ok, () => {
-        // If the figure is already on screen the trigger fires in this frame,
-        // so resetting the text is invisible. If it is not, the reset has to
-        // happen now or the number would show its answer and then rewind to
-        // zero the moment it scrolled into view.
-        element.textContent = running(0);
-
         const count = { current: 0 };
 
         const tween = gsap.to(count, {
@@ -64,6 +58,11 @@ export function Counter({
           ease: ease.entrance,
           onUpdate: () => {
             element.textContent = running(count.current);
+          },
+          // Keep the server-rendered value until the trigger starts. A
+          // trigger that never runs must not turn a real figure into zero.
+          onStart: () => {
+            element.textContent = running(0);
           },
           // A count that ends on "3.0" has not finished counting.
           onComplete: () => {
