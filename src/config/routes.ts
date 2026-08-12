@@ -66,7 +66,7 @@ export const routes = {
 
   careers: {
     path: "/careers",
-    live: false,
+    live: true,
     changeFrequency: "weekly",
     priority: 0.6,
     preserved: true,
