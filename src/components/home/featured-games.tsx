@@ -47,8 +47,8 @@ export function FeaturedGames() {
 
       {/* No <Reveal> wrapper. The cards animate individually inside <Hand>,
           and fading the whole block in first would be two entrances stacked on
-          one moment. `will-reveal` marks each card for progressive enhancement;
-          the server-rendered state remains readable if motion never starts. */}
+          one moment. `will-reveal` supplies the FOUC-safe pre-state; <Hand>
+          resolves it with autoAlpha or fails open if GSAP setup breaks. */}
       <div className="mt-10 lg:mt-14">
         <Hand label="Featured games" count={featured.length}>
           {featured.map(({ game, cover }) => (

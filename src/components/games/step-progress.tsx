@@ -3,7 +3,13 @@
 import { useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
-import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import {
+  failOpenRevealTargets,
+  gsap,
+  MOTION_QUERY,
+  registerGsap,
+  useGSAP,
+} from "@/lib/motion/gsap";
 import { duration, ease, stagger, travel } from "@/lib/motion/tokens";
 
 /**
@@ -29,8 +35,6 @@ export function StepProgress({
 
   useGSAP(
     () => {
-      registerGsap();
-
       const root = scope.current;
       if (!root) return;
 
@@ -40,53 +44,66 @@ export function StepProgress({
       if (!steps.length) return;
 
       const spine = root.querySelector<HTMLElement>("[data-spine]");
-      const media = gsap.matchMedia();
+      const targets = spine ? [spine, ...steps] : steps;
 
-      media.add(MOTION_QUERY.ok, () => {
-        const timeline = gsap.timeline({
-          scrollTrigger: { trigger: root, start: "top 80%", once: true },
-          onStart: () => gsap.set(steps, { willChange: "transform, opacity" }),
-          onComplete: () =>
-            gsap.set(spine ? [spine, ...steps] : steps, {
-              clearProps: "willChange",
-            }),
+      try {
+        registerGsap();
+
+        const media = gsap.matchMedia();
+
+        media.add(MOTION_QUERY.ok, () => {
+          try {
+            const timeline = gsap.timeline({
+              scrollTrigger: { trigger: root, start: "top 80%", once: true },
+              onStart: () => gsap.set(steps, { willChange: "transform, opacity" }),
+              onComplete: () => gsap.set(targets, { clearProps: "willChange" }),
+            });
+
+            if (spine) {
+              timeline.fromTo(
+                spine,
+                { autoAlpha: 0, scaleY: 0, transformOrigin: "top center" },
+                {
+                  autoAlpha: 1,
+                  scaleY: 1,
+                  immediateRender: true,
+                  duration: duration.reveal * 1.6,
+                  ease: ease.entrance,
+                },
+              );
+            }
+
+            timeline.fromTo(
+              steps,
+              { autoAlpha: 0, y: travel.lg },
+              {
+                autoAlpha: 1,
+                y: 0,
+                immediateRender: true,
+                duration: duration.reveal,
+                ease: ease.entrance,
+                stagger: stagger.base * 1.8,
+              },
+              spine ? 0.15 : 0,
+            );
+
+            return () => {
+              timeline.scrollTrigger?.kill();
+              timeline.kill();
+            };
+          } catch {
+            failOpenRevealTargets(targets);
+          }
         });
 
-        if (spine) {
-          timeline.from(spine, {
-            scaleY: 0,
-            transformOrigin: "top center",
-            immediateRender: false,
-            duration: duration.reveal * 1.6,
-            ease: ease.entrance,
-          });
-        }
+        media.add(MOTION_QUERY.reduced, () => {
+          gsap.set(targets, { autoAlpha: 1, clearProps: "all" });
+        });
 
-        timeline.from(
-          steps,
-          {
-            opacity: 0,
-            y: travel.lg,
-            immediateRender: false,
-            duration: duration.reveal,
-            ease: ease.entrance,
-            stagger: stagger.base * 1.8,
-          },
-          spine ? 0.15 : 0,
-        );
-
-        return () => {
-          timeline.scrollTrigger?.kill();
-          timeline.kill();
-        };
-      });
-
-      media.add(MOTION_QUERY.reduced, () => {
-        if (spine) gsap.set(spine, { clearProps: "all" });
-        gsap.set(steps, { opacity: 1, y: 0, clearProps: "willChange" });
-      });
-
-      return () => media.revert();
+        return () => media.revert();
+      } catch {
+        failOpenRevealTargets(targets);
+      }
     },
     { scope },
   );
@@ -96,7 +113,7 @@ export function StepProgress({
       ref={scope}
       role="list"
       className={cn(
-        "border-line relative flex flex-col gap-10 border-l pl-8 sm:gap-14 sm:pl-12",
+        "reveal-stagger border-line relative flex flex-col gap-10 border-l pl-8 sm:gap-14 sm:pl-12",
         className,
       )}
     >

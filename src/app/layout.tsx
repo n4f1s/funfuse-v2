@@ -76,6 +76,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geist.variable} ${bricolage.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <noscript>
+          <style>{`
+            .will-reveal,
+            .reveal-stagger > *,
+            .will-draw,
+            .will-draw-y {
+              visibility: visible !important;
+            }
+          `}</style>
+        </noscript>
         <a href="#main" className="skip-link">
           Skip to content
         </a>

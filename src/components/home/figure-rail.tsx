@@ -3,7 +3,13 @@
 import { useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
-import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import {
+  failOpenRevealTargets,
+  gsap,
+  MOTION_QUERY,
+  registerGsap,
+  useGSAP,
+} from "@/lib/motion/gsap";
 import { duration, ease, stagger, travel } from "@/lib/motion/tokens";
 
 /**
@@ -30,61 +36,75 @@ export function FigureRail({
 
   useGSAP(
     () => {
-      registerGsap();
-
       const root = scope.current;
       if (!root) return;
 
       const rules = gsap.utils.toArray<HTMLElement>("[data-rule]", root);
       const figures = gsap.utils.toArray<HTMLElement>("[data-figure]", root);
-      const media = gsap.matchMedia();
+      const targets = [...rules, ...figures];
 
-      media.add(MOTION_QUERY.ok, () => {
-        const timeline = gsap.timeline({
-          scrollTrigger: { trigger: root, start: "top 85%", once: true },
-          onStart: () =>
-            gsap.set(figures, { willChange: "transform, opacity" }),
-          onComplete: () =>
-            gsap.set([...rules, ...figures], { clearProps: "willChange" }),
+      try {
+        registerGsap();
+
+        const media = gsap.matchMedia();
+
+        media.add(MOTION_QUERY.ok, () => {
+          try {
+            const timeline = gsap.timeline({
+              scrollTrigger: { trigger: root, start: "top 85%", once: true },
+              onStart: () =>
+                gsap.set(figures, { willChange: "transform, opacity" }),
+              onComplete: () =>
+                gsap.set(targets, { clearProps: "willChange" }),
+            });
+
+            timeline
+              .fromTo(
+                rules,
+                { autoAlpha: 0, scaleX: 0, transformOrigin: "left center" },
+                {
+                  autoAlpha: 1,
+                  scaleX: 1,
+                  immediateRender: true,
+                  duration: duration.reveal * 1.2,
+                  ease: ease.entrance,
+                  stagger: stagger.base * 1.5,
+                },
+              )
+              .fromTo(
+                figures,
+                { autoAlpha: 0, y: travel.lg },
+                {
+                  autoAlpha: 1,
+                  y: 0,
+                  immediateRender: true,
+                  duration: duration.reveal,
+                  ease: ease.entrance,
+                  stagger: stagger.base * 1.5,
+                },
+                // Each column follows its own rule rather than waiting for the
+                // last one, so the two passes travel together.
+                0.14,
+              );
+
+            return () => {
+              timeline.scrollTrigger?.kill();
+              timeline.kill();
+            };
+          } catch {
+            failOpenRevealTargets(targets);
+          }
         });
 
-        timeline
-          .from(rules, {
-            scaleX: 0,
-            transformOrigin: "left center",
-            immediateRender: false,
-            duration: duration.reveal * 1.2,
-            ease: ease.entrance,
-            stagger: stagger.base * 1.5,
-          })
-          .from(
-            figures,
-            {
-              opacity: 0,
-              y: travel.lg,
-              immediateRender: false,
-              duration: duration.reveal,
-              ease: ease.entrance,
-              stagger: stagger.base * 1.5,
-            },
-            // Each column follows its own rule rather than waiting for the
-            // last one, so the two passes travel together.
-            0.14,
-          );
+        // Reduced motion: the row is simply there.
+        media.add(MOTION_QUERY.reduced, () => {
+          gsap.set(targets, { autoAlpha: 1, clearProps: "all" });
+        });
 
-        return () => {
-          timeline.scrollTrigger?.kill();
-          timeline.kill();
-        };
-      });
-
-      // Reduced motion: the row is simply there.
-      media.add(MOTION_QUERY.reduced, () => {
-        gsap.set(rules, { clearProps: "all" });
-        gsap.set(figures, { clearProps: "all" });
-      });
-
-      return () => media.revert();
+        return () => media.revert();
+      } catch {
+        failOpenRevealTargets(targets);
+      }
     },
     { scope },
   );

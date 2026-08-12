@@ -4,7 +4,13 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/cn";
-import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import {
+  failOpenRevealTargets,
+  gsap,
+  MOTION_QUERY,
+  registerGsap,
+  useGSAP,
+} from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
 /**
@@ -44,58 +50,67 @@ export function Hand({
    */
   useGSAP(
     () => {
-      registerGsap();
-
       const element = track.current;
       if (!element) return;
 
       const cards = [...element.children] as HTMLElement[];
       if (!cards.length) return;
 
-      const clear = () =>
-        cards.forEach((card) => card.classList.remove("will-reveal"));
+      try {
+        registerGsap();
 
-      const media = gsap.matchMedia();
+        const media = gsap.matchMedia();
 
-      media.add(MOTION_QUERY.ok, () => {
-        const tween = gsap.from(cards, {
-          opacity: 0,
-          y: 56,
-          rotate: -3,
-          scale: 0.94,
-          immediateRender: false,
-          transformOrigin: "50% 100%",
-          duration: 0.9,
-          ease: ease.entrance,
-          stagger: 0.09,
-          scrollTrigger: { trigger: element, start: "top 88%", once: true },
-          onStart: () =>
-            gsap.set(cards, { willChange: "transform, opacity" }),
-          // Transform goes too. A settled card has no transform of its own,
-          // and leaving an identity matrix on five elements keeps five
-          // compositor layers alive for the rest of the session.
-          onComplete: () =>
-            gsap.set(cards, {
-              clearProps: "willChange,transform,transformOrigin",
-            }),
+        media.add(MOTION_QUERY.ok, () => {
+          try {
+            const tween = gsap.fromTo(
+              cards,
+              {
+                autoAlpha: 0,
+                y: 56,
+                rotate: -3,
+                scale: 0.94,
+                transformOrigin: "50% 100%",
+              },
+              {
+                autoAlpha: 1,
+                y: 0,
+                rotate: 0,
+                scale: 1,
+                immediateRender: true,
+                duration: 0.9,
+                ease: ease.entrance,
+                stagger: 0.09,
+                scrollTrigger: { trigger: element, start: "top 88%", once: true },
+                onStart: () =>
+                  gsap.set(cards, { willChange: "transform, opacity" }),
+                // Transform goes too. A settled card has no transform of its own,
+                // and leaving an identity matrix on five elements keeps five
+                // compositor layers alive for the rest of the session.
+                onComplete: () =>
+                  gsap.set(cards, {
+                    clearProps: "willChange,transform,transformOrigin",
+                  }),
+              },
+            );
+
+            return () => {
+              tween.scrollTrigger?.kill();
+              tween.kill();
+            };
+          } catch {
+            failOpenRevealTargets(cards);
+          }
         });
 
-        // The cards remain readable until their live ScrollTrigger starts.
-        // Animation is enhancement, never the only way to reveal a card.
-        clear();
+        media.add(MOTION_QUERY.reduced, () => {
+          gsap.set(cards, { autoAlpha: 1, y: 0, rotate: 0, scale: 1 });
+        });
 
-        return () => {
-          tween.scrollTrigger?.kill();
-          tween.kill();
-        };
-      });
-
-      media.add(MOTION_QUERY.reduced, () => {
-        clear();
-        gsap.set(cards, { opacity: 1, y: 0, rotate: 0, scale: 1 });
-      });
-
-      return () => media.revert();
+        return () => media.revert();
+      } catch {
+        failOpenRevealTargets(cards);
+      }
     },
     { scope: track, dependencies: [count] },
   );

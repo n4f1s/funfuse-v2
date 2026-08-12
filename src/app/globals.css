@@ -460,15 +460,25 @@
    ========================================================================== */
 
 @layer utilities {
-  /* These classes mark elements that a client motion island may enhance.
-     They deliberately have no visual pre-state: server HTML must remain
-     readable when JavaScript, GSAP, or ScrollTrigger is unavailable. The
-     motion islands apply their start values only as a live trigger begins. */
+  /* Reveal targets are concealed before first paint so their GSAP entrance
+     cannot flash visible, then hidden, then visible. `autoAlpha` owns the
+     inline visible state once the client island is ready. The `<noscript>`
+     fallback in the root layout and this reduced-motion branch keep content
+     readable without an entrance animation. */
   .will-reveal,
   .reveal-stagger > *,
   .will-draw,
   .will-draw-y {
-    opacity: 1;
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .will-reveal,
+    .reveal-stagger > *,
+    .will-draw,
+    .will-draw-y {
+      visibility: visible;
+    }
   }
 
   /* Marks an element that GSAP will transform. Applied for the duration of

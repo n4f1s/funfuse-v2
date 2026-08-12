@@ -22,6 +22,22 @@ import { useGSAP } from "@gsap/react";
 
 let registered = false;
 
+/**
+ * Escape hatch for reveal islands whose setup throws after server HTML has
+ * applied the FOUC-safe `visibility: hidden` marker. This deliberately uses
+ * the DOM rather than GSAP so it still works when plugin registration itself
+ * is the failed step.
+ */
+export function failOpenRevealTargets(targets: Iterable<Element>) {
+  for (const target of targets) {
+    if (!(target instanceof HTMLElement)) continue;
+
+    target.style.visibility = "visible";
+    target.style.opacity = "1";
+    target.style.removeProperty("will-change");
+  }
+}
+
 export function registerGsap() {
   if (registered || typeof window === "undefined") return;
 

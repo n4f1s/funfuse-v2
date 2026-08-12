@@ -8,7 +8,13 @@ import {
 } from "react";
 
 import { cn } from "@/lib/cn";
-import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import {
+  failOpenRevealTargets,
+  gsap,
+  MOTION_QUERY,
+  registerGsap,
+  useGSAP,
+} from "@/lib/motion/gsap";
 import {
   duration,
   ease,
@@ -72,54 +78,67 @@ export function Reveal({
 
   useGSAP(
     () => {
-      registerGsap();
-
       const root = scope.current;
       if (!root) return;
 
       const targets: Element[] = stagger ? [...root.children] : [root];
       const distance = typeof y === "number" ? y : travel[y];
-      const media = gsap.matchMedia();
+      try {
+        registerGsap();
 
-      media.add(MOTION_QUERY.ok, () => {
-        // The readable server state is the fallback. Delaying the `from`
-        // render until ScrollTrigger actually starts means an unavailable or
-        // never-fired trigger cannot leave content hidden in production.
-        const tween = gsap.from(targets, {
-          opacity: 0,
-          y: distance,
-          immediateRender: false,
-          delay,
-          duration: duration.reveal,
-          ease: ease.entrance,
-          stagger:
-            stagger === true
-              ? staggerTokens.base
-              : typeof stagger === "number"
-                ? stagger
-                : 0,
-          scrollTrigger: { trigger: root, start, once: true },
-          // A permanent will-change keeps a compositing layer alive forever.
-          onStart: () => gsap.set(targets, { willChange: "transform, opacity" }),
-          onComplete: () => gsap.set(targets, { clearProps: "willChange" }),
+        const media = gsap.matchMedia();
+
+        media.add(MOTION_QUERY.ok, () => {
+          try {
+            // CSS hides this target before paint. `fromTo()` immediately
+            // establishes GSAP's autoAlpha/transform start state, so the
+            // trigger can only transition hidden content into its final state.
+            const tween = gsap.fromTo(
+              targets,
+              { autoAlpha: 0, y: distance },
+              {
+                autoAlpha: 1,
+                y: 0,
+                immediateRender: true,
+                delay,
+                duration: duration.reveal,
+                ease: ease.entrance,
+                stagger:
+                  stagger === true
+                    ? staggerTokens.base
+                    : typeof stagger === "number"
+                      ? stagger
+                      : 0,
+                scrollTrigger: { trigger: root, start, once: true },
+                // A permanent will-change keeps a compositing layer alive forever.
+                onStart: () => gsap.set(targets, { willChange: "transform, opacity" }),
+                onComplete: () => gsap.set(targets, { clearProps: "willChange" }),
+              },
+            );
+
+            return () => {
+              tween.scrollTrigger?.kill();
+              tween.kill();
+            };
+          } catch {
+            failOpenRevealTargets(targets);
+          }
         });
 
-        clearPreState(root);
+        // Reduced motion resolves the same CSS-hidden marker in the layout
+        // effect, before it can be painted.
+        media.add(MOTION_QUERY.reduced, () => {
+          gsap.set(targets, {
+            autoAlpha: 1,
+            y: 0,
+            clearProps: "willChange",
+          });
+        });
 
-        return () => {
-          tween.scrollTrigger?.kill();
-          tween.kill();
-        };
-      });
-
-      // Reduced motion: show the content, skip the travel. The CSS escape in
-      // globals.css already made it visible before this ran.
-      media.add(MOTION_QUERY.reduced, () => {
-        clearPreState(root);
-        gsap.set(targets, { opacity: 1, y: 0, clearProps: "willChange" });
-      });
-
-      return () => media.revert();
+        return () => media.revert();
+      } catch {
+        failOpenRevealTargets(targets);
+      }
     },
     { scope, dependencies: [stagger, y, delay, start] },
   );
@@ -134,8 +153,4 @@ export function Reveal({
       {children}
     </Tag>
   );
-}
-
-function clearPreState(root: HTMLElement) {
-  root.classList.remove("will-reveal", "reveal-stagger");
 }
