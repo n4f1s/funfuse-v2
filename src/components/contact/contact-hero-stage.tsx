@@ -7,23 +7,31 @@ import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
 /**
- * The hero stage: a deck being idly shuffled.
+ * The hero stage: a fanned hand turning itself over.
  *
- * Why it animates: it is the only thing on a contact page that can say "there
- * is somebody here" before a word has been exchanged. The gesture is somebody
- * turning a deck over in their hands while they wait for you to speak, which
- * is a different sentence from the fan on the careers page (an offer) and from
- * the table below (progress). Three card scenes on this site, three things
- * being said.
+ * Why it animates: it is the only thing a contact page can say before a word
+ * has been exchanged. Somebody is at the table, turning cards.
  *
- * It costs a loop, so it is paid for carefully: desktop only, and paused the
- * moment it leaves the viewport or the tab goes to the background. An idle
- * tween behind a scrolled-past section is exactly the cost that never shows up
- * in a screenshot.
+ * **The fan never moves.** A wave of turns runs down the hand and back up it,
+ * and every card ends the loop in the exact position and on the exact face it
+ * started. Nothing gathers, nothing re-spreads, so there is no seam at the
+ * repeat and no arrangement to drift out of place.
  *
- * The resting spread is an inline transform in the server HTML, so reduced
- * motion, no JavaScript and a failed chunk all get a fanned deck rather than a
- * pile of rectangles.
+ * That guarantee is structural rather than careful arithmetic. Three nested
+ * elements, three owners, and no two ever writing the same property:
+ *
+ *   - `.contact-hero-card` — the fan pose. An inline transform from the server,
+ *     which GSAP is never given a reason to touch.
+ *   - `[data-turn]` — the scale pop as a card comes off the table.
+ *   - `[data-flip]` — `rotationY`, the turn itself.
+ *
+ * The loop costs an infinite timeline, so it is paid for carefully: desktop
+ * only, and paused the moment it leaves the viewport or the tab goes to the
+ * background. An idle tween behind a scrolled-past section is exactly the cost
+ * that never shows up in a screenshot.
+ *
+ * Reduced motion, no JavaScript and a failed chunk all get the fan face down
+ * and still, which is the composition the loop returns to anyway.
  */
 
 /** Fractions of the stage. Every card starts life stacked on this point. */
@@ -32,15 +40,27 @@ const STAGE_ASPECT = 5 / 4;
 const CARD_H = CARD_W * (7 / 5) * STAGE_ASPECT;
 const ORIGIN = { x: 0.5, y: 0.5 };
 
-/** The spread. Percentages of a card, which is how GSAP will read them back. */
-const FAN = [
-  { x: -152, y: 24, r: -26 },
-  { x: -92, y: -6, r: -15 },
-  { x: -31, y: -22, r: -5 },
-  { x: 31, y: -22, r: 5 },
-  { x: 92, y: -6, r: 15 },
-  { x: 152, y: 24, r: 26 },
+type HeroCard = {
+  rank: string;
+  suit: "♠" | "♥" | "♦" | "♣";
+  /** Percentages of a card's own size, so the fan scales with the stage. */
+  x: number;
+  y: number;
+  rotate: number;
+};
+
+/** Left to right, which is also the order the turn travels in. */
+const HAND: HeroCard[] = [
+  { rank: "9", suit: "♥", x: -152, y: 24, rotate: -26 },
+  { rank: "10", suit: "♠", x: -92, y: -6, rotate: -15 },
+  { rank: "J", suit: "♣", x: -31, y: -22, rotate: -5 },
+  { rank: "Q", suit: "♦", x: 31, y: -22, rotate: 5 },
+  { rank: "K", suit: "♥", x: 92, y: -6, rotate: 15 },
+  { rank: "A", suit: "♠", x: 152, y: 24, rotate: 26 },
 ];
+
+/** Seconds between one card starting its turn and the next one starting. */
+const WAVE = 0.11;
 
 const pct = (value: number) => `${(value * 100).toFixed(3)}%`;
 
@@ -56,20 +76,21 @@ export function ContactHeroStage({ className }: { className?: string }) {
 
       registerGsap();
 
-      const cards = gsap.utils.toArray<HTMLElement>("[data-card]", stageEl);
-      if (cards.length !== FAN.length) return;
+      const flips = gsap.utils.toArray<HTMLElement>("[data-flip]", stageEl);
+      const turns = gsap.utils.toArray<HTMLElement>("[data-turn]", stageEl);
+      if (flips.length !== HAND.length) return;
 
       const media = gsap.matchMedia();
 
       media.add(
         {
           ok: MOTION_QUERY.ok,
-          // The shuffle is an infinite timeline. On a phone the stage is a
-          // third of the size and the loop would be a compositor layer per
-          // card for as long as the page is open.
+          // The turn is an infinite timeline. On a phone the stage is a third
+          // of the size and the loop would hold a compositor layer per card
+          // for as long as the page is open.
           desktop: MOTION_QUERY.desktop,
           // Tilt is a pointer affordance. On touch a tap reports as a hover
-          // and leaves the deck stuck mid-lean, so it is gated, not scaled.
+          // and leaves the hand stuck mid-lean, so it is gated, not scaled.
           pointer: "(hover: hover) and (pointer: fine)",
         },
         (context) => {
@@ -79,8 +100,9 @@ export function ContactHeroStage({ className }: { className?: string }) {
             pointer: boolean;
           };
 
-          // Reduced motion: the deck is already fanned. There is nothing to
-          // schedule, because a static spread is the correct end state.
+          // Reduced motion: the hand is already fanned and already face down.
+          // A still composition is the correct end state, so there is nothing
+          // to schedule.
           if (!ok) return;
 
           const cleanups: (() => void)[] = [];
@@ -89,66 +111,59 @@ export function ContactHeroStage({ className }: { className?: string }) {
             const loop = gsap.timeline({
               paused: true,
               repeat: -1,
-              repeatDelay: 1.4,
+              repeatDelay: 0.7,
             });
 
-            loop
-              // Gather. The fan closes into a squared stack.
-              .to(cards, {
-                xPercent: 0,
-                yPercent: 0,
-                rotation: (index: number) => (index - 2.5) * 1.6,
-                duration: 0.5,
-                ease: ease.out,
-                stagger: { each: 0.035, from: "edges" },
-              })
-              // Riffle. The top of the stack springs apart and snaps back,
-              // which is the gesture that says a hand is about to start.
-              .to(
-                cards,
-                {
-                  xPercent: (index: number) => (index - 2.5) * 12,
-                  rotation: (index: number) => (index - 2.5) * 3.4,
-                  duration: 0.26,
-                  ease: "power2.out",
-                  stagger: 0.022,
-                },
-                "+=0.12",
-              )
-              .to(cards, {
-                xPercent: 0,
-                rotation: (index: number) => (index - 2.5) * 1.6,
-                duration: 0.36,
-                ease: "back.out(1.9)",
-                stagger: { each: 0.02, from: "end" },
-              })
-              // Squared up, then fanned back out. The loop ends exactly where
-              // it began, so the repeat has nothing to hide.
-              .to(cards, { scale: 0.96, duration: 0.16, ease: "power2.in" })
-              .to(cards, { scale: 1, duration: 0.28, ease: "back.out(2.2)" })
-              .to(
-                cards,
-                {
-                  xPercent: (index: number) => FAN[index].x,
-                  yPercent: (index: number) => FAN[index].y,
-                  rotation: (index: number) => FAN[index].r,
-                  duration: 0.62,
-                  ease: ease.entrance,
-                  stagger: 0.045,
-                },
-                "+=0.1",
-              );
+            /**
+             * One pass of the wave.
+             *
+             * `rotationY` only ever counts upward, so a card turns the same
+             * way every time instead of unwinding the way it came. The final
+             * `set` back to zero is invisible at a multiple of 360 and leaves
+             * the timeline able to repeat from a clean start.
+             *
+             * The pop is on a different element from the turn, so a card
+             * lifting and a card turning are two tweens that never argue.
+             */
+            const pass = (to: number, from: "start" | "end", at: string) => {
+              const stagger = { each: WAVE, from } as const;
+
+              loop
+                .to(
+                  flips,
+                  { rotationY: to, duration: 0.55, ease: ease.inOut, stagger },
+                  at,
+                )
+                .to(
+                  turns,
+                  { scale: 1.07, duration: 0.26, ease: "power2.out", stagger },
+                  "<",
+                )
+                .to(
+                  turns,
+                  { scale: 1, duration: 0.32, ease: "power2.in", stagger },
+                  "<0.26",
+                );
+            };
+
+            // Down the hand face up, back up it face down. The second pass
+            // runs from the far end, so the two read as one sweep returning
+            // rather than as the same animation played twice.
+            pass(180, "start", "0");
+            pass(360, "end", "+=0.95");
+
+            loop.set(flips, { rotationY: 0 });
 
             let onScreen = false;
 
             const sync = () => {
               if (onScreen && !document.hidden) {
-                gsap.set(cards, { willChange: "transform" });
+                gsap.set(turns, { willChange: "transform" });
                 loop.play();
                 return;
               }
               loop.pause();
-              gsap.set(cards, { clearProps: "willChange" });
+              gsap.set(turns, { clearProps: "willChange" });
             };
 
             const observer = new IntersectionObserver(
@@ -222,6 +237,8 @@ export function ContactHeroStage({ className }: { className?: string }) {
   } as CSSProperties;
 
   return (
+    // Decorative in full. The heading beside it carries every fact this
+    // section has, and a screen reader reading out six playing cards is noise.
     <div
       ref={stage}
       aria-hidden
@@ -232,28 +249,70 @@ export function ContactHeroStage({ className }: { className?: string }) {
       )}
     >
       <div ref={tilt} className="absolute inset-0 [transform-style:preserve-3d]">
-        {FAN.map((pose, index) => (
+        {HAND.map((card, index) => (
           <div
-            key={index}
-            data-card
+            key={`${card.rank}${card.suit}`}
             className="contact-hero-card"
-            // The resting spread lives in the markup, so the deck is already a
-            // deck before GSAP runs, or if it never does.
+            // The fan lives in the markup and GSAP never touches it, so the
+            // hand is a hand before any script runs and cannot drift after.
             style={{
-              transform: `translate(${pose.x}%, ${pose.y}%) rotate(${pose.r}deg)`,
+              transform: `translate(${card.x}%, ${card.y}%) rotate(${card.rotate}deg)`,
               zIndex: index,
             }}
           >
-            <div className="bg-accent-strong absolute inset-0 rounded-[8%/6%] shadow-lg">
-              <span className="border-surface/30 absolute inset-[7%] rounded-[6%/4%] border" />
-              <span className="absolute inset-0 rounded-[8%/6%] bg-[radial-gradient(var(--color-brand-300)_0.9px,transparent_0.9px)] opacity-45 [background-size:8px_8px]" />
-              <span className="text-surface/85 absolute inset-0 grid place-items-center text-2xl">
-                ♠
-              </span>
+            <div data-turn className="absolute inset-0">
+              <div
+                data-flip
+                className="relative h-full w-full [transform-style:preserve-3d]"
+              >
+                {/* Back. The face the hand rests on. */}
+                <div className="bg-accent-strong absolute inset-0 rounded-[8%/6%] shadow-lg [backface-visibility:hidden]">
+                  <span className="border-surface/30 absolute inset-[7%] rounded-[6%/4%] border" />
+                  <span className="absolute inset-0 rounded-[8%/6%] bg-[radial-gradient(var(--color-brand-300)_0.9px,transparent_0.9px)] opacity-45 [background-size:8px_8px]" />
+                  <span className="text-surface/85 absolute inset-0 grid place-items-center text-2xl">
+                    ♠
+                  </span>
+                </div>
+
+                {/* Front. Only ever seen mid-wave, so it is the plainest a
+                    card can be: an index, a pip, and nothing else. */}
+                <div className="bg-surface border-line absolute inset-0 rounded-[8%/6%] border shadow-lg [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  <span className="border-line/60 absolute inset-[7%] rounded-[6%/4%] border" />
+                  <Corner card={card} />
+                  <span
+                    className={cn(
+                      "absolute inset-0 grid place-items-center text-4xl leading-none",
+                      card.suit === "♥" || card.suit === "♦"
+                        ? "text-accent"
+                        : "text-heading",
+                    )}
+                  >
+                    {card.suit}
+                  </span>
+                  <Corner card={card} flipped />
+                </div>
+              </div>
             </div>
           </div>
         ))}
       </div>
     </div>
+  );
+}
+
+function Corner({ card, flipped = false }: { card: HeroCard; flipped?: boolean }) {
+  const red = card.suit === "♥" || card.suit === "♦";
+
+  return (
+    <span
+      className={cn(
+        "absolute flex flex-col items-center gap-0.5 text-sm leading-none font-semibold",
+        flipped ? "right-[10%] bottom-[7%] rotate-180" : "top-[7%] left-[10%]",
+        red ? "text-accent" : "text-heading",
+      )}
+    >
+      <span>{card.rank}</span>
+      <span className="text-[0.75em]">{card.suit}</span>
+    </span>
   );
 }
