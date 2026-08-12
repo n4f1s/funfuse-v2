@@ -20,8 +20,14 @@ export function Section({
 }: {
   children: ReactNode;
   id?: string;
-  /** Adjacent tones give separation without drawing a box around everything. */
-  tone?: "canvas" | "surface" | "sunken";
+  /**
+   * Adjacent tones give separation without drawing a box around everything.
+   *
+   * `accent` is the brand tint, not a fourth surface. It is the one band on a
+   * page allowed to carry colour, so a second one on the same page cancels
+   * out whatever the first was emphasising.
+   */
+  tone?: "canvas" | "surface" | "sunken" | "accent";
   density?: "default" | "tight";
   /** Skip the container — for full-bleed media that manages its own gutters. */
   bleed?: boolean;
@@ -32,6 +38,7 @@ export function Section({
     canvas: "bg-canvas",
     surface: "bg-surface",
     sunken: "bg-surface-sunken",
+    accent: "bg-accent-tint",
   } as const;
 
   return (
