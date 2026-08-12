@@ -486,6 +486,19 @@
     }
   }
 
+  /* Vertical counterpart, for a rail that draws downward instead of across —
+     the game detail page's How to Play progress spine. */
+  .will-draw-y {
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .will-draw-y {
+      transform: none;
+    }
+  }
+
   /* Marks an element that GSAP will transform. Applied for the duration of
      the animation only — a permanent will-change costs a layer forever. */
   .gpu {

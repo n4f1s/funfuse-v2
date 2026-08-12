@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 
-import { Breadcrumb, GameHero, RelatedGames, ScreenshotsGallery } from "@/components/games";
+import {
+  Breadcrumb,
+  GameHero,
+  GameHowToPlay,
+  GameModes,
+  GameOverview,
+  GameRules,
+  GameTips,
+  RelatedGames,
+  ScreenshotsGallery,
+} from "@/components/games";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Section } from "@/components/ui/section";
 import {
@@ -13,6 +24,7 @@ import {
   type GameArtwork,
 } from "@/content/games";
 import { getGameArt } from "@/content/games/art";
+import { getGameDetails } from "@/content/games/details";
 import { breadcrumbSchema, gameSchema, jsonLdGraph } from "@/lib/jsonld";
 import { createMetadata } from "@/lib/seo";
 
@@ -33,10 +45,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!game) notFound();
 
   const cover = getGameArt(slug)?.cover;
+  const details = getGameDetails(slug);
 
   return createMetadata({
     title: game.title,
-    description: game.description ?? game.summary,
+    description: details?.seoDescription ?? game.description ?? game.summary,
     path: gameHref(game),
     image: cover
       ? {
@@ -55,6 +68,7 @@ export default async function GameDetailPage({ params }: Props) {
   if (!game) notFound();
 
   const art = getGameArt(slug);
+  const details = getGameDetails(slug);
   const trail = [
     { name: "Home", path: "/" },
     { name: "Games", path: "/games" },
@@ -70,24 +84,65 @@ export default async function GameDetailPage({ params }: Props) {
       (entry): entry is { game: Game; cover: GameArtwork } => entry.cover !== undefined,
     );
 
+  /**
+   * The band list, not fixed `<Section>` tones per slot. `details` is
+   * structured, optional data — a game can ship without rule groups, tips or
+   * (outside Puzzle Club) modes — and skipping a slot must not also skip its
+   * place in the canvas/surface alternation, or two adjacent bands land on
+   * the same tone. Building the list first and alternating over what actually
+   * rendered keeps every one of the 19 pages visually correct regardless of
+   * which optional fields it has, with no per-slug branching.
+   */
+  const bands: { key: string; node: ReactNode }[] = [
+    {
+      key: "hero",
+      node: (
+        <>
+          <Breadcrumb trail={trail} />
+          <GameHero game={game} cover={art?.cover} icon={art?.icon} />
+        </>
+      ),
+    },
+  ];
+
+  if (details) {
+    bands.push({ key: "overview", node: <GameOverview details={details} /> });
+    bands.push({ key: "how-to-play", node: <GameHowToPlay details={details} /> });
+
+    if (details.modes && details.modes.length > 0) {
+      bands.push({ key: "modes", node: <GameModes modes={details.modes} /> });
+    }
+    if (details.ruleGroups && details.ruleGroups.length > 0) {
+      bands.push({ key: "rules", node: <GameRules ruleGroups={details.ruleGroups} /> });
+    }
+    if (details.tips && details.tips.length > 0) {
+      bands.push({ key: "tips", node: <GameTips tips={details.tips} /> });
+    }
+  }
+
+  bands.push({
+    key: "screenshots",
+    node: <ScreenshotsGallery screenshots={art?.screenshots} title={game.title} />,
+  });
+
+  if (related.length > 0) {
+    bands.push({ key: "related", node: <RelatedGames current={game} related={related} /> });
+  }
+
   return (
     <>
-      <Section tone="canvas">
-        <Breadcrumb trail={trail} />
-        <GameHero game={game} cover={art?.cover} icon={art?.icon} />
-      </Section>
-
-      <Section tone="surface">
-        <ScreenshotsGallery screenshots={art?.screenshots} title={game.title} />
-      </Section>
-
-      {related.length > 0 ? (
-        <Section tone="canvas">
-          <RelatedGames current={game} related={related} />
+      {bands.map((band, index) => (
+        <Section key={band.key} tone={index % 2 === 0 ? "canvas" : "surface"}>
+          {band.node}
         </Section>
-      ) : null}
+      ))}
 
-      <JsonLd data={jsonLdGraph(gameSchema(game), breadcrumbSchema(trail))} />
+      <JsonLd
+        data={jsonLdGraph(
+          gameSchema(game, details?.seoDescription),
+          breadcrumbSchema(trail),
+        )}
+      />
     </>
   );
 }

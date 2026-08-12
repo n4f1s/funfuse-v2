@@ -61,8 +61,13 @@ export function websiteSchema(): Thing {
 /**
  * A single game. `SoftwareApplication` with the Game category is what Google
  * documents for mobile titles; `VideoGame` alone loses the app fields.
+ *
+ * `description` defaults to the catalogue's own fallback chain, but a caller
+ * with richer content — `details.seoDescription` from
+ * `src/content/games/details.ts` — can pass it in so the graph and the page
+ * metadata never disagree about which sentence describes the game.
  */
-export function gameSchema(game: Game): Thing {
+export function gameSchema(game: Game, description?: string): Thing {
   const playUrl = playStoreUrl(game);
 
   return {
@@ -71,7 +76,7 @@ export function gameSchema(game: Game): Thing {
     name: game.title,
     alternateName: game.nativeTitle,
     url: absoluteUrl(gameHref(game)),
-    description: game.description ?? game.summary,
+    description: description ?? game.description ?? game.summary,
     applicationCategory: "GameApplication",
     applicationSubCategory: categoryLabels[game.category],
     operatingSystem: game.androidPackageId ? "Android" : undefined,

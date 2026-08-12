@@ -72,7 +72,7 @@ export function Closing() {
       <div
         aria-hidden
         // Widths track the `cutout` sizes preset. Change both together.
-        className="pointer-events-none absolute -bottom-6 right-4 hidden lg:block lg:w-72 xl:w-[22rem]"
+        className="pointer-events-none absolute bottom-2 right-4 hidden lg:block lg:w-72 xl:w-[22rem]"
       >
         {/* Drifts up as the footer approaches, so the pair rise out of the
             bottom edge rather than sitting parked on it. */}

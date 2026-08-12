@@ -81,6 +81,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -107,6 +108,7 @@ funfuse-v2
 ├─ README.md
 ├─ docs
 │  ├─ design-system.md
+│  ├─ game-content-sources.md
 │  └─ seo-migration.md
 ├─ eslint.config.mjs
 ├─ next.config.ts
@@ -164,13 +166,23 @@ funfuse-v2
 │  │     │  └─ icon.webp
 │  │     ├─ belote-francaise
 │  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
+│  │     │  ├─ icon.webp
+│  │     │  ├─ screenshots-1.webp
+│  │     │  ├─ screenshots-2.webp
+│  │     │  ├─ screenshots-3.webp
+│  │     │  ├─ screenshots-4.webp
+│  │     │  └─ screenshots-5.webp
 │  │     ├─ bhabhi-thulla
 │  │     │  ├─ cover.webp
 │  │     │  └─ icon.webp
 │  │     ├─ callbreak-offline
 │  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
+│  │     │  ├─ icon.webp
+│  │     │  ├─ screenshots-1.webp
+│  │     │  ├─ screenshots-2.webp
+│  │     │  ├─ screenshots-3.webp
+│  │     │  ├─ screenshots-4.webp
+│  │     │  └─ screenshots-5.webp
 │  │     ├─ capsa-susun
 │  │     │  ├─ cover.webp
 │  │     │  └─ icon.webp
@@ -226,12 +238,19 @@ funfuse-v2
 │  │  ├─ games
 │  │  │  ├─ breadcrumb.tsx
 │  │  │  ├─ game-card.tsx
+│  │  │  ├─ game-facts.tsx
 │  │  │  ├─ game-grid.tsx
 │  │  │  ├─ game-hero.tsx
+│  │  │  ├─ game-modes.tsx
+│  │  │  ├─ game-overview.tsx
+│  │  │  ├─ game-rules.tsx
+│  │  │  ├─ game-tips.tsx
+│  │  │  ├─ how-to-play.tsx
 │  │  │  ├─ index.ts
 │  │  │  ├─ listing-intro.tsx
 │  │  │  ├─ related-games.tsx
-│  │  │  └─ screenshots-gallery.tsx
+│  │  │  ├─ screenshots-gallery.tsx
+│  │  │  └─ step-progress.tsx
 │  │  ├─ home
 │  │  │  ├─ catalogue.tsx
 │  │  │  ├─ closing.tsx
@@ -276,6 +295,7 @@ funfuse-v2
 │  ├─ content
 │  │  └─ games
 │  │     ├─ art.ts
+│  │     ├─ details.ts
 │  │     ├─ games.ts
 │  │     ├─ index.ts
 │  │     └─ types.ts

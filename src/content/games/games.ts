@@ -6,9 +6,11 @@ import type { Game } from "./types";
  * Sourced from the Google Play developer listing and the current
  * funfusegames.com project pages. Facts only:
  *   - `title` / `androidPackageId` come from the store listing.
- *   - `summary` describes the traditional game, which is public knowledge.
- *   - `description` stays `null` until the real store copy is imported. Do not
- *     write marketing copy here from imagination.
+ *   - `summary` is a compact factual synopsis for listings and the hero.
+ *   - Rich editorial descriptions / rules live in `./details.ts` so this file
+ *     stays lightweight for routing, sitemap and next.config consumers.
+ *   - `description` remains a legacy/optional field for now; do not duplicate
+ *     the structured long-form content from `details.ts` into it.
  *
  * Slugs are the public URL. Eight of these titles already have an indexed page
  * at `/projects/<slug>/` on the WordPress site, and the new site serves the
@@ -39,7 +41,7 @@ export const games: readonly Game[] = [
     slug: "hazari-grand",
     title: "Hazari Grand - 1000 Points Game",
     summary:
-      "Hazari is a Bangladeshi and Indian card game in which thirteen cards are split into five hands and scored toward a target of 1000 points.",
+      "Hazari is a four-player South Asian card game where thirteen cards are arranged into groups of 3, 3, 3 and 4, then compared and scored toward 1000 points.",
     description: null,
     category: "card",
     region: "bangladesh",
@@ -61,7 +63,7 @@ export const games: readonly Game[] = [
     slug: "3-2-5-offline-fun-card-game",
     title: "3 2 5 Offline Fun Card Game",
     summary:
-      "Also known as Do Teen Panch, this three-player Indian trick-taking game deals uneven hands with targets of three, two and five tricks.",
+      "Also known as Teen Do Panch, this three-player South Asian trick-taking game gives each player ten cards but rotating quotas of five, three and two tricks.",
     description: null,
     category: "card",
     region: "india",
@@ -106,7 +108,7 @@ export const games: readonly Game[] = [
     slug: "puzzle-twist-game",
     title: "Puzzle Club Offline",
     summary:
-      "A block-and-tile puzzle collection played against the clock, with progressively tighter boards as levels advance.",
+      "A puzzle collection featuring 2048, Tic Tac Toe, Dice Down, falling-block play, Block Puzzle and SOS.",
     description: null,
     category: "puzzle",
     region: "international",
@@ -172,7 +174,7 @@ export const games: readonly Game[] = [
     slug: "okey-club",
     title: "Okey Club",
     summary:
-      "Okey is a Turkish tile game for four players, similar to rummy, played with 106 numbered tiles and a joker chosen at the start of each hand.",
+      "Okey is a Turkish rummy-style tile game, supported for two to four players in the app, using 106 tiles and an indicator-defined joker.",
     description: null,
     category: "board",
     region: "turkey",
@@ -194,7 +196,7 @@ export const games: readonly Game[] = [
     slug: "mau-mau-offline",
     title: "Mau Mau Offline",
     summary:
-      "Mau-Mau is a German shedding game in which players match the rank or suit of the discard pile and special cards force draws, skips and suit changes.",
+      "Mau-Mau is a shedding game where players normally match the rank or suit of the discard pile, with additional special-card effects depending on the ruleset.",
     description: null,
     category: "card",
     region: "germany",
@@ -228,7 +230,7 @@ export const games: readonly Game[] = [
     slug: "bhabhi-thulla-card-game",
     title: "Bhabhi Thulla Card Game",
     summary:
-      "Bhabhi, also called Thulla, is an Indian shedding game where failing to follow suit forces a player to pick up the whole pile.",
+      "Bhabhi, also called Thulla or Getaway, is a South Asian shedding game where an off-suit Thulla can force the highest card of the led suit to pick up the trick.",
     description: null,
     category: "card",
     region: "india",
