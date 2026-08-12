@@ -566,6 +566,56 @@
     }
   }
 
+  /* Careers — the open roles switcher.
+     ------------------------------------------------------------------------
+     Every role's panel is rendered on the server and stacked into one grid
+     cell, so the container is always as tall as the longest role. Switching is
+     then a crossfade with no layout in it: nothing below the section moves
+     when a tab is pressed, and no height is ever animated.
+
+     `visibility` rather than opacity alone, so a closed panel is not a
+     rasterized layer nobody can see. GSAP's autoAlpha writes both properties,
+     so it can still fade one in over the top of this. */
+  .role-stack {
+    display: grid;
+  }
+
+  .role-stack > * {
+    grid-area: 1 / 1;
+    /* Top-aligned, not stretched. The cell is as tall as the longest role, and
+       a shorter one stretched to fill it would be a card with a hole in the
+       middle. Left at its own height it is simply a shorter card, and the slack
+       falls below it where it reads as section spacing. */
+    align-self: start;
+  }
+
+  .role-panel[data-active="false"] {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  /* Without scripting the rail cannot select anything, so it stands down and
+     every role is printed in full. This has to be CSS rather than a fallback
+     in the island, because the island is the thing that may not have run. */
+  @media (scripting: none) {
+    .role-rail {
+      display: none;
+    }
+
+    .role-stack {
+      display: block;
+    }
+
+    .role-panel[data-active="false"] {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .role-panel + .role-panel {
+      margin-top: 1.5rem;
+    }
+  }
+
   /* Hairline that fades at both ends — reads as a seam, not a table border. */
   .rule-soft {
     height: 1px;

@@ -24,7 +24,7 @@ export default function CareersPage() {
 
   return (
     <>
-      <CareersHero hero={careersContent.hero} />
+      <CareersHero hero={careersContent.hero} jobs={careersContent.jobs} />
       <CareerBenefits
         title={careersContent.benefits.title}
         groups={careersContent.benefits.groups}
