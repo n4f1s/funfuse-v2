@@ -42,7 +42,7 @@ export type GameArtwork = {
 };
 
 export type GameArt = {
-  /** 512x512 store icon. */
+  /** 600x600 store icon. */
   icon?: GameArtwork;
   /** Vertical key art used in listings (4:5). */
   cover?: GameArtwork;

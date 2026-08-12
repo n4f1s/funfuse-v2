@@ -34,26 +34,25 @@ export function GameHero({
   return (
     <div className="lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12">
       <Reveal as="div" y="lg" className="lg:col-span-5">
-        <div className="flex items-center gap-4">
-          <Media
-            src={icon?.src}
-            {...iconAlt}
-            aspect="icon"
-            sizes="icon"
-            rounded="xl"
-            placeholderLabel="Icon"
-            className="w-16 shrink-0 sm:w-20"
-          />
-          <div className="min-w-0">
-            <h1 className="text-h1 text-heading font-bold tracking-tightest">
-              {game.title}
-            </h1>
-            {game.nativeTitle ? (
-              // Bricolage Grotesque has no Arabic or Cyrillic coverage, so a
-              // native title always drops to Geist.
-              <p className="text-muted mt-1 font-sans text-lg">{game.nativeTitle}</p>
-            ) : null}
-          </div>
+        <Media
+          src={icon?.src}
+          {...iconAlt}
+          aspect="icon"
+          sizes="icon"
+          rounded="xl"
+          placeholderLabel="Icon"
+          className="plate w-14 sm:w-16"
+        />
+
+        <div className="mt-4 min-w-0">
+          <h1 className="text-h1 text-heading font-bold tracking-tightest">
+            {game.title}
+          </h1>
+          {game.nativeTitle ? (
+            // Bricolage Grotesque has no Arabic or Cyrillic coverage, so a
+            // native title always drops to Geist.
+            <p className="text-muted mt-1 font-sans text-lg">{game.nativeTitle}</p>
+          ) : null}
         </div>
 
         <p className="text-faint mt-5 text-sm">
