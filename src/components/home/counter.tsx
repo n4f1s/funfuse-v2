@@ -15,13 +15,24 @@ import { duration, ease } from "@/lib/motion/tokens";
  * before any JavaScript runs. That covers no-JS, reduced motion, and anything
  * that reads the page rather than watching it. The tween only replaces the text
  * once it knows the element has not been seen yet.
+ *
+ * The unit sits in its own element rather than in the counted string: it is set
+ * smaller than the digits, and keeping it out of the tween means the digits are
+ * the only thing being rewritten sixty times a second.
  */
 export function Counter({
   value,
   suffix = "",
+  countDecimals = 0,
 }: {
   value: number;
   suffix?: string;
+  /**
+   * Decimal places to show *while counting*. A figure like 3 has only four
+   * integer states between zero and itself, so counting it whole reads as a
+   * stutter. Counting it to one decimal is smooth and still lands on `value`.
+   */
+  countDecimals?: number;
 }) {
   const node = useRef<HTMLSpanElement>(null);
 
@@ -32,6 +43,10 @@ export function Counter({
       const element = node.current;
       if (!element) return;
 
+      const settled = `${value}`;
+      const running = (n: number) =>
+        countDecimals > 0 ? n.toFixed(countDecimals) : `${Math.round(n)}`;
+
       const media = gsap.matchMedia();
 
       media.add(MOTION_QUERY.ok, () => {
@@ -39,7 +54,7 @@ export function Counter({
         // so resetting the text is invisible. If it is not, the reset has to
         // happen now or the number would show its answer and then rewind to
         // zero the moment it scrolled into view.
-        element.textContent = `0${suffix}`;
+        element.textContent = running(0);
 
         const count = { current: 0 };
 
@@ -48,7 +63,11 @@ export function Counter({
           duration: duration.reveal * 2,
           ease: ease.entrance,
           onUpdate: () => {
-            element.textContent = `${Math.round(count.current)}${suffix}`;
+            element.textContent = running(count.current);
+          },
+          // A count that ends on "3.0" has not finished counting.
+          onComplete: () => {
+            element.textContent = settled;
           },
           scrollTrigger: { trigger: element, start: "top 88%", once: true },
         });
@@ -56,20 +75,26 @@ export function Counter({
         return () => {
           tween.scrollTrigger?.kill();
           tween.kill();
-          element.textContent = `${value}${suffix}`;
+          element.textContent = settled;
         };
       });
 
       return () => media.revert();
     },
-    { scope: node, dependencies: [value, suffix] },
+    { scope: node, dependencies: [value, countDecimals] },
   );
 
-  // `tabular` so the digits do not jostle the label as the count runs.
+  // `tabular` so the digits do not jostle the unit as the count runs.
   return (
-    <span ref={node} className="tabular">
-      {value}
-      {suffix}
-    </span>
+    <>
+      <span ref={node} className="tabular">
+        {value}
+      </span>
+      {suffix ? (
+        <span className="align-baseline text-[0.55em] tracking-tight">
+          {suffix}
+        </span>
+      ) : null}
+    </>
   );
 }

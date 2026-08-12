@@ -1,4 +1,4 @@
-import cardPlayer from "@/assets/decorative/characters/card-player-young-man.png";
+import whatWeDoIllustration from "@/assets/decorative/illustrations/what-we-do-card-game.png";
 import pencil from "@/assets/decorative/props/pencil.png";
 import pokerRummyArt from "@/assets/games/poker-rummy/cover.webp";
 import { Media } from "@/components/media";
@@ -56,7 +56,7 @@ export function Craft() {
                 Bottom-anchored so it sits on the baseline of the sticky column
                 rather than floating in the middle of it. */}
             <Media
-              src={cardPlayer}
+              src={whatWeDoIllustration}
               decorative
               aspect="intrinsic"
               sizes="cutout"

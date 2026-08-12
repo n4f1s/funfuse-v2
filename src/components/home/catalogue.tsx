@@ -58,13 +58,21 @@ export function Catalogue() {
           </Button>
         </Reveal>
 
+        {/* Drives rather than floats. It is the one prop on the page with a
+            front, and it is drawn facing left, so it travels right to left as
+            the section passes. The bob doubles as suspension over a bad road,
+            and the three degrees of tilt come with it.
+
+            Travel is bounded by its lane: the paragraph ends around 576px and
+            the button starts around 1100px, so 90px each way keeps the jeepney
+            clear of both at every desktop width. */}
         <Prop
           src={jeepney}
           sizes="(min-width: 1280px) 240px, 200px"
-          drift={-120}
-          spin={-8}
-          bob={false}
-          className="hidden w-50 lg:top-1 lg:left-[52%] lg:block xl:w-60"
+          axis="x"
+          drift={-180}
+          spin={3}
+          className="hidden w-50 lg:top-1 lg:left-[55%] lg:block xl:w-60"
         />
       </div>
 

@@ -2,35 +2,38 @@ import gem from "@/assets/decorative/props/pink-crystal-gem.png";
 import bolt from "@/assets/decorative/props/yellow-lightning-bolt.png";
 import { Reveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
-import { getAllGames, getGameRegions } from "@/content/games";
+import { getAllGames } from "@/content/games";
 
 import { Counter } from "./counter";
+import { FigureRail, FigureRule } from "./figure-rail";
 import { Prop } from "./prop";
 
 /**
- * What the studio is, and the only three figures on the page.
+ * What the studio is, and the three figures on the page.
  *
- * Every number here is either counted from `src/content/games` at build time or
- * already published on funfusegames.com. Nothing about downloads, ratings,
- * awards or players appears anywhere on this site: the live WordPress counters
- * read zero, and a figure we cannot stand behind is worse than no figure.
+ * The catalogue count is counted from `src/content/games` at build time, so it
+ * cannot drift from the games we actually ship. Downloads and active users are
+ * supplied by the studio: they are not derivable from anything in this repo and
+ * nothing here can verify them, so they are recorded in one place, here, and
+ * updated deliberately. Do not add a figure we cannot stand behind.
  */
 
 export function Studio() {
-  const figures = [
+  const figures: {
+    value: number;
+    suffix: string;
+    label: string;
+    countDecimals?: number;
+  }[] = [
     {
       value: getAllGames().length,
       suffix: "",
-      label: "titles live on Google Play",
+      label: "Published games",
     },
-    {
-      value: getGameRegions().length,
-      suffix: "",
-      label: "card and board traditions",
-    },
-    // The only figure not counted from our own data. It restates
-    // "a global team of over 10 seasoned professionals" from funfusegames.com.
-    { value: 10, suffix: "+", label: "people, working across several countries" },
+    // Counted to one decimal in flight. Whole, it is a four-step count that
+    // reads as a stutter next to a figure in the hundreds.
+    { value: 3, suffix: "M+", countDecimals: 1, label: "Total downloads" },
+    { value: 500, suffix: "K+", label: "Active users" },
   ];
 
   return (
@@ -82,28 +85,46 @@ export function Studio() {
       </div>
 
       <div className="relative">
-        {/* Reversed rather than duplicated: the value reads on top, while the
-            DOM keeps term before description so a screen reader gets
-            "titles live on Google Play, 19" once, not the label twice. */}
-        <Reveal
-          stagger
-          as="dl"
-          className="mt-12 grid gap-9 sm:grid-cols-3 sm:gap-8 lg:mt-16"
-        >
-          {figures.map((figure) => (
-            <div
-              key={figure.label}
-              className="border-line flex flex-col-reverse border-t pt-6"
-            >
-              <dt className="text-muted mt-4 max-w-56 text-sm">
-                {figure.label}
-              </dt>
-              <dd className="font-display text-h1 text-accent leading-none font-bold tracking-tightest">
-                <Counter value={figure.value} suffix={figure.suffix} />
-              </dd>
-            </div>
-          ))}
-        </Reveal>
+        {/* Four columns on desktop: the row titles itself in the first one, so
+            the figures read as an answer to it rather than as three loose
+            numbers. Below lg the title takes the full width and the figures
+            share a row; below sm they stack, because "500K+" at display size
+            does not survive a third of a phone. */}
+        <FigureRail className="mt-12 grid gap-y-10 lg:mt-16 lg:grid-cols-4 lg:gap-x-8">
+          <div data-figure className="will-reveal relative pt-6">
+            <FigureRule tone="accent" />
+            <p className="font-display text-h2 text-heading font-semibold tracking-tightest">
+              Numbers
+              <br />
+              <span className="text-accent ">speak.</span>
+            </p>
+          </div>
+
+          {/* Reversed rather than duplicated: the value reads on top, while the
+              DOM keeps term before description so a screen reader gets
+              "Completed games, 19" once, not the label twice. */}
+          <dl className="grid gap-y-10 sm:grid-cols-3 sm:gap-x-8 lg:col-span-3">
+            {figures.map((figure) => (
+              <div
+                key={figure.label}
+                data-figure
+                className="will-reveal relative flex flex-col-reverse pt-6"
+              >
+                <FigureRule />
+                <dt className="text-muted mt-4 max-w-56 text-sm">
+                  {figure.label}
+                </dt>
+                <dd className="font-display text-h1 text-accent leading-none font-bold tracking-tightest">
+                  <Counter
+                    value={figure.value}
+                    suffix={figure.suffix}
+                    countDecimals={figure.countDecimals}
+                  />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </FigureRail>
 
         {/* Bottom right of the figures block. The third label is capped at
             14rem, so the corner beside it is clear at every desktop width. */}

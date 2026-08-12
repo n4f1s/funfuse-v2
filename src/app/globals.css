@@ -472,6 +472,20 @@
     }
   }
 
+  /* Same idea for a rule that draws itself in: the collapsed state has to be
+     in the first paint, not written by JS after it. The escape leaves the
+     rule fully drawn when the animation will never run. */
+  .will-draw {
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .will-draw {
+      transform: none;
+    }
+  }
+
   /* Marks an element that GSAP will transform. Applied for the duration of
      the animation only — a permanent will-change costs a layer forever. */
   .gpu {

@@ -22,6 +22,7 @@ export function Prop({
   className,
   sizes = "prop",
   drift,
+  axis,
   spin,
   bob,
 }: {
@@ -30,11 +31,18 @@ export function Prop({
   className?: string;
   sizes?: SizePreset | (string & {});
   drift?: number;
+  axis?: "x" | "y";
   spin?: number;
   bob?: boolean;
 }) {
   return (
-    <FloatingProp className={className} drift={drift} spin={spin} bob={bob}>
+    <FloatingProp
+      className={className}
+      drift={drift}
+      axis={axis}
+      spin={spin}
+      bob={bob}
+    >
       <Media
         src={src}
         decorative

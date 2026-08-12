@@ -28,8 +28,20 @@ import { ease } from "@/lib/motion/tokens";
 export function FloatingProp({
   children,
   className,
-  /** Total scrubbed travel in px across the pass. Negative rises. */
+  /**
+   * Total scrubbed travel in px across the pass. Negative goes toward the start
+   * of the axis: up on `y`, left on `x`.
+   */
   drift = -110,
+  /**
+   * Which way `drift` runs.
+   *
+   * `y` is the default and reads as depth: the prop hangs behind the page and
+   * the page slides past it. `x` is for objects that should read as *going
+   * somewhere*, and it only makes sense on a prop that has a front. The jeepney
+   * is drawn facing left, so it drives left.
+   */
+  axis = "y",
   /** Total scrubbed rotation in degrees across the pass. */
   spin = 14,
   /** Idle bob. Turn it off where the prop sits close to running text. */
@@ -38,6 +50,7 @@ export function FloatingProp({
   children: ReactNode;
   className?: string;
   drift?: number;
+  axis?: "x" | "y";
   spin?: number;
   bob?: boolean;
 }) {
@@ -66,11 +79,13 @@ export function FloatingProp({
           // It is decoration, so there is nothing to communicate by moving it.
           if (!ok) return;
 
+          // The bob already owns `y` on the inner node, so an `x` prop and a
+          // `y` prop never end up writing the same property on the same element.
           const travel = gsap.fromTo(
             root,
-            { y: -drift / 2, rotate: -spin / 2 },
+            { [axis]: -drift / 2, rotate: -spin / 2 },
             {
-              y: drift / 2,
+              [axis]: drift / 2,
               rotate: spin / 2,
               ease: ease.linear,
               scrollTrigger: {
@@ -104,7 +119,7 @@ export function FloatingProp({
 
       return () => media.revert();
     },
-    { scope, dependencies: [drift, spin, bob] },
+    { scope, dependencies: [drift, axis, spin, bob] },
   );
 
   return (

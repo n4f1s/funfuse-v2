@@ -75,6 +75,9 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
+
+
 ```
 funfuse-v2
 ├─ .agents
@@ -134,32 +137,60 @@ funfuse-v2
 │  │  │  │  ├─ cheerful-boys-pair.png
 │  │  │  │  ├─ fantasy-boy-fire-staff.png
 │  │  │  │  └─ traditional-dress-woman.png
+│  │  │  ├─ illustrations
+│  │  │  │  └─ what-we-do-card-game.png
 │  │  │  └─ props
+│  │  │     ├─ bomb.png
+│  │  │     ├─ circular-logo.png
 │  │  │     ├─ orange-jeepney.png
 │  │  │     ├─ pencil.png
 │  │  │     ├─ pink-crystal-gem.png
 │  │  │     └─ yellow-lightning-bolt.png
 │  │  └─ games
+│  │     ├─ 3-2-5-offline
+│  │     │  └─ cover.webp
+│  │     ├─ belote-francaise
+│  │     │  └─ cover.webp
 │  │     ├─ callbreak-offline
+│  │     │  └─ cover.webp
+│  │     ├─ capsa-susun
 │  │     │  └─ cover.webp
 │  │     ├─ gin-rummy
 │  │     │  └─ cover.webp
 │  │     ├─ hazari-grand
 │  │     │  ├─ cover.webp
 │  │     │  └─ logo.webp
-│  │     ├─ indian-rummy
+│  │     ├─ lucky-9
 │  │     │  └─ cover.webp
-│  │     ├─ poker-full-house
+│  │     ├─ ludo-challenge
 │  │     │  └─ cover.webp
-│  │     ├─ poker-rummy
+│  │     ├─ okey-club
 │  │     │  └─ cover.webp
-│  │     ├─ puzzle-twist
+│  │     ├─ pusoy
+│  │     │  └─ cover.webp
+│  │     ├─ pusoy-dos
 │  │     │  └─ cover.webp
 │  │     ├─ tarneeb
 │  │     │  └─ cover.webp
-│  │     └─ tongits-legend
+│  │     ├─ tien-len
+│  │     │  └─ cover.webp
+│  │     └─ tongits-club-offline
 │  │        └─ cover.webp
 │  ├─ components
+│  │  ├─ home
+│  │  │  ├─ catalogue.tsx
+│  │  │  ├─ closing.tsx
+│  │  │  ├─ counter.tsx
+│  │  │  ├─ craft.tsx
+│  │  │  ├─ featured-games.tsx
+│  │  │  ├─ figure-rail.tsx
+│  │  │  ├─ game-link.ts
+│  │  │  ├─ hand.tsx
+│  │  │  ├─ hero-stage.tsx
+│  │  │  ├─ hero.tsx
+│  │  │  ├─ index.ts
+│  │  │  ├─ prop.tsx
+│  │  │  └─ studio.tsx
 │  │  ├─ layout
 │  │  │  ├─ index.ts
 │  │  │  ├─ mobile-nav.tsx
@@ -173,7 +204,9 @@ funfuse-v2
 │  │  │  ├─ media.tsx
 │  │  │  └─ sizes.ts
 │  │  ├─ motion
+│  │  │  ├─ floating-prop.tsx
 │  │  │  ├─ index.ts
+│  │  │  ├─ parallax.tsx
 │  │  │  └─ reveal.tsx
 │  │  ├─ seo
 │  │  │  └─ json-ld.tsx
@@ -187,6 +220,7 @@ funfuse-v2
 │  │  └─ site.ts
 │  ├─ content
 │  │  └─ games
+│  │     ├─ art.ts
 │  │     ├─ games.ts
 │  │     ├─ index.ts
 │  │     └─ types.ts
