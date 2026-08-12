@@ -17,12 +17,12 @@ export function SiteHeader() {
   return (
     <header className="bg-canvas/80 border-line sticky top-0 z-50 border-b backdrop-blur-md">
       <Container className="flex h-(--header-height) items-center justify-between gap-6">
-        <Wordmark />
+        <Wordmark priority="eager" />
 
         <SiteNav className="hidden lg:block" />
 
         <div className="flex items-center gap-2">
-          <Button href="/contact-us" variant="secondary" size="sm" className="hidden sm:inline-flex">
+          <Button href="/contact-us" size="sm" className="hidden sm:inline-flex">
             Contact us
           </Button>
           <MobileNav className="lg:hidden" />

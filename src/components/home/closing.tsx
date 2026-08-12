@@ -9,9 +9,8 @@ import { site } from "@/config/site";
 /**
  * The sign-off.
  *
- * The only place the full brand lockup appears. The header keeps its
- * typographic wordmark, which stays legible at 20px in a way this mark does
- * not, so the two do not compete.
+ * The largest rendering of the brand lockup on the site, distinct from the
+ * compact size the header and footer use via `<Wordmark>`.
  *
  * Both destinations are real today. No link on this page points at a route that
  * has not shipped.

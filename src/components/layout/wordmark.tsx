@@ -1,33 +1,42 @@
 import Link from "next/link";
 
+import logo from "@/assets/brand/funfuse-games-logo.webp";
+import { Media, type MediaPriority } from "@/components/media";
 import { cn } from "@/lib/cn";
 
 /**
- * Typographic wordmark.
+ * The official brand lockup, linked to home. Shared by the header and footer
+ * so the mark only needs to be swapped in one place.
  *
- * Placeholder for the real logo: when the brand supplies an SVG, swap the span
- * for it here and every surface updates. Set as display type rather than a
- * hand-drawn mark so it never looks like a stand-in.
+ * Sized by width; height follows from the asset's own aspect ratio. The link
+ * carries the accessible name, so the image itself is decorative.
  */
 export function Wordmark({
   className,
   href = "/",
+  priority = "lazy",
 }: {
   className?: string;
   href?: string;
+  priority?: MediaPriority;
 }) {
   return (
     <Link
       href={href}
       aria-label="FunFuse Games, home"
-      className={cn(
-        "font-display text-heading text-xl leading-none font-bold tracking-tightest",
-        "transition-opacity duration-[var(--duration-hover)] ease-out hover:opacity-70",
-        className,
-      )}
+      className="inline-flex transition-opacity duration-(--duration-hover) ease-out hover:opacity-70"
     >
-      FunFuse
-      <span className="text-accent">.</span>
+      <Media
+        src={logo}
+        decorative
+        aspect="intrinsic"
+        sizes="lockup"
+        fit="contain"
+        tone="none"
+        rounded="none"
+        priority={priority}
+        className={cn("w-28", className)}
+      />
     </Link>
   );
 }

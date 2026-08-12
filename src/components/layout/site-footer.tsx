@@ -19,7 +19,7 @@ export function SiteFooter() {
       <Container className="py-14 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-24">
           <div className="max-w-sm">
-            <Wordmark className="text-2xl" />
+            <Wordmark className="w-40" />
             <p className="text-muted mt-4 text-sm">{site.description}</p>
             <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
               {socialLinks.map((social) => (
