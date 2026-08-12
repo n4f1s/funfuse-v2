@@ -3,6 +3,7 @@
 import { useRef, type CSSProperties } from "react";
 
 import { cn } from "@/lib/cn";
+import { celebrate } from "@/lib/motion/confetti";
 import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
@@ -56,27 +57,6 @@ import {
 /** Must match the `md:` variants here and the breakpoint in globals.css. */
 const WIDE_QUERY = "(min-width: 48rem)";
 
-/**
- * The celebration. Fixed rather than random so the burst is identical on the
- * server and the client, and so it can be tuned instead of rerolled. Units are
- * percentages of a confetti chip, which is itself sized in `cqw`, so the burst
- * scales with the board.
- */
-const CONFETTI = [
-  { x: -420, y: -300, r: -140 },
-  { x: -270, y: -430, r: 95 },
-  { x: -140, y: -230, r: -60 },
-  { x: -60, y: -470, r: 170 },
-  { x: 40, y: -330, r: -110 },
-  { x: 130, y: -480, r: 60 },
-  { x: 240, y: -260, r: -170 },
-  { x: 350, y: -400, r: 120 },
-  { x: 460, y: -230, r: -80 },
-  { x: -350, y: -150, r: 150 },
-  { x: 200, y: -140, r: -40 },
-  { x: 0, y: -560, r: 200 },
-] as const;
-
 const pct = (value: number) => `${(value * 100).toFixed(3)}%`;
 
 type CardRefs = { root: HTMLElement; flip: HTMLElement; glow: HTMLElement };
@@ -127,7 +107,6 @@ function buildRound(root: HTMLElement, layout: Layout): Round {
   const banner = pick("[data-banner]");
   const bannerText = pick("[data-banner-text]");
   const deckBase = pick("[data-deck]");
-  const confetti = gsap.utils.toArray<HTMLElement>("[data-confetti] > *", root);
 
   const all = cards.map((entry) => card(entry.id).root);
   const vars = (pose: Pose) => toVars(layout, pose);
@@ -153,7 +132,6 @@ function buildRound(root: HTMLElement, layout: Layout): Round {
 
     gsap.set(deckBase, { autoAlpha: 1 });
     gsap.set(banner, { autoAlpha: 0, scale: 0.94, y: 6 });
-    gsap.set(confetti, { autoAlpha: 0, xPercent: 0, yPercent: 0, rotation: 0 });
   };
 
   reset();
@@ -412,32 +390,26 @@ function buildRound(root: HTMLElement, layout: Layout): Round {
     at = landed + 0.4;
   });
 
-  // ---- A small celebration ------------------------------------------------
-  const burstAt = at - 0.3;
-  timeline
-    .to(confetti, { autoAlpha: 1, duration: 0.1 }, burstAt)
-    .to(
-      confetti,
-      {
-        xPercent: (index: number) => CONFETTI[index % CONFETTI.length].x,
-        yPercent: (index: number) => CONFETTI[index % CONFETTI.length].y,
-        rotation: (index: number) => CONFETTI[index % CONFETTI.length].r,
-        duration: 0.9,
-        ease: "power2.out",
-      },
-      burstAt,
-    )
-    .to(
-      confetti,
-      {
-        yPercent: (index: number) => CONFETTI[index % CONFETTI.length].y + 320,
-        rotation: (index: number) => CONFETTI[index % CONFETTI.length].r * 1.6,
-        duration: 0.8,
-        ease: "power1.in",
-      },
-      burstAt + 0.9,
-    )
-    .to(confetti, { autoAlpha: 0, duration: 0.4, ease: "none" }, burstAt + 1.1);
+  // ---- The celebration ----------------------------------------------------
+  // Real confetti, from canvas-confetti, fired out of the burst anchor so the
+  // paper comes off the table rather than out of the middle of the window.
+  //
+  // This used to be twelve divs on fixed paths. Handing it to the library that
+  // is already in the bundle for the contact form buys a far bigger burst for
+  // less code, and the two celebrations on the site now look like the same
+  // studio said them.
+  //
+  // Safe to fire on every repeat: the timeline only runs while the section is
+  // on screen and the tab is in front, so this cannot go off behind a
+  // scrolled-past page, and reduced motion never builds the timeline at all.
+  timeline.call(
+    () => {
+      const anchor = root.querySelector<HTMLElement>("[data-burst]");
+      if (anchor) celebrate(anchor, "huge");
+    },
+    undefined,
+    at - 0.3,
+  );
 
   // ---- Back to a deck -----------------------------------------------------
   // The loop ends exactly where it began, so the repeat has nothing to hide.
@@ -663,23 +635,14 @@ export function TrickTableBoard({ className }: { className?: string }) {
           </div>
         </div>
 
+        {/* Nothing is drawn here. It is a zero-size marker at the burst point,
+            carrying the same layout geometry as everything else on the board,
+            and the celebration reads its position off the screen. */}
         <div
-          data-confetti
+          data-burst
           style={anchor(COMPACT.burst, WIDE.burst)}
           className="trick-anchor"
-        >
-          {CONFETTI.map((piece, index) => (
-            <span
-              key={index}
-              className={cn(
-                "absolute h-[2.6cqw] w-[1.7cqw] rounded-[0.5cqw] opacity-0 md:h-[1.3cqw] md:w-[0.85cqw] md:rounded-[0.25cqw]",
-                ["bg-accent", "bg-brand-300", "bg-brand-200", "bg-accent-strong"][
-                  index % 4
-                ],
-              )}
-            />
-          ))}
-        </div>
+        />
       </div>
     </div>
   );

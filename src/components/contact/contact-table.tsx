@@ -3,6 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 
 import { cn } from "@/lib/cn";
+import { celebrate } from "@/lib/motion/confetti";
 import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
@@ -70,9 +71,6 @@ const WON: Pose[] = [
   { x: 0.58, y: 0.56, rotate: 18 },
   { x: 0.5, y: 0.6, rotate: 5 },
 ];
-
-/** Brand ramp only. Confetti in a colour we do not own is a second accent. */
-const CONFETTI_COLORS = ["#eb3845", "#c92736", "#ffa39f", "#ffe3e1", "#ffffff"];
 
 export type TableCard = {
   /** Matches the form field name, which is how a card knows it was played. */
@@ -301,7 +299,7 @@ export function ContactTable({
 
           if (state.sent && !celebrated) {
             celebrated = true;
-            burst(root);
+            celebrate(root);
           }
 
           placed = true;
@@ -444,62 +442,6 @@ export function ContactTable({
       </div>
     </div>
   );
-}
-
-/**
- * The celebration.
- *
- * `canvas-confetti` is imported at the moment it is needed rather than with
- * the page, so the bytes only ever reach a browser that got as far as sending
- * something. It draws to a fixed canvas of its own and cleans up after itself.
- *
- * Aimed at the table rather than at the middle of the window, so the burst
- * comes out of the trick that was just taken.
- */
-async function burst(root: HTMLElement) {
-  if (window.matchMedia(MOTION_QUERY.reduced).matches) return;
-
-  try {
-    const { default: confetti } = await import("canvas-confetti");
-    const box = root.getBoundingClientRect();
-    const origin = {
-      x: (box.left + box.width / 2) / window.innerWidth,
-      y: (box.top + box.height * 0.45) / window.innerHeight,
-    };
-
-    const shared = {
-      colors: CONFETTI_COLORS,
-      disableForReducedMotion: true,
-      origin,
-    };
-
-    confetti({
-      ...shared,
-      particleCount: 90,
-      spread: 78,
-      startVelocity: 38,
-      decay: 0.9,
-      scalar: 0.95,
-      ticks: 180,
-    });
-
-    // A second, wider handful a beat later, so the burst has a tail instead of
-    // being one puff that stops dead.
-    window.setTimeout(() => {
-      confetti({
-        ...shared,
-        particleCount: 45,
-        spread: 110,
-        startVelocity: 26,
-        decay: 0.91,
-        scalar: 0.8,
-        ticks: 160,
-      });
-    }, 220);
-  } catch {
-    // A missing chunk costs a celebration, never the confirmation. The panel
-    // beside this table has already told the visitor the message went.
-  }
 }
 
 function Corner({
