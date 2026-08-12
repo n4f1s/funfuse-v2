@@ -80,6 +80,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -135,7 +136,8 @@ funfuse-v2
 │  │  └─ sitemap.ts
 │  ├─ assets
 │  │  ├─ brand
-│  │  │  └─ funfuse-games-logo-wide.png
+│  │  │  ├─ funfuse-games-icon.png
+│  │  │  └─ funfuse-games-logo.webp
 │  │  ├─ decorative
 │  │  │  ├─ backgrounds
 │  │  │  │  ├─ game-art-mosaic.png
@@ -158,44 +160,68 @@ funfuse-v2
 │  │  │     └─ yellow-lightning-bolt.png
 │  │  └─ games
 │  │     ├─ 3-2-5-offline
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ belote-francaise
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ bhabhi-thulla
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ callbreak-offline
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ capsa-susun
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ gin-rummy
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ hazari-grand
 │  │     │  ├─ cover.webp
-│  │     │  └─ logo.webp
+│  │     │  ├─ icon.webp
+│  │     │  ├─ logo.webp
+│  │     │  ├─ screenshots-1.webp
+│  │     │  ├─ screenshots-2.webp
+│  │     │  ├─ screenshots-3.webp
+│  │     │  ├─ screenshots-4.webp
+│  │     │  └─ screenshots-5.webp
 │  │     ├─ lucky-9
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ ludo-challenge
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ mau-mau
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ okey-club
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ omi-club
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ pusoy
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ pusoy-dos
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ puzzle-club
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ tarneeb
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ thousand
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     ├─ tien-len
-│  │     │  └─ cover.webp
+│  │     │  ├─ cover.webp
+│  │     │  └─ icon.webp
 │  │     └─ tongits-club-offline
-│  │        └─ cover.webp
+│  │        ├─ cover.webp
+│  │        └─ icon.webp
 │  ├─ components
 │  │  ├─ games
 │  │  │  ├─ breadcrumb.tsx

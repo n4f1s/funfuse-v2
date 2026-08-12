@@ -1,4 +1,4 @@
-import logo from "@/assets/brand/funfuse-games-logo-wide.png";
+import logo from "@/assets/brand/funfuse-games-logo.webp";
 import boys from "@/assets/decorative/characters/cheerful-boys-pair.png";
 import { Media } from "@/components/media";
 import { Parallax, Reveal } from "@/components/motion";
@@ -28,7 +28,7 @@ export function Closing() {
           tone="none"
           rounded="none"
           fit="contain"
-          className="w-56 sm:w-[26rem]"
+          className="w-36 sm:w-52"
         />
 
         <h2 className="text-h2 text-heading mt-10 font-semibold tracking-tightest">
