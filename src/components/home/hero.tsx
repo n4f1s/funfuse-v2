@@ -1,8 +1,8 @@
 import type { StaticImageData } from "next/image";
 
-import indianRummyArt from "@/assets/games/indian-rummy/cover.webp";
-import pokerFullHouseArt from "@/assets/games/poker-full-house/cover.webp";
-import tongitsLegendArt from "@/assets/games/tongits-legend/cover.webp";
+import threeTwoFiveArt from "@/assets/games/3-2-5-offline/cover.webp";
+import ludoChallengeArt from "@/assets/games/ludo-challenge/cover.webp";
+import puzzleClubArt from "@/assets/games/puzzle-club/cover.webp";
 import { Media, type MediaPriority } from "@/components/media";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -17,7 +17,7 @@ import { HeroStage } from "./hero-stage";
  * Landscape key art cropped to 3:4 stops reading as a store banner and starts
  * reading as a playing card, which is what lets the fan work at all. Portrait
  * plates are used only here; everything further down the page is 16:9, so the
- * same nine assets carry two registers instead of one repeated shape.
+ * same current covers carry two registers instead of one repeated shape.
  *
  * The three plates are artwork, not a claim: they carry no title, and none of
  * them is attached to a catalogue record (see src/content/games/art.ts). They
@@ -56,7 +56,7 @@ type Plate = {
  */
 const PLATES: Plate[] = [
   {
-    src: indianRummyArt,
+    src: threeTwoFiveArt,
     left: "0%",
     top: "20%",
     width: "36%",
@@ -66,7 +66,7 @@ const PLATES: Plate[] = [
     priority: "eager",
   },
   {
-    src: pokerFullHouseArt,
+    src: ludoChallengeArt,
     left: "64%",
     top: "18%",
     width: "36%",
@@ -76,7 +76,7 @@ const PLATES: Plate[] = [
     priority: "eager",
   },
   {
-    src: tongitsLegendArt,
+    src: puzzleClubArt,
     left: "28%",
     top: "0%",
     width: "44%",

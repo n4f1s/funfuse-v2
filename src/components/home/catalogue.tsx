@@ -18,8 +18,8 @@ import { Prop } from "./prop";
 /**
  * Every title, as type.
  *
- * Only five games have artwork, so a grid of covers here would be mostly empty
- * frames. A list is not the fallback: it is the point. Nineteen names, each one
+ * The catalogue is intentionally a list even though every game now has cover
+ * artwork. Nineteen names, each one
  * a game somebody's family plays, is the most convincing thing this studio can
  * put on a page, and it needs no images to land.
  *

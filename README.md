@@ -78,6 +78,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -151,6 +152,8 @@ funfuse-v2
 │  │     │  └─ cover.webp
 │  │     ├─ belote-francaise
 │  │     │  └─ cover.webp
+│  │     ├─ bhabhi-thulla
+│  │     │  └─ cover.webp
 │  │     ├─ callbreak-offline
 │  │     │  └─ cover.webp
 │  │     ├─ capsa-susun
@@ -164,13 +167,21 @@ funfuse-v2
 │  │     │  └─ cover.webp
 │  │     ├─ ludo-challenge
 │  │     │  └─ cover.webp
+│  │     ├─ mau-mau
+│  │     │  └─ cover.webp
 │  │     ├─ okey-club
+│  │     │  └─ cover.webp
+│  │     ├─ omi-club
 │  │     │  └─ cover.webp
 │  │     ├─ pusoy
 │  │     │  └─ cover.webp
 │  │     ├─ pusoy-dos
 │  │     │  └─ cover.webp
+│  │     ├─ puzzle-club
+│  │     │  └─ cover.webp
 │  │     ├─ tarneeb
+│  │     │  └─ cover.webp
+│  │     ├─ thousand
 │  │     │  └─ cover.webp
 │  │     ├─ tien-len
 │  │     │  └─ cover.webp

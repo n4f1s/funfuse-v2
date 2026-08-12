@@ -1,6 +1,6 @@
 import whatWeDoIllustration from "@/assets/decorative/illustrations/what-we-do-card-game.png";
 import pencil from "@/assets/decorative/props/pencil.png";
-import pokerRummyArt from "@/assets/games/poker-rummy/cover.webp";
+import ludoChallengeArt from "@/assets/games/ludo-challenge/cover.webp";
 import { Media } from "@/components/media";
 import { Parallax, Reveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
@@ -92,8 +92,8 @@ export function Craft() {
 
           <Parallax distance={-84} className="mt-8">
             <Media
-              src={pokerRummyArt}
-              alt="FunFuse key art: a card table framed by two carved signboards under a jungle canopy."
+              src={ludoChallengeArt}
+              alt="Ludo board with colorful playing pieces, dice, and players around the table."
               aspect="wide"
               // The slot is seven of twelve columns, which `half` under-declares
               // by about fifteen percent at every desktop width.

@@ -33,7 +33,7 @@ export function getGamesByCategory(category: GameCategory): Game[] {
  * Distinct regions the catalogue draws from, excluding `international`.
  *
  * `international` is a fallback for titles with no single home (Gin Rummy,
- * Puzzle Twist), so counting it would overstate how many living traditions the
+ * Puzzle Club), so counting it would overstate how many living traditions the
  * catalogue actually covers. Any figure the site prints about reach is derived
  * from this, never typed in by hand.
  */

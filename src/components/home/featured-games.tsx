@@ -9,7 +9,7 @@ import {
   type Game,
   type GameArtwork,
 } from "@/content/games";
-import { getGamesWithCover } from "@/content/games/art";
+import { getFeaturedGames } from "@/content/games/art";
 import { cn } from "@/lib/cn";
 
 import { gameLinkHref } from "./game-link";
@@ -18,16 +18,15 @@ import { Hand } from "./hand";
 /**
  * Featured games.
  *
- * The row is driven by `getGamesWithCover()`, so it holds exactly the titles
- * that have real key art. Nothing is padded out with a placeholder frame: an
- * empty skeleton in a section called "featured" is worse than a shorter row,
- * and the full catalogue further down carries every title anyway.
+ * The row is driven by a curated subset of the current covers. The full
+ * catalogue further down carries every title, so artwork availability alone
+ * does not turn this into a nineteen-card wall.
  *
  * Full-bleed, because a gallery that stops at the page gutter reads as a widget
  * rather than a wall.
  */
 export function FeaturedGames() {
-  const featured = getGamesWithCover();
+  const featured = getFeaturedGames();
   if (!featured.length) return null;
 
   return (
