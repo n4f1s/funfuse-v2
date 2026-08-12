@@ -1,3 +1,4 @@
+import jeepney from "@/assets/decorative/props/orange-jeepney.png";
 import { Reveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
@@ -12,6 +13,7 @@ import {
 import { cn } from "@/lib/cn";
 
 import { gameLinkHref } from "./game-link";
+import { Prop } from "./prop";
 
 /**
  * Every title, as type.
@@ -31,21 +33,40 @@ export function Catalogue() {
 
   return (
     <Section id="catalogue" tone="canvas">
-      <Reveal as="div" className="flex flex-wrap items-end justify-between gap-8">
-        <div className="max-w-xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            The full catalogue
-          </h2>
-          <p className="text-muted mt-4 text-lg">
-            {games.length} titles drawn from {regions.length} traditions, from
-            Tongits in Manila to Belote in France. All of them play offline.
-          </p>
-        </div>
+      {/* The band between the paragraph and the button is the widest gap on
+          the page. The jeepney fills it and earns the spot: the sentence right
+          beside it starts in Manila, and six of the nineteen titles are
+          Filipino. */}
+      <div className="relative">
+        <Reveal
+          as="div"
+          y="lg"
+          className="flex flex-wrap items-end justify-between gap-8"
+        >
+          <div className="max-w-xl">
+            <h2 className="text-h2 text-heading font-semibold tracking-tightest">
+              The full catalogue
+            </h2>
+            <p className="text-muted mt-4 text-lg">
+              {games.length} titles drawn from {regions.length} traditions, from
+              Tongits in Manila to Belote in France. All of them play offline.
+            </p>
+          </div>
 
-        <Button href={site.socials.googlePlay} variant="secondary">
-          Open Google Play
-        </Button>
-      </Reveal>
+          <Button href={site.socials.googlePlay} variant="secondary">
+            Open Google Play
+          </Button>
+        </Reveal>
+
+        <Prop
+          src={jeepney}
+          sizes="(min-width: 1280px) 240px, 200px"
+          drift={-120}
+          spin={-8}
+          bob={false}
+          className="hidden w-50 lg:top-1 lg:left-[52%] lg:block xl:w-60"
+        />
+      </div>
 
       <Reveal
         stagger={0.025}

@@ -1,8 +1,11 @@
 import cardPlayer from "@/assets/decorative/characters/card-player-young-man.png";
+import pencil from "@/assets/decorative/props/pencil.png";
 import pokerRummyArt from "@/assets/games/poker-rummy/cover.webp";
 import { Media } from "@/components/media";
 import { Parallax, Reveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
+
+import { Prop } from "./prop";
 
 /**
  * What the studio does.
@@ -35,9 +38,12 @@ export function Craft() {
   return (
     <Section tone="surface">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
-        <div className="lg:col-span-4">
+        {/* The heading column sticks, so once it has been read this cell is
+            a tall empty strip for the rest of the section. The pencil sits at
+            the bottom of it, outside the sticky box, where that space is. */}
+        <div className="relative lg:col-span-4">
           <div className="lg:sticky lg:top-[calc(var(--header-height)+3rem)]">
-            <Reveal as="div">
+            <Reveal as="div" y="lg">
               <h2 className="text-h2 text-heading font-semibold tracking-tightest">
                 What we do
               </h2>
@@ -61,6 +67,13 @@ export function Craft() {
               className="mt-12 hidden lg:block lg:w-72 xl:w-[22rem]"
             />
           </div>
+
+          <Prop
+            src={pencil}
+            drift={-150}
+            spin={-24}
+            className="hidden w-24 lg:bottom-4 lg:right-[14%] lg:block xl:w-28"
+          />
         </div>
 
         <div className="mt-12 lg:col-span-7 lg:col-start-6 lg:mt-0">
@@ -77,7 +90,7 @@ export function Craft() {
             ))}
           </Reveal>
 
-          <Parallax distance={-56} className="mt-6">
+          <Parallax distance={-84} className="mt-8">
             <Media
               src={pokerRummyArt}
               alt="FunFuse key art: a card table framed by two carved signboards under a jungle canopy."

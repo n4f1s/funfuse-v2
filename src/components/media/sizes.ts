@@ -54,6 +54,13 @@ export const sizePresets = {
   /** The wide brand lockup. */
   lockup: "(min-width: 640px) 420px, 264px",
 
+  /**
+   * A small 3D prop used as scenery. The source art is 93px to 250px wide, so
+   * this is a ceiling rather than a target: Next caps the request at the
+   * asset's own width, and nothing here should ever be displayed near it.
+   */
+  prop: "(min-width: 1024px) 128px, 88px",
+
   /** Store icon in a listing row. */
   icon: "(min-width: 768px) 88px, 64px",
 

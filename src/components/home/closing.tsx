@@ -1,7 +1,7 @@
 import logo from "@/assets/brand/funfuse-games-logo-wide.png";
 import boys from "@/assets/decorative/characters/cheerful-boys-pair.png";
 import { Media } from "@/components/media";
-import { Reveal } from "@/components/motion";
+import { Parallax, Reveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { site } from "@/config/site";
@@ -19,7 +19,7 @@ import { site } from "@/config/site";
 export function Closing() {
   return (
     <Section tone="sunken" className="relative overflow-hidden">
-      <Reveal as="div" className="relative z-1 max-w-2xl">
+      <Reveal as="div" y="lg" className="relative z-1 max-w-2xl">
         <Media
           src={logo}
           alt="FunFuse Games"
@@ -74,15 +74,19 @@ export function Closing() {
         // Widths track the `cutout` sizes preset. Change both together.
         className="pointer-events-none absolute -bottom-6 right-4 hidden lg:block lg:w-72 xl:w-[22rem]"
       >
-        <Media
-          src={boys}
-          decorative
-          aspect="intrinsic"
-          sizes="cutout"
-          tone="none"
-          rounded="none"
-          fit="contain"
-        />
+        {/* Drifts up as the footer approaches, so the pair rise out of the
+            bottom edge rather than sitting parked on it. */}
+        <Parallax distance={-64}>
+          <Media
+            src={boys}
+            decorative
+            aspect="intrinsic"
+            sizes="cutout"
+            tone="none"
+            rounded="none"
+            fit="contain"
+          />
+        </Parallax>
       </div>
     </Section>
   );

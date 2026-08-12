@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/cn";
+import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import { ease } from "@/lib/motion/tokens";
 
 /**
  * The featured row: a real horizontal scroll container, not a pinned section.
@@ -32,37 +34,110 @@ export function Hand({
   const track = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
 
+  /**
+   * The cards land as a hand being spread, echoing the hero's deal at the other
+   * end of the page. Each one arrives from below with a little counter-rotation
+   * that unwinds as it settles, so the row assembles rather than fades.
+   *
+   * It fires on the vertical scroll, not the horizontal one: this is the
+   * section arriving, and cards further along the track are still off screen.
+   */
+  useGSAP(
+    () => {
+      registerGsap();
+
+      const element = track.current;
+      if (!element) return;
+
+      const cards = [...element.children] as HTMLElement[];
+      if (!cards.length) return;
+
+      const clear = () =>
+        cards.forEach((card) => card.classList.remove("will-reveal"));
+
+      const media = gsap.matchMedia();
+
+      media.add(MOTION_QUERY.ok, () => {
+        const tween = gsap.from(cards, {
+          opacity: 0,
+          y: 56,
+          rotate: -3,
+          scale: 0.94,
+          transformOrigin: "50% 100%",
+          duration: 0.9,
+          ease: ease.entrance,
+          stagger: 0.09,
+          scrollTrigger: { trigger: element, start: "top 88%", once: true },
+          onStart: () =>
+            gsap.set(cards, { willChange: "transform, opacity" }),
+          // Transform goes too. A settled card has no transform of its own,
+          // and leaving an identity matrix on five elements keeps five
+          // compositor layers alive for the rest of the session.
+          onComplete: () =>
+            gsap.set(cards, {
+              clearProps: "willChange,transform,transformOrigin",
+            }),
+        });
+
+        // `from` writes its start values in this layout effect, so the inline
+        // opacity is in place before the class comes off. No flash either way.
+        clear();
+
+        return () => {
+          tween.scrollTrigger?.kill();
+          tween.kill();
+        };
+      });
+
+      media.add(MOTION_QUERY.reduced, () => {
+        clear();
+        gsap.set(cards, { opacity: 1, y: 0, rotate: 0, scale: 1 });
+      });
+
+      return () => media.revert();
+    },
+    { scope: track, dependencies: [count] },
+  );
+
   useEffect(() => {
     const element = track.current;
     if (!element) return;
 
     const cards = [...element.children] as HTMLElement[];
 
-    // How much of each card is in the track right now. Two cards are usually
-    // visible at once, so the readout has to be the *most* visible one rather
-    // than whichever entry the observer happened to report last: taking the
-    // last one makes a freshly loaded row announce itself as card 2 of 5.
-    const ratios = new Array<number>(cards.length).fill(0);
+    /**
+     * Which card is framed right now: the one whose centre is nearest the
+     * track's centre.
+     *
+     * Not "the most visible one". The cards snap to centre and two fit at once,
+     * so at either end of the track the last two are both fully in view and
+     * their visibility ties. Ranking by visibility there means the readout
+     * sticks at 4 of 5 and the next arrow never disables, however far you
+     * scroll. Distance from centre has no such tie.
+     */
+    const framed = () => {
+      const middle = element.scrollLeft + element.clientWidth / 2;
+      let best = 0;
+      let shortest = Infinity;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const index = cards.indexOf(entry.target as HTMLElement);
-          if (index !== -1) ratios[index] = entry.intersectionRatio;
+      cards.forEach((card, index) => {
+        const distance = Math.abs(card.offsetLeft + card.clientWidth / 2 - middle);
+        if (distance < shortest) {
+          shortest = distance;
+          best = index;
         }
+      });
 
-        let best = 0;
-        for (let index = 1; index < ratios.length; index += 1) {
-          // Strictly greater, so a tie keeps the earlier card.
-          if (ratios[index] > ratios[best]) best = index;
-        }
-        setActive(best);
-      },
-      // Rooted on the track, so "visible" means visible in the row rather than
-      // in the page. The steps are fine enough to tell a half-scrolled card
-      // from a fully framed one.
-      { root: element, threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
+      return best;
+    };
+
+    // The observer is the trigger, not the measurement: it fires when a card
+    // crosses one of these steps, which is often enough for a snap scroller and
+    // far cheaper than listening to every scroll frame.
+    const observer = new IntersectionObserver(() => setActive(framed()), {
+      root: element,
+      threshold: [0, 0.25, 0.5, 0.75, 1],
+    });
 
     for (const card of cards) observer.observe(card);
     return () => observer.disconnect();
@@ -72,6 +147,11 @@ export function Hand({
     const element = track.current;
     const card = element?.children[index] as HTMLElement | undefined;
     if (!element || !card) return;
+
+    // Claim the new index now rather than waiting for the smooth scroll to
+    // settle and the observer to report it. A control that takes 300ms to
+    // acknowledge a click reads as a control that missed it.
+    setActive(index);
 
     // scrollTo on the track, not scrollIntoView on the card: the latter also
     // scrolls the page vertically to bring the row into view.

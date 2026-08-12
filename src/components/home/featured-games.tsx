@@ -33,7 +33,7 @@ export function FeaturedGames() {
   return (
     <Section id="featured" bleed tone="canvas">
       <Container>
-        <Reveal as="div" className="max-w-2xl">
+        <Reveal as="div" y="lg" className="max-w-2xl">
           <h2 className="text-h2 text-heading font-semibold tracking-tightest">
             Featured games
           </h2>
@@ -44,19 +44,24 @@ export function FeaturedGames() {
         </Reveal>
       </Container>
 
-      <Reveal as="div" className="mt-10 lg:mt-14">
+      {/* No <Reveal> wrapper. The cards animate individually inside <Hand>,
+          and fading the whole block in first would be two entrances stacked on
+          one moment. Each card carries `will-reveal` so the very first paint is
+          already the pre-animation state, and the CSS escape in globals.css
+          shows them if GSAP never runs. */}
+      <div className="mt-10 lg:mt-14">
         <Hand label="Featured games" count={featured.length}>
           {featured.map(({ game, cover }) => (
             <li
               key={game.slug}
               // Matches the `galleryPlate` sizes preset. Change both together.
-              className="w-[84vw] max-w-[37.5rem] sm:w-[62vw] lg:w-[37.5rem]"
+              className="will-reveal w-[84vw] max-w-[37.5rem] sm:w-[62vw] lg:w-[37.5rem]"
             >
               <GameCard game={game} cover={cover} />
             </li>
           ))}
         </Hand>
-      </Reveal>
+      </div>
     </Section>
   );
 }

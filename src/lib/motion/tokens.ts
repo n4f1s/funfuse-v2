@@ -42,6 +42,12 @@ export const ease = {
   entrance: "cubic-bezier(0.16, 1, 0.3, 1)",
   /** Constant motion only: marquees, progress. */
   linear: "none",
+  /**
+   * Idle loops that yoyo. GSAP-only, and the one curve here with no CSS
+   * counterpart: a loop has to ease identically in both directions, and every
+   * curve above is deliberately asymmetric because it describes an arrival.
+   */
+  loop: "sine.inOut",
 } as const;
 
 /** Distances, in px, for entrance transforms. Keep them small. */
