@@ -7,46 +7,83 @@ import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
 /**
- * Three cards, cycling.
+ * Three cards, cut one at a time.
  *
  * Why it animates: the band beside it is a roll call of places, and it is
  * already moving. A still block of type on one side of a marquee reads as the
  * part of the page that has not loaded yet. This gives that column something
  * with the same pulse, at a fraction of the width.
  *
- * The gesture is a cut: the front card lifts, turns over the top of the other
- * two and tucks in at the back, and the other two step forward. Three steps
- * and every card is in the slot it started in, which is what makes the loop
- * seamless — not tuning, arithmetic:
+ * **The move is the one a hand can actually make.** The card at the *back* is
+ * drawn out to the side, lifted over the other two and set down on *top*. A
+ * card that travels over a stack lands on it; the earlier version of this took
+ * the front card over the top and then dropped it underneath, which is not
+ * something that can happen to a physical card.
  *
- *   slots  0 1 2  ->  1 2 0  ->  2 0 1  ->  0 1 2
+ * The z-order is the whole problem, and it is solved by sequence rather than
+ * by hoping nobody looks:
  *
- * Each card therefore travels exactly once per cycle and picks up exactly one
- * full turn. The `set` back to the resting angles at the end of the timeline is
- * a multiple of 360 away from where the cards actually are, so it is invisible,
- * and it stops the numbers climbing forever.
+ *   1. the traveller slides clear while still *behind* everything. It is the
+ *      back card sliding out from behind the fan, which is exactly what that
+ *      looks like.
+ *   2. it is raised only once its box no longer touches another card — the
+ *      slide is a full card width past the nearest one, and the other two have
+ *      not started moving yet. So the moment it comes to the front is a moment
+ *      with nothing to be in front of.
+ *   3. it arcs over and lands in the front slot, staying on top the whole way
+ *      down. Its z drops from "in flight" to "front of the stack" at the end,
+ *      which is invisible because nothing else sits between the two.
+ *
+ * Depth is carried by scale as well as by stacking: the back card is a little
+ * smaller and grows as it comes forward, which is what moving toward the eye
+ * looks like.
+ *
+ * The loop is seamless by arithmetic rather than by tuning. Every card steps
+ * one slot back each time, so three steps return all three to where they
+ * began, and each has travelled exactly once. Every property is absolute per
+ * slot, so nothing accumulates and there is nothing to reset.
  *
  * Nothing is measured. Every pose is a percentage of a card's own size, so a
  * resize can never strand one mid-flight.
  */
 
 /** Fractions of the stage. The card is sized from the width. */
-const CARD_W = 0.44;
+const CARD_W = 0.3;
 const STAGE_ASPECT = 5 / 4;
 const CARD_H = CARD_W * (7 / 5) * STAGE_ASPECT;
 
-type Slot = { x: number; y: number; r: number; z: number };
+type Slot = { x: number; y: number; r: number; scale: number; z: number };
 
-/** Front to back. Percentages of a card's own size, plus a stacking order. */
+/**
+ * Front to back. Positions are percentages of a card's own size.
+ *
+ * The scale step is small on purpose: it is perspective on a table, not a
+ * corridor. Anything stronger and the back card reads as a different size of
+ * card rather than the same one further away.
+ */
 const SLOTS: Slot[] = [
-  { x: -32, y: 14, r: -12, z: 30 },
-  { x: 0, y: 0, r: 1, z: 20 },
-  { x: 32, y: -14, r: 13, z: 10 },
+  { x: -44, y: 16, r: -12, scale: 1, z: 30 },
+  { x: 0, y: 0, r: 1, scale: 0.97, z: 20 },
+  { x: 44, y: -16, r: 13, scale: 0.94, z: 10 },
 ];
 
-/** Seconds a card spends travelling, and the pause before the next one goes. */
-const STEP = 0.9;
-const HOLD = 0.55;
+/**
+ * Where the traveller waits before it is lifted.
+ *
+ * 112% of a card's width from the middle, against a nearest neighbour sitting
+ * at 0. Two boxes a full width apart do not overlap, which is what makes the
+ * change of stacking order at this instant impossible to see.
+ */
+const CLEAR = { x: 112, y: 34, r: 22 };
+
+/** Seconds a card spends being moved, and the pause before the next one goes. */
+const STEP = 1.05;
+const HOLD = 0.5;
+
+/** Fractions of `STEP`. The slide has to finish before the lift begins. */
+const SLIDE = 0.26;
+/** When the other two close the gap. After the traveller is out of their way. */
+const SHIFT = 0.3;
 
 type OriginsCard = { rank: string; suit: "♠" | "♥" | "♦" | "♣" };
 
@@ -89,17 +126,24 @@ export function OriginsCards({ className }: { className?: string }) {
               xPercent: slot.x,
               yPercent: slot.y,
               rotation: slot.r,
+              scale: slot.scale,
               zIndex: slot.z,
-              scale: 1,
             });
           });
 
-          const loop = gsap.timeline({ paused: true, repeat: -1 });
+          // `repeatDelay` rather than a spacer at the end: a timeline's length
+          // is its last tween, so without this the third card would land and
+          // the first would be drawn out in the same frame, losing one beat
+          // out of every three.
+          const loop = gsap.timeline({
+            paused: true,
+            repeat: -1,
+            repeatDelay: HOLD,
+          });
 
           /** Which slot each card is in, as the timeline is built. */
           const at = nodes.map((_, index) => index);
-          /** Absolute rotation, which keeps climbing so a turn never unwinds. */
-          const spin = nodes.map((_, index) => SLOTS[index].r);
+          const back = SLOTS.length - 1;
 
           for (let step = 0; step < SLOTS.length; step += 1) {
             const start = step * (STEP + HOLD);
@@ -107,90 +151,105 @@ export function OriginsCards({ className }: { className?: string }) {
 
             nodes.forEach((node, index) => {
               const source = from[index];
-              // The front card goes to the back; everything else steps up one.
-              const target = source === 0 ? SLOTS.length - 1 : source - 1;
+              // Everything steps one slot further back; the card that was at
+              // the back comes round to the front.
+              const target = (source + 1) % SLOTS.length;
               const slot = SLOTS[target];
-              const travelling = source === 0;
-
-              spin[index] += slot.r - SLOTS[source].r + (travelling ? 360 : 0);
               at[index] = target;
 
-              if (!travelling) {
-                // Stepping forward, so it can take its new stacking order at
-                // once: there is nothing for it to pass over.
+              if (source !== back) {
+                // Closing the gap the traveller left. A slide across the table,
+                // so no lift and no change in size. Its new stacking order can
+                // be taken at once: the two of them keep their order relative
+                // to each other, and the traveller is above both regardless.
                 loop
-                  .set(node, { zIndex: slot.z }, start)
+                  .set(node, { zIndex: slot.z }, start + STEP * SHIFT)
                   .to(
                     node,
                     {
                       xPercent: slot.x,
                       yPercent: slot.y,
-                      rotation: spin[index],
-                      duration: STEP * 0.8,
+                      rotation: slot.r,
+                      scale: slot.scale,
+                      duration: STEP * 0.62,
                       ease: ease.out,
                     },
-                    start + 0.05,
+                    start + STEP * SHIFT,
                   );
                 return;
               }
 
-              // The traveller. Two eases across two axes is what bows a
-              // straight line into an arc over the other cards, and it costs
-              // nothing: no motion path plugin, no extra bundle.
+              // ---- The traveller -------------------------------------------
+              // Out from behind, still underneath everything.
+              loop.to(
+                node,
+                {
+                  xPercent: CLEAR.x,
+                  yPercent: CLEAR.y,
+                  rotation: CLEAR.r,
+                  duration: STEP * SLIDE,
+                  ease: "power2.out",
+                },
+                start,
+              );
+
+              // Clear of every other card, so this is unobservable.
+              loop.set(node, { zIndex: 50 }, start + STEP * SLIDE);
+
+              const lift = start + STEP * SLIDE;
+              const flight = STEP * (1 - SLIDE);
+
+              // Two eases across two axes is what bows a straight line into an
+              // arc over the other cards, and it costs nothing: no motion path
+              // plugin, no extra bundle.
               loop
-                .set(node, { zIndex: 50 }, start)
                 .to(
                   node,
-                  { xPercent: slot.x, duration: STEP, ease: "power2.inOut" },
-                  start,
+                  { xPercent: slot.x, duration: flight, ease: "power1.inOut" },
+                  lift,
                 )
                 .to(
                   node,
                   {
-                    yPercent: slot.y - 30,
-                    duration: STEP * 0.5,
+                    yPercent: slot.y - 52,
+                    duration: flight * 0.45,
                     ease: "power2.out",
                   },
-                  start,
+                  lift,
                 )
                 .to(
                   node,
-                  {
-                    yPercent: slot.y,
-                    duration: STEP * 0.5,
-                    ease: "power2.in",
-                  },
-                  start + STEP * 0.5,
+                  { yPercent: slot.y, duration: flight * 0.55, ease: "power2.in" },
+                  lift + flight * 0.45,
+                )
+                // A wrist turn, not a pirouette: it swings past the angle it is
+                // going to land on and comes back to it.
+                .to(
+                  node,
+                  { rotation: -34, duration: flight * 0.45, ease: "power2.out" },
+                  lift,
                 )
                 .to(
                   node,
-                  { rotation: spin[index], duration: STEP, ease: "power2.inOut" },
-                  start,
+                  { rotation: slot.r, duration: flight * 0.55, ease: ease.out },
+                  lift + flight * 0.45,
                 )
-                // The lift. Without it the card reads as sliding across the
-                // others rather than coming up off them.
+                // Bigger at the top of the arc, because it is nearer the eye.
                 .to(
                   node,
-                  { scale: 1.1, duration: STEP * 0.45, ease: "power2.out" },
-                  start,
+                  { scale: 1.12, duration: flight * 0.45, ease: "power2.out" },
+                  lift,
                 )
                 .to(
                   node,
-                  { scale: 1, duration: STEP * 0.55, ease: "power2.in" },
-                  start + STEP * 0.45,
+                  { scale: slot.scale, duration: flight * 0.55, ease: "power2.in" },
+                  lift + flight * 0.45,
                 )
-                // Back into the stack only once it has cleared the others.
-                .set(node, { zIndex: slot.z }, start + STEP * 0.92);
+                // Down onto the front of the stack. Invisible: nothing else
+                // sits between the front slot and the in-flight order.
+                .set(node, { zIndex: slot.z }, start + STEP);
             });
           }
-
-          // Every card is home and exactly one turn heavier. Shedding the turn
-          // here is invisible and keeps the numbers from climbing forever.
-          loop.set(
-            nodes,
-            { rotation: (index: number) => SLOTS[index].r },
-            SLOTS.length * (STEP + HOLD),
-          );
 
           let onScreen = false;
 
@@ -256,7 +315,7 @@ export function OriginsCards({ className }: { className?: string }) {
             // cards before GSAP runs, or if it never does.
             style={{
               ...seat,
-              transform: `translate(${slot.x}%, ${slot.y}%) rotate(${slot.r}deg)`,
+              transform: `translate(${slot.x}%, ${slot.y}%) rotate(${slot.r}deg) scale(${slot.scale})`,
               zIndex: slot.z,
             }}
           >

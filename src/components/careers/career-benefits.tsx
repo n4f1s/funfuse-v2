@@ -74,7 +74,7 @@ export function CareerBenefits({
               <article className="group border-line bg-surface shadow-xs duration-[var(--duration-hover)] hover:shadow-md relative h-full overflow-hidden rounded-lg border p-6 transition-[transform,box-shadow] ease-out hover:-translate-y-1 sm:p-7">
                 <span
                   aria-hidden
-                  className="text-accent-tint-strong pointer-events-none absolute -top-8 -right-2 text-[8rem] leading-none select-none"
+                  className="text-accent-tint-strong pointer-events-none absolute -top-4 right-0 text-[8rem] leading-none select-none"
                 >
                   {SUITS[index % SUITS.length]}
                 </span>

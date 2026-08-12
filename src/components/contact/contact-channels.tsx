@@ -76,7 +76,7 @@ export function ContactChannels() {
               >
                 <span
                   aria-hidden
-                  className="text-accent-tint-strong pointer-events-none absolute -top-6 -right-1 text-[5.5rem] leading-none select-none"
+                  className="text-accent-tint-strong pointer-events-none absolute -top-2 right-1 text-[5.5rem] leading-none select-none"
                 >
                   {channel.suit}
                 </span>
