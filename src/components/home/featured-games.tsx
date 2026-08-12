@@ -1,6 +1,9 @@
+import Link from "next/link";
+
 import { Media } from "@/components/media";
 import { Reveal } from "@/components/motion";
 import { Container } from "@/components/ui/container";
+import { Hand } from "@/components/ui/hand";
 import { Section } from "@/components/ui/section";
 import {
   categoryLabels,
@@ -13,7 +16,6 @@ import { getFeaturedGames } from "@/content/games/art";
 import { cn } from "@/lib/cn";
 
 import { gameLinkHref } from "./game-link";
-import { Hand } from "./hand";
 
 /**
  * Featured games.
@@ -78,7 +80,7 @@ function GameCard({ game, cover }: { game: Game; cover: GameArtwork }) {
         className="plate"
         imageClassName={cn(
           "transition-transform duration-[var(--duration-hover)] ease-out",
-          href && "group-hover:scale-[1.04]",
+          "group-hover:scale-[1.04]",
         )}
       />
 
@@ -108,19 +110,15 @@ function GameCard({ game, cover }: { game: Game; cover: GameArtwork }) {
     </>
   );
 
-  if (!href) return <div>{body}</div>;
-
   return (
-    <a
+    <Link
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
       // An explicit name keeps the link from reading out the artwork
       // description as well as the title. It still contains the visible label.
-      aria-label={`${game.title} on Google Play`}
+      aria-label={game.title}
       className="group block rounded-lg focus-visible:outline-offset-4"
     >
       {body}
-    </a>
+    </Link>
   );
 }

@@ -79,6 +79,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -118,10 +119,18 @@ funfuse-v2
 │  ├─ app
 │  │  ├─ error.tsx
 │  │  ├─ favicon.ico
+│  │  ├─ games
+│  │  │  └─ page.tsx
 │  │  ├─ globals.css
 │  │  ├─ layout.tsx
 │  │  ├─ not-found.tsx
 │  │  ├─ page.tsx
+│  │  ├─ project-genre
+│  │  │  └─ [genre]
+│  │  │     └─ page.tsx
+│  │  ├─ projects
+│  │  │  └─ [slug]
+│  │  │     └─ page.tsx
 │  │  ├─ robots.ts
 │  │  └─ sitemap.ts
 │  ├─ assets
@@ -188,6 +197,15 @@ funfuse-v2
 │  │     └─ tongits-club-offline
 │  │        └─ cover.webp
 │  ├─ components
+│  │  ├─ games
+│  │  │  ├─ breadcrumb.tsx
+│  │  │  ├─ game-card.tsx
+│  │  │  ├─ game-grid.tsx
+│  │  │  ├─ game-hero.tsx
+│  │  │  ├─ index.ts
+│  │  │  ├─ listing-intro.tsx
+│  │  │  ├─ related-games.tsx
+│  │  │  └─ screenshots-gallery.tsx
 │  │  ├─ home
 │  │  │  ├─ catalogue.tsx
 │  │  │  ├─ closing.tsx
@@ -196,7 +214,6 @@ funfuse-v2
 │  │  │  ├─ featured-games.tsx
 │  │  │  ├─ figure-rail.tsx
 │  │  │  ├─ game-link.ts
-│  │  │  ├─ hand.tsx
 │  │  │  ├─ hero-stage.tsx
 │  │  │  ├─ hero.tsx
 │  │  │  ├─ index.ts
@@ -224,6 +241,7 @@ funfuse-v2
 │  │  └─ ui
 │  │     ├─ button.tsx
 │  │     ├─ container.tsx
+│  │     ├─ hand.tsx
 │  │     ├─ index.ts
 │  │     └─ section.tsx
 │  ├─ config

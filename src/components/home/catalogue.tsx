@@ -1,8 +1,9 @@
+import Link from "next/link";
+
 import jeepney from "@/assets/decorative/props/orange-jeepney.png";
 import { Reveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
-import { site } from "@/config/site";
 import {
   categoryLabels,
   getAllGames,
@@ -53,8 +54,8 @@ export function Catalogue() {
             </p>
           </div>
 
-          <Button href={site.socials.googlePlay} variant="secondary">
-            Open Google Play
+          <Button href="/games" variant="secondary">
+            Browse all games
           </Button>
         </Reveal>
 
@@ -102,7 +103,7 @@ function CatalogueRow({ game }: { game: Game }) {
           className={cn(
             "font-display text-heading block text-lg font-semibold tracking-tighter sm:text-xl",
             "transition-transform duration-[var(--duration-hover)] ease-out",
-            href && "group-hover:translate-x-1",
+            "group-hover:translate-x-1",
           )}
         >
           {game.title}
@@ -133,22 +134,16 @@ function CatalogueRow({ game }: { game: Game }) {
 
   return (
     <li className="border-line border-t">
-      {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${game.title} on Google Play`}
-          className={cn(
-            shared,
-            "group hover:bg-surface-muted transition-colors duration-[var(--duration-hover)] ease-out",
-          )}
-        >
-          {inner}
-        </a>
-      ) : (
-        <div className={shared}>{inner}</div>
-      )}
+      <Link
+        href={href}
+        aria-label={game.title}
+        className={cn(
+          shared,
+          "group hover:bg-surface-muted transition-colors duration-[var(--duration-hover)] ease-out",
+        )}
+      >
+        {inner}
+      </Link>
     </li>
   );
 }

@@ -69,6 +69,32 @@ export const sizePresets = {
 
   /** Person / team photo. */
   avatar: "56px",
+
+  /**
+   * Large card in the games listing grid — 4 of 6 columns at lg, 2 of 2 below
+   * it. Container 1320px, 6-col track, gap-x-8 (32px): (1320 - 5*32)/6 =
+   * 193.3px per unit, so 4 units + 3 internal gaps = 869px. Keep in step with
+   * the `lg:col-span-4` card and the grid's `gap-x-8` in
+   * components/games/game-grid.tsx.
+   */
+  catalogueLarge:
+    "(min-width: 1400px) 869px, (min-width: 1024px) 62vw, (min-width: 640px) 46vw, 94vw",
+
+  /**
+   * Regular card in the games listing grid — 2 of 6 columns at lg. Same
+   * container math as `catalogueLarge`: 2 units + 1 internal gap = 419px.
+   */
+  catalogueRegular:
+    "(min-width: 1400px) 419px, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, 94vw",
+
+  /**
+   * Game detail page cover plate — 7 of 12 columns, the same ratio
+   * components/home/craft.tsx already uses inline for its own 7-of-12 image.
+   */
+  heroPlate: "(min-width: 1400px) 740px, (min-width: 1024px) 56vw, 94vw",
+
+  /** Portrait 9:16 screenshot card inside a `<Hand>` scroller. */
+  screenshotCard: "(min-width: 640px) 240px, 60vw",
 } as const;
 
 export type SizePreset = keyof typeof sizePresets;

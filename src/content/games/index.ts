@@ -109,3 +109,27 @@ export function getGameRedirects(): { source: string; destination: string }[] {
       .map((source) => ({ source, destination }));
   });
 }
+
+/**
+ * Other titles worth surfacing on a game's detail page.
+ *
+ * Same category first, then same region, then whatever is left, so every
+ * game gets a full rail: `puzzle-twist-game` is the only puzzle in the
+ * catalogue and `board` has just two titles, so "same category only" would
+ * leave those pages nearly empty.
+ */
+export function getRelatedGames(game: Game, count = 6): Game[] {
+  const pool = games.filter((candidate) => candidate.slug !== game.slug);
+  const byCategory = pool.filter(
+    (candidate) => candidate.category === game.category,
+  );
+  const byRegion = pool.filter(
+    (candidate) =>
+      candidate.region === game.region && !byCategory.includes(candidate),
+  );
+  const rest = pool.filter(
+    (candidate) =>
+      !byCategory.includes(candidate) && !byRegion.includes(candidate),
+  );
+  return [...byCategory, ...byRegion, ...rest].slice(0, count);
+}

@@ -34,7 +34,7 @@ export const routes = {
   /** New. The catalogue the old site never had a clean URL for. */
   games: {
     path: "/games",
-    live: false,
+    live: true,
     changeFrequency: "weekly",
     priority: 0.9,
   },
@@ -115,7 +115,7 @@ export const legacyGenreRoutes: Record<string, GameCategory> = {
 export const genreRoutes: RouteEntry[] = Object.keys(legacyGenreRoutes).map(
   (genre) => ({
     path: `/project-genre/${genre}`,
-    live: false,
+    live: true,
     changeFrequency: "monthly",
     priority: 0.4,
     preserved: true,
