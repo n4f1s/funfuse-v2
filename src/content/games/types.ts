@@ -48,9 +48,14 @@ export type GameArt = {
   cover?: GameArtwork;
   /** 1024x500 Play Store feature graphic. */
   feature?: GameArtwork;
-  /** Phone screenshots, 9:16. */
-  screenshots?: GameArtwork[];
 };
+
+/**
+ * Phone screenshots, 9:16, are not part of `GameArt` — every game always has
+ * exactly five slots (real or placeholder), generated from the filesystem by
+ * `scripts/generate-screenshots.ts`. See `getGameScreenshots` in
+ * `./screenshots.ts`.
+ */
 
 export type Game = {
   /** URL segment under /games. Stable — changing it needs a redirect. */

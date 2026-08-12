@@ -409,6 +409,13 @@
   .hand-track {
     position: relative; /* makes child offsetLeft measurable against the track */
     display: flex;
+    /* Every existing use of <Hand> is one fixed aspect ratio per row, so this
+       has never mattered — flex's default `stretch` and `flex-start` looked
+       identical. The screenshot gallery mixes true-aspect phone and table
+       captures with a fixed-aspect placeholder in the same row, and `stretch`
+       would pad the shorter cards with blank space to match the tallest
+       instead of letting each card be its own real height. */
+    align-items: flex-start;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;

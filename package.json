@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "generate:screenshots": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-screenshots.ts",
+    "dev": "pnpm generate:screenshots && next dev",
+    "build": "pnpm generate:screenshots && next build",
     "start": "next start",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "lint": "pnpm generate:screenshots && eslint",
+    "typecheck": "pnpm generate:screenshots && tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint && pnpm build"
   },
   "dependencies": {

@@ -25,6 +25,7 @@ import {
 } from "@/content/games";
 import { getGameArt } from "@/content/games/art";
 import { getGameDetails } from "@/content/games/details";
+import { getGameScreenshots } from "@/content/games/screenshots";
 import { breadcrumbSchema, gameSchema, jsonLdGraph } from "@/lib/jsonld";
 import { createMetadata } from "@/lib/seo";
 
@@ -69,6 +70,7 @@ export default async function GameDetailPage({ params }: Props) {
 
   const art = getGameArt(slug);
   const details = getGameDetails(slug);
+  const screenshots = getGameScreenshots(slug, game.title);
   const trail = [
     { name: "Home", path: "/" },
     { name: "Games", path: "/games" },
@@ -103,6 +105,10 @@ export default async function GameDetailPage({ params }: Props) {
         </>
       ),
     },
+    {
+      key: "screenshots",
+      node: <ScreenshotsGallery slots={screenshots} title={game.title} />,
+    },
   ];
 
   if (details) {
@@ -119,11 +125,6 @@ export default async function GameDetailPage({ params }: Props) {
       bands.push({ key: "tips", node: <GameTips tips={details.tips} /> });
     }
   }
-
-  bands.push({
-    key: "screenshots",
-    node: <ScreenshotsGallery screenshots={art?.screenshots} title={game.title} />,
-  });
 
   if (related.length > 0) {
     bands.push({ key: "related", node: <RelatedGames current={game} related={related} /> });

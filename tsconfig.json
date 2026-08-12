@@ -6,6 +6,13 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    /**
+     * Only needed for scripts/generate-screenshots.ts: Node's native
+     * TypeScript execution (no ts-node/tsx — see AGENTS.md's "no casual
+     * dependencies" rule) requires an explicit extension on relative
+     * imports, which this option lets tsc accept. Safe with `noEmit`.
+     */
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

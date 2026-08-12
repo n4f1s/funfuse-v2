@@ -4,19 +4,27 @@ import { Hand } from "@/components/ui/hand";
 import type { GameArtwork } from "@/content/games";
 
 /**
- * Phone screenshots for a game, when they exist. No game in the catalogue has
- * any yet (see `src/content/games/art.ts`), so the empty state below is not a
- * placeholder to delete later — it is the shipped design for that state.
+ * Every game has exactly five screenshot slots — see
+ * `src/content/games/screenshots.ts`. A slot is either a real screenshot or
+ * `null`, and `null` renders the same polished placeholder tile the gallery
+ * has always used for "not shot yet", just per slot instead of for the whole
+ * section. The row is always five wide, so a game with zero real screenshots
+ * and a game with five look like the same feature at different stages, never
+ * like one has something broken.
  *
- * The empty state is one static tile, not an inert `<Hand>` shell: a scroller
- * with a single item still renders disabled arrows and a 1-of-1 segment bar,
- * which reads as a broken feature rather than an honest "not yet".
+ * Real screenshots render at their own intrinsic ratio rather than a fixed
+ * 9:16 frame: the first real assets in the catalogue are a mix of true phone
+ * captures (Belote, portrait) and landscape table captures (CallBreak,
+ * Hazari), and cropping the latter to fit a portrait frame would misrepresent
+ * them. Only the placeholder tile — which has no real image to measure —
+ * uses the fixed `screenshot` (9:16) preset, as a phone-shaped stand-in for
+ * whichever orientation eventually lands there.
  */
 export function ScreenshotsGallery({
-  screenshots,
+  slots,
   title,
 }: {
-  screenshots?: GameArtwork[];
+  slots: readonly (GameArtwork | null)[];
   title: string;
 }) {
   return (
@@ -25,33 +33,31 @@ export function ScreenshotsGallery({
         Screenshots
       </Reveal>
 
-      {screenshots && screenshots.length > 0 ? (
-        <div className="mt-10">
-          <Hand label={`${title} screenshots`} count={screenshots.length}>
-            {screenshots.map((shot, index) => (
-              <li key={index} className="will-reveal w-[60vw] max-w-60 sm:w-60">
+      <div className="mt-10">
+        <Hand label={`${title} screenshots`} count={slots.length}>
+          {slots.map((shot, index) => (
+            <li key={index} className="will-reveal w-[60vw] max-w-60 sm:w-60">
+              {shot ? (
                 <Media
                   src={shot.src}
                   alt={shot.alt}
-                  aspect="screenshot"
+                  aspect="intrinsic"
                   sizes="screenshotCard"
                   className="plate"
                 />
-              </li>
-            ))}
-          </Hand>
-        </div>
-      ) : (
-        <Reveal as="div" y="base" className="mt-10 w-40 sm:w-60">
-          <Media
-            src={undefined}
-            decorative
-            aspect="screenshot"
-            sizes="screenshotCard"
-            placeholderLabel="Screenshots coming soon"
-          />
-        </Reveal>
-      )}
+              ) : (
+                <Media
+                  src={undefined}
+                  decorative
+                  aspect="screenshot"
+                  sizes="screenshotCard"
+                  placeholderLabel="Screenshot coming soon"
+                />
+              )}
+            </li>
+          ))}
+        </Hand>
+      </div>
     </div>
   );
 }
