@@ -623,8 +623,11 @@
      source of truth for the geometry. Only the container query and the resting
      hand live here.
 
-     `translate` rather than a transform function, because GSAP owns `transform`
-     on the card and the two must not write the same property. */
+     The half-card offset is subtracted in `--card-x` / `--card-y` rather than
+     taken back with `translate: -50% -50%`. GSAP owns `transform` on a card and
+     composes its own percentage translations into it; leaving a second
+     centring translation on the same element makes the card disagree with the
+     static slot drawn under it. So neither of them has one. */
   .contact-stage {
     aspect-ratio: 5 / 4;
   }
@@ -642,10 +645,19 @@
     top: var(--card-y);
     width: var(--card-w);
     aspect-ratio: 5 / 7;
-    translate: -50% -50%;
     /* The flip is a rotateY on the card's inner node; without a perspective on
        an ancestor it reads as a horizontal squash rather than a turn. */
     perspective: 900px;
+  }
+
+  /* The hero deck. Same rule as the table above: the half-card offset is in
+     the left/top values, so GSAP is the only thing writing `transform`. */
+  .contact-hero-card {
+    position: absolute;
+    left: var(--hero-card-x);
+    top: var(--hero-card-y);
+    width: var(--hero-card-w);
+    aspect-ratio: 5 / 7;
   }
 
   .contact-glow {

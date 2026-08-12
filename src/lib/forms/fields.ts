@@ -135,6 +135,76 @@ export function choice(
   return { value };
 }
 
+/**
+ * An uploaded CV.
+ *
+ * Three limits, and all three are here rather than on the input, because
+ * `accept` and `maxlength` in the markup are conveniences a POST can ignore:
+ *
+ *   - **size**, checked against the same ceiling `serverActions.bodySizeLimit`
+ *     protects. A body over that never reaches this function at all, so the
+ *     message below is for the file that squeaks under the transport limit and
+ *     over ours.
+ *   - **extension**, because it is what the recipient's mail client will act
+ *     on and what an attachment is named by.
+ *   - **type**, because the extension is trivially renamed.
+ *
+ * Nothing is executed, unpacked or stored: the bytes go straight onto an email
+ * as an attachment and are never written to disk.
+ */
+export const CV_MAX_BYTES = 5 * 1024 * 1024;
+
+const CV_TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+};
+
+export const CV_ACCEPT = ".pdf,.doc,.docx";
+
+export type UploadedFile = { name: string; bytes: Uint8Array };
+
+export async function cv(
+  form: FormData,
+  name: string,
+): Promise<{ value: UploadedFile | null; error?: string }> {
+  const entry = form.get(name);
+
+  // An empty file input still posts a zero-byte File, so "no file" and "a
+  // broken file" have to be told apart before anything else is checked.
+  if (!(entry instanceof File) || entry.size === 0) return { value: null };
+
+  if (entry.size > CV_MAX_BYTES) {
+    return {
+      value: null,
+      error: `That file is ${(entry.size / 1024 / 1024).toFixed(1)}MB. Keep it under 5MB, or send us a link instead.`,
+    };
+  }
+
+  const extension = entry.name.split(".").pop()?.toLowerCase() ?? "";
+  const expected = CV_TYPES[extension];
+
+  if (!expected) {
+    return { value: null, error: "Send a PDF, DOC or DOCX." };
+  }
+  // Browsers occasionally report an empty type for a DOCX. An absent type is
+  // tolerated; a type that contradicts the extension is not.
+  if (entry.type && entry.type !== expected) {
+    return { value: null, error: "That file is not the kind its name says it is." };
+  }
+
+  const bytes = new Uint8Array(await entry.arrayBuffer());
+
+  return {
+    value: {
+      // The name reaches a mail header, so it loses its line breaks and any
+      // path a browser might have prefixed.
+      name: headerSafe(entry.name).split(/[\\/]/).pop() || `cv.${extension}`,
+      bytes,
+    },
+  };
+}
+
 /** Optional URL. Rejects anything that is not http(s) so a link is clickable. */
 export function link(form: FormData, name: string, label: string): { value: string; error?: string } {
   const value = clean(form.get(name));

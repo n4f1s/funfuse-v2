@@ -66,6 +66,22 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  experimental: {
+    serverActions: {
+      /**
+       * The careers form takes a CV. Action bodies are capped at 1MB by
+       * default, which a two-page PDF can clear on its own.
+       *
+       * 6mb against a 5MB file cap: the limit applies to the raw multipart
+       * body, so the boundaries, part headers and the other five fields all
+       * count against it. The headroom is that overhead plus room to grow.
+       * The real rejection happens in the action, which returns a message a
+       * person can act on; this is only the ceiling that protects the server.
+       */
+      bodySizeLimit: "6mb",
+    },
+  },
+
   /** Surface accessibility and correctness problems during development. */
   reactStrictMode: true,
 

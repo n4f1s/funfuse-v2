@@ -4,6 +4,7 @@ import { buildMessage } from "@/lib/email/messages";
 import { mailConfig } from "@/lib/email/resend";
 import {
   choice,
+  cv as cvField,
   email as emailField,
   headerSafe,
   isBot,
@@ -134,6 +135,7 @@ export async function sendApplication(
   const from = emailField(form, "email");
   const role = choice(form, "role", ROLE_TITLES, "Role");
   const portfolio = link(form, "portfolio", "Portfolio or CV link");
+  const attachment = await cvField(form, "cv");
   const message = text(form, "message", {
     label: "Message",
     min: 10,
@@ -154,6 +156,7 @@ export async function sendApplication(
   if (from.error) errors.email = from.error;
   if (role.error) errors.role = role.error;
   if (portfolio.error) errors.portfolio = portfolio.error;
+  if (attachment.error) errors.cv = attachment.error;
   if (message.error) errors.message = message.error;
 
   if (Object.keys(errors).length > 0) return invalid(errors, values);
@@ -169,6 +172,7 @@ export async function sendApplication(
       { label: "Email", value: from.value },
       { label: "Role", value: role.value },
       { label: "Portfolio", value: portfolio.value, link: true },
+      { label: "CV", value: attachment.value?.name ?? "" },
     ],
     bodyLabel: "About them",
     body: message.value,
@@ -182,6 +186,17 @@ export async function sendApplication(
       subject: mail.subject,
       text: mail.text,
       html: mail.html,
+      // Resend takes the raw bytes. The file is never written to disk, never
+      // parsed and never served: it goes from the request straight onto the
+      // email and out.
+      attachments: attachment.value
+        ? [
+            {
+              filename: attachment.value.name,
+              content: Buffer.from(attachment.value.bytes),
+            },
+          ]
+        : undefined,
     });
 
     if (error) {

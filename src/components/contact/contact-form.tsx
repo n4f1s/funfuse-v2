@@ -66,6 +66,7 @@ const same = (a: readonly string[], b: readonly string[]) =>
 export function ContactForm() {
   const [state, formAction] = useActionState(sendContactMessage, idleState);
   const [played, setPlayed] = useState<readonly string[]>([]);
+  const [focused, setFocused] = useState<string | null>(null);
   const form = useRef<HTMLFormElement>(null);
 
   const sent = state.status === "success";
@@ -123,6 +124,14 @@ export function ContactForm() {
             ref={form}
             action={formAction}
             onChange={readForm}
+            // React's focus events are focusin/focusout, so one pair on the
+            // form covers every control inside it. The card for whichever
+            // field the visitor is in lifts off the table while they are
+            // in it.
+            onFocus={(event) =>
+              setFocused(event.target.getAttribute("name"))
+            }
+            onBlur={() => setFocused(null)}
             noValidate
             className="relative"
           >
@@ -189,7 +198,12 @@ export function ContactForm() {
           form, so on a narrow screen it goes where it can be seen before the
           fields push it off the top. */}
       <div className="order-first lg:order-none lg:sticky lg:top-[calc(var(--header-height)+2.5rem)] lg:col-span-5">
-        <ContactTable cards={CARDS} played={played} sent={sent} />
+        <ContactTable
+          cards={CARDS}
+          played={played}
+          focused={focused}
+          sent={sent}
+        />
       </div>
     </div>
   );

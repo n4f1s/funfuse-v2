@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 
 import {
+  FileInput,
   FormError,
   FormGuards,
   SelectInput,
@@ -13,7 +14,7 @@ import {
 } from "@/components/forms";
 import { Reveal } from "@/components/motion";
 import { sendApplication } from "@/lib/forms/actions";
-import { idleState } from "@/lib/forms/fields";
+import { CV_ACCEPT, idleState } from "@/lib/forms/fields";
 
 import { applyHash } from "./role-id";
 
@@ -119,15 +120,26 @@ export function ApplyForm({ roles }: { roles: readonly string[] }) {
         </div>
 
         <TextInput
-          label="Portfolio or CV link"
+          label="Portfolio link"
           name="portfolio"
           type="url"
           inputMode="url"
           maxLength={500}
           defaultValue={values.portfolio}
           error={errors.portfolio}
-          hint="A link we can open. Drive, GitHub, ArtStation, a personal site."
+          hint="Something we can open. GitHub, ArtStation, a personal site."
           placeholder="https://"
+        />
+
+        {/* A file input cannot be repopulated by the browser, so a rejected
+            submit clears this one and only this one. The hint says so rather
+            than letting somebody press send twice before noticing. */}
+        <FileInput
+          label="CV"
+          name="cv"
+          accept={CV_ACCEPT}
+          error={errors.cv}
+          hint="PDF, DOC or DOCX, up to 5MB. Reattach it if the form comes back with a correction."
         />
 
         <TextareaInput

@@ -182,6 +182,50 @@ export function SelectInput({
 }
 
 /**
+ * The CV upload.
+ *
+ * A real `<input type="file">`, styled through `::file-selector-button` rather
+ * than hidden behind a decorative button. Keeping the native control means the
+ * platform's own file picker, its keyboard behaviour and its drag-and-drop all
+ * arrive for free, and there is no state to get out of step with the form.
+ *
+ * `accept` and the size note are conveniences. The rules that decide are in
+ * lib/forms/fields.ts, on the server, where a POST cannot skip them.
+ */
+export function FileInput({
+  label,
+  error,
+  hint,
+  name,
+  className,
+  ...rest
+}: Common & ComponentPropsWithRef<"input">) {
+  const id = `field-${name}`;
+
+  return (
+    <Shell id={id} label={label} error={error} hint={hint} optional={!rest.required}>
+      <input
+        {...described(id, error, hint)}
+        type="file"
+        name={name}
+        className={cn(
+          "border-line hover:border-line-strong w-full rounded-md border border-dashed bg-transparent p-3",
+          "text-muted text-sm",
+          "duration-[var(--duration-hover)] transition-[border-color,background-color] ease-out",
+          "aria-[invalid=true]:border-accent-strong",
+          "file:bg-surface-muted file:text-heading file:mr-4 file:cursor-pointer file:rounded-full file:border-0",
+          "file:px-4 file:py-2 file:text-sm file:font-medium",
+          "file:duration-[var(--duration-press)] file:transition-colors file:ease-out",
+          "hover:file:bg-accent-tint hover:file:text-accent-text",
+          className,
+        )}
+        {...rest}
+      />
+    </Shell>
+  );
+}
+
+/**
  * A radio group drawn as pressable cards.
  *
  * Used where the choice is the routing decision rather than a detail — the
