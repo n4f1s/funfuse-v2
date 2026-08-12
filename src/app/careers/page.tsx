@@ -1,6 +1,6 @@
 import {
+  CareerApply,
   CareerBenefits,
-  CareerClosing,
   CareerPositions,
   CareersHero,
 } from "@/components/careers";
@@ -12,6 +12,10 @@ import { createMetadata } from "@/lib/seo";
  * The preserved WordPress careers URL. This page deliberately has no job
  * schema: the source content does not supply the employment type, location,
  * posting date, or other fields needed to make a valid JobPosting truthful.
+ *
+ * The page ends on the application form rather than on a sign-off, because the
+ * whole route exists to get somebody into it. An Apply button in the switcher
+ * links to `#apply-<role>`, and the form reads that back to preselect the role.
  */
 export const metadata = createMetadata({
   title: careersContent.hero.eyebrow,
@@ -31,10 +35,7 @@ export default function CareersPage() {
       />
       <CareerPositions jobs={careersContent.jobs} />
       {applicationEmail ? (
-        <CareerClosing
-          email={applicationEmail}
-          description={careersContent.hero.description}
-        />
+        <CareerApply jobs={careersContent.jobs} email={applicationEmail} />
       ) : null}
     </>
   );

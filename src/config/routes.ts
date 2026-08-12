@@ -73,7 +73,7 @@ export const routes = {
   },
   contact: {
     path: "/contact-us",
-    live: false,
+    live: true,
     changeFrequency: "yearly",
     priority: 0.5,
     preserved: true,

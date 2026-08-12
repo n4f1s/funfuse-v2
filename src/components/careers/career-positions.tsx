@@ -2,7 +2,7 @@ import { Reveal } from "@/components/motion";
 import { Button, Section } from "@/components/ui";
 import type { CareerJob } from "@/content/careers";
 
-import { roleId } from "./role-id";
+import { applyHash, roleId } from "./role-id";
 import { RoleSwitcher } from "./role-switcher";
 
 /**
@@ -87,15 +87,18 @@ export function CareerPositions({ jobs }: { jobs: readonly CareerJob[] }) {
                   data-role-row
                   className="border-line flex flex-col gap-4 border-t pt-7 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <p className="text-muted text-sm">{job.applyEmail}</p>
-                  {/* The subject is prefilled with the role, so an application
-                      arrives labelled without anybody being told to label it. */}
+                  <p className="text-muted text-sm">
+                    Applications go to {job.applyEmail}
+                  </p>
+                  {/* Straight to the form at the foot of this page, which reads
+                      the hash back and preselects this role. A plain anchor, so
+                      it still scrolls to the form with no JavaScript. */}
                   <Button
-                    href={`mailto:${job.applyEmail}?subject=${encodeURIComponent(job.title)}`}
+                    href={`#${applyHash(job.title)}`}
                     size="md"
                     className="w-full sm:w-auto"
                   >
-                    Apply via email
+                    Apply for this role
                   </Button>
                 </div>
               </div>

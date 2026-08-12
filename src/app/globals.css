@@ -616,6 +616,60 @@
     }
   }
 
+  /* Contact — the table beside the form.
+     ------------------------------------------------------------------------
+     Same construction as the homepage table: every number arrives as a custom
+     property inlined by the scene from contact-table.tsx, which stays the one
+     source of truth for the geometry. Only the container query and the resting
+     hand live here.
+
+     `translate` rather than a transform function, because GSAP owns `transform`
+     on the card and the two must not write the same property. */
+  .contact-stage {
+    aspect-ratio: 5 / 4;
+  }
+
+  .contact-board {
+    /* Makes cqw a percentage of the board, so a rank stays the same size
+       relative to the card it is printed on at every viewport. */
+    container-type: inline-size;
+  }
+
+  .contact-card,
+  .contact-slot {
+    position: absolute;
+    left: var(--card-x);
+    top: var(--card-y);
+    width: var(--card-w);
+    aspect-ratio: 5 / 7;
+    translate: -50% -50%;
+    /* The flip is a rotateY on the card's inner node; without a perspective on
+       an ancestor it reads as a horizontal squash rather than a turn. */
+    perspective: 900px;
+  }
+
+  .contact-glow {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    width: 46%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+  }
+
+  /* The resting hand: all four cards played, face up, which is the state no
+     script can reach. Hidden rather than transparent so nothing is rasterized
+     to show nothing; GSAP's autoAlpha writes both, so it can still fade in. */
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .contact-card {
+      transform: var(--rest);
+    }
+
+    .contact-card [data-flip] {
+      transform: rotateY(180deg);
+    }
+  }
+
   /* Hairline that fades at both ends — reads as a seam, not a table border. */
   .rule-soft {
     height: 1px;
