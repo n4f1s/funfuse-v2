@@ -140,9 +140,16 @@ export function HeroBoardGame({ className }: { className?: string }) {
         registerGsap();
 
         const sparks = gsap.utils.toArray<HTMLElement>("[data-game-spark]", root);
+
+        // The face, never the tile. A tile carries its position and its
+        // heading in the `translate` and `rotate` properties, and the first
+        // GSAP transform on an element folds those into `transform` and sets
+        // them to `none` inline. Pulsing the tile itself would therefore drop
+        // it out of the track the first time a piece landed on it.
         const tiles = new Map<number, HTMLElement>();
         for (const tile of gsap.utils.toArray<HTMLElement>("[data-game-tile]", root)) {
-          tiles.set(Number(tile.dataset.gameTile), tile);
+          const face = tile.querySelector<HTMLElement>(".hero-game-tile-face");
+          if (face) tiles.set(Number(tile.dataset.gameTile), face);
         }
 
         const tokens = new Map<PlayerId, TokenRefs>();
@@ -254,13 +261,14 @@ export function HeroBoardGame({ className }: { className?: string }) {
             pods.get(other.id)?.root.toggleAttribute("data-active", active);
           }
 
-          // Multiplies with the CSS `scale` the active marker already carries,
-          // so this is a pop on top of the rest state rather than a fight
-          // with it.
-          const marker = chips.get(player.id);
-          if (marker) {
+          // The pop goes on the slot, not on the marker inside it. The marker's
+          // active state is the `scale` and `translate` properties, and GSAP
+          // zeroes those on any element it transforms. Scaling the slot moves
+          // the marker just the same and leaves its state alone.
+          const slot = chips.get(player.id)?.parentElement;
+          if (slot) {
             gsap.fromTo(
-              marker,
+              slot,
               { scale: 0.82 },
               { scale: 1, duration: 0.5, ease: "back.out(3)", overwrite: "auto" },
             );
@@ -858,6 +866,10 @@ export function HeroBoardGame({ className }: { className?: string }) {
           const pose = diePose(OPENING_FACE);
           gsap.set(die, { rotationX: pose.x, rotationY: pose.y, rotationZ: 0, x: 0, y: 0 });
           gsap.set(trayRing, { autoAlpha: 0.5, scale: 1 });
+          // GSAP's own centring, because GSAP owns this element's transform and
+          // would zero a CSS `translate` on it. Set once; every later tween
+          // touches y/scale only, which compose on top.
+          gsap.set(banner, { xPercent: -50, yPercent: -50 });
           gsap.set([banner, scrim], { autoAlpha: 0 });
           gsap.set(sparks, { autoAlpha: 0 });
           gsap.set(impactRing, { autoAlpha: 0 });
