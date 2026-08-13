@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { Media, type MediaPriority, type SizePreset } from "@/components/media";
+import { Link } from "@/components/navigation";
 import {
   categoryLabels,
   gameHref,

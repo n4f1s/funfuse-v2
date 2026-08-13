@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
+import { Link } from "@/components/navigation";
 import { cn } from "@/lib/cn";
 
 /**

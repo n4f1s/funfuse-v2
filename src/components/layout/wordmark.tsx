@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import logo from "@/assets/brand/funfuse-games-logo.webp";
 import { Media, type MediaPriority } from "@/components/media";
+import { Link } from "@/components/navigation";
 import { cn } from "@/lib/cn";
 
 /**

@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import jeepney from "@/assets/decorative/props/orange-jeepney.png";
+import { Link } from "@/components/navigation";
 import { Reveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";

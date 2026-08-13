@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { Link } from "@/components/navigation";
 import { primaryNav, type NavItem } from "@/config/site";
 import { cn } from "@/lib/cn";
 

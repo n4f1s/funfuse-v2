@@ -1,35 +1,25 @@
 import type { CSSProperties } from "react";
 
+import { SUIT_PATH, SUITS, type SuitName } from "@/components/ui/suits";
 import { cn } from "@/lib/cn";
 
 /**
- * The five cards, their geometry, and the four suits.
+ * The five cards and their geometry.
  *
  * All of it is CSS and SVG: the intro loads no artwork of its own beyond the
  * brand lockup the header already fetches on every page.
  *
- * **The suits are drawn, not typed.** Everywhere else on the site they are the
- * Unicode glyphs, which is fine inside a paragraph of type. Here they are the
- * subject, and on a good number of Android builds `♥` and `♦` resolve to the
- * emoji font: a glossy red heart in the middle of an otherwise flat card. Four
- * paths, defined once and referenced with `<use>`, cost less than the glyphs
- * and look the same on every device.
+ * The suit shapes come from `@/components/ui/suits` and are declared here once
+ * as `<symbol>`s, then referenced with `<use>`. This markup ships in the HTML of
+ * every route whether or not the intro will ever play, and there are more than
+ * thirty pips across five cards — inlining the paths would put ten kilobytes of
+ * path data on every page.
  *
  * Sizes are in `cqw` against the stage, so a rank stays the same size relative
  * to the card it is printed on from a 360px phone to a desktop.
  */
 
-export type SuitName = "spade" | "heart" | "diamond" | "club";
-
-/** 24x24, all four drawn on the same optical weight. */
-const SUIT_PATH: Record<SuitName, string> = {
-  spade:
-    "M12 2.4c0 0-8.6 6.3-8.6 11.5 0 2.7 1.9 4.6 4.3 4.6 1.5 0 2.8-.7 3.5-1.9.1 2.1-.5 3.9-1.8 5.1h5.2c-1.3-1.2-1.9-3-1.8-5.1.7 1.2 2 1.9 3.5 1.9 2.4 0 4.3-1.9 4.3-4.6C20.6 8.7 12 2.4 12 2.4z",
-  heart:
-    "M12 21.3c0 0-8.9-5.9-8.9-12C3.1 6 5.4 3.6 8.2 3.6c1.8 0 3.1.9 3.8 2 .7-1.1 2-2 3.8-2 2.8 0 5.1 2.4 5.1 5.7 0 6.1-8.9 12-8.9 12z",
-  diamond: "M12 2.2 20.4 12 12 21.8 3.6 12z",
-  club: "M12 2.3c-2.1 0-3.8 1.7-3.8 3.8 0 .7.2 1.3.5 1.8-.5-.2-1-.4-1.6-.4-2.1 0-3.8 1.7-3.8 3.8s1.7 3.8 3.8 3.8c1.4 0 2.6-.7 3.2-1.8.1 2.6-.5 4.9-1.7 6.4h6.8c-1.2-1.5-1.8-3.8-1.7-6.4.6 1.1 1.8 1.8 3.2 1.8 2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8c-.6 0-1.1.2-1.6.4.3-.5.5-1.1.5-1.8 0-2.1-1.7-3.8-3.8-3.8z",
-};
+export type { SuitName };
 
 export type IntroFace = {
   rank: string;
@@ -131,7 +121,7 @@ export function SuitDefs() {
   return (
     <svg aria-hidden focusable="false" className="absolute h-0 w-0 overflow-hidden">
       <defs>
-        {(Object.keys(SUIT_PATH) as SuitName[]).map((suit) => (
+        {SUITS.map((suit) => (
           <symbol key={suit} id={`intro-suit-${suit}`} viewBox="0 0 24 24">
             <path d={SUIT_PATH[suit]} fill="currentColor" />
           </symbol>
@@ -184,7 +174,32 @@ export function IntroCard({
         <div className="bg-accent-strong absolute inset-0 overflow-hidden rounded-[1.6cqw] shadow-lg [backface-visibility:hidden]">
           <span className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent_0_0.7cqw,rgba(255,255,255,0.11)_0.7cqw_1.4cqw)]" />
           <span className="border-surface/35 absolute inset-[7%] rounded-[1.1cqw] border" />
-          <span className="border-surface/50 bg-surface/15 absolute top-1/2 left-1/2 h-[6cqw] w-[6cqw] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[0.7cqw] border" />
+
+          {/* The medallion: all four suits, on the diamond the back has always
+              carried. The frame turns and the suits turn back, so they sit
+              upright on a lozenge rather than lying on their sides.
+
+              Two fits have to hold at once, and both are proportions of the
+              same card, so they hold at every viewport. The frame is 13cqw, so
+              its diagonal is 18.4cqw inside an inner area of 20.6cqw. Turning
+              the pips back upright means they live in the frame's *inscribed*
+              square, 13/root-2 = 9.2cqw, against a block of 8.3cqw.
+
+              The pips are sized for the smaller end rather than the larger: at
+              3.8cqw they are 21px on a desktop and 12px on a 375px phone, and
+              the phone is the number that decides whether these read as suits
+              or as texture. */}
+          <span className="border-surface/50 bg-surface/15 absolute top-1/2 left-1/2 h-[13cqw] w-[13cqw] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1cqw] border">
+            <span className="absolute inset-0 grid -rotate-45 grid-cols-2 place-content-center place-items-center gap-[0.7cqw]">
+              {SUITS.map((suit) => (
+                <Pip
+                  key={suit}
+                  suit={suit}
+                  className="text-surface/85 h-[3.8cqw] w-[3.8cqw]"
+                />
+              ))}
+            </span>
+          </span>
         </div>
 
         <div className="bg-surface ring-line absolute inset-0 rounded-[1.6cqw] shadow-lg ring-1 [backface-visibility:hidden] [transform:rotateY(180deg)]">

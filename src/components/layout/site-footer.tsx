@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Link } from "@/components/navigation";
 import { Container } from "@/components/ui/container";
 import { footerNav, site } from "@/config/site";
 

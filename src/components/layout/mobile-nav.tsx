@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Link } from "@/components/navigation";
 import { primaryNav, site } from "@/config/site";
 import { cn } from "@/lib/cn";
 
@@ -38,6 +38,22 @@ export function MobileNav({ className }: { className?: string }) {
     // Let the exit transition run before the element leaves the top layer.
     window.clearTimeout(exitTimer.current);
     exitTimer.current = window.setTimeout(() => dialog.close(), EXIT_MS);
+  }, []);
+
+  /**
+   * Closing for a navigation, which is a different problem from closing.
+   *
+   * `showModal()` puts the dialog in the browser's top layer, which sits above
+   * every z-index on the page — including the route transition's. Letting the
+   * panel take its usual 260ms to leave would mean the cover animates *behind*
+   * the sheet and the visitor watches a menu slide out over a red screen. The
+   * cover is about to hide everything anyway, so the sheet has nothing left to
+   * animate for and goes at once.
+   */
+  const closeForNavigation = useCallback(() => {
+    window.clearTimeout(exitTimer.current);
+    setOpen(false);
+    dialogRef.current?.close();
   }, []);
 
   // Close on navigation. Without this the panel survives the route change and
@@ -106,6 +122,7 @@ export function MobileNav({ className }: { className?: string }) {
                 <li key={item.href} className="border-line border-b">
                   <Link
                     href={item.href}
+                    onNavigate={closeForNavigation}
                     aria-current={isActive(pathname, item) ? "page" : undefined}
                     className={cn(
                       "font-display block py-4 text-h3 tracking-tighter",
@@ -120,7 +137,11 @@ export function MobileNav({ className }: { className?: string }) {
           </nav>
 
           <div className="mt-8 flex flex-col gap-1 text-sm">
-            <Link href="/contact-us" className="text-heading py-2 font-medium">
+            <Link
+              href="/contact-us"
+              onNavigate={closeForNavigation}
+              className="text-heading py-2 font-medium"
+            >
               Contact us
             </Link>
             <a href={`mailto:${site.email}`} className="text-muted py-2">

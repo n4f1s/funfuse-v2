@@ -6,6 +6,7 @@ import { IntroGate, SiteIntro } from "@/components/intro";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Media } from "@/components/media";
+import { RouteTransition } from "@/components/navigation/route-transition";
 import { JsonLd } from "@/components/seo/json-ld";
 import { site } from "@/config/site";
 import { jsonLdGraph, organizationSchema, websiteSchema } from "@/lib/jsonld";
@@ -107,6 +108,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <SiteFooter />
         </div>
+
+        {/* Internal navigation only. It cannot fire on first paint or
+            hydration — the only thing that opens it is a link's `onNavigate` —
+            so it never competes with the intro below. z-90 keeps it under the
+            skip link (100) and under the intro (110), which is the order that
+            makes an overlap impossible rather than merely unlikely. */}
+        <RouteTransition />
 
         {/* The lockup is passed in rather than imported by the island, so the
             image system stays on the server side of the boundary. Same asset

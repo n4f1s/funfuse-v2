@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { Media } from "@/components/media";
+import { Link } from "@/components/navigation";
 import { Reveal } from "@/components/motion";
 import { Container } from "@/components/ui/container";
 import { Hand } from "@/components/ui/hand";
