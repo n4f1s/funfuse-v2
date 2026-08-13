@@ -12,9 +12,7 @@ import { ease } from "@/lib/motion/tokens";
 
 registerGsap();
 
-const SUITS = ["♠", "♥", "♦", "♣"] as const;
-
-type Suit = (typeof SUITS)[number];
+type Suit = "♠" | "♥" | "♦" | "♣";
 
 type FaceCardProps = {
   suit: Suit;
