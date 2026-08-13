@@ -289,7 +289,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.7"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
@@ -309,7 +309,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.95"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
@@ -329,7 +329,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.52"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
@@ -349,7 +349,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.75"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
@@ -369,7 +369,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.4"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
@@ -389,7 +389,7 @@ export function TermsDecor() {
         <div
           data-terms-pointer-card
           data-pointer-depth="0.65"
-          className="h-full w-full [transform-style:preserve-3d]"
+          className="h-full w-full transform-3d"
         >
           <div
             data-terms-card-shell
