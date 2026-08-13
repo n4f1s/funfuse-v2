@@ -6,6 +6,14 @@ import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
 import {
+  BEAT,
+  COUNT,
+  FULL_SECONDS,
+  QUIET,
+  QUIET_SECONDS,
+  WATCHDOG_SLACK_MS,
+} from "./intro-beats";
+import {
   FAN,
   HAND,
   HERO,
@@ -16,7 +24,7 @@ import {
   Z,
 } from "./intro-cards";
 import {
-  INTRO_EXIT_ATTRIBUTE,
+  INTRO_CLAIM_ATTRIBUTE,
   INTRO_LOCK_ID,
   SHELL_ID,
 } from "./intro-config";
@@ -31,56 +39,43 @@ import {
  * years, so it takes the middle, and at the end it comes at the viewer until its
  * face is the whole screen and dissolves into the page.
  *
- * It is not page-transition UI. It runs once per tab, on the route the visitor
- * actually asked for, and it has no opinion about which route that is: the
- * overlay lives in the root layout, so a direct arrival at `/careers/` gets its
- * own page behind the intro rather than a detour through home.
+ * ## A brand animation, not a loading indicator
+ *
+ * One master timeline of fixed length, built entirely from the literals in
+ * `intro-beats.ts`. Nothing here consults `load`, `readyState`, `fonts.ready` or
+ * any resource, and nothing pauses. The route renders behind the overlay at
+ * whatever pace the connection allows and is revealed in whatever state it has
+ * reached when the animation ends.
+ *
+ * That is a deliberate reversal. Tying the choreography to real readiness meant
+ * a slow connection got a half-played animation and a readout stuck in the high
+ * eighties, which is the opposite of what an identity moment is for. The count
+ * is now choreography: it belongs to the cards, not to the network, and it
+ * always reaches 100.
+ *
+ * ## What it is not
+ *
+ * Route-transition UI. It runs once per tab, on the route the visitor actually
+ * asked for — the overlay lives in the root layout, so a direct arrival at
+ * `/careers/` gets its own page behind the intro rather than a detour through
+ * home. It never touches the router, and leaving does no more than unmount a
+ * fixed overlay, so it cannot set a page transition going on its way out.
  *
  * ## What guarantees it goes away
  *
- * Four independent stops, in the order they would fire:
+ * Four independent stops:
  *
- *   1. the normal path — the exit timeline's `onComplete`;
+ *   1. the normal path — the master timeline's `onComplete`, at a known time;
  *   2. `catch` around every step of setup, which calls the same `finish`;
- *   3. this island's own watchdog, if a tween somehow never completes;
- *   4. the gate script's failsafe, which needs no bundle to have loaded at all.
+ *   3. this island's watchdog, for a timeline stalled by a backgrounded tab;
+ *   4. the gate script's failsafe, for a bundle that never ran at all. Once
+ *      this island claims the lock, that one stands down for good.
  *
  * All four do the same single thing: remove the gate's `<style>` element. That
  * element is both the overlay's `display` and the scroll lock, so there is no
  * ordering in which the page ends up covered, or scrollable but covered, or
  * uncovered but locked.
- *
- * ## What it will not do
- *
- * Wait for the whole page. Readiness is `load` plus `document.fonts.ready`, both
- * of which ignore lazily-loaded images, raced against a hard deadline. The
- * percentage is honest about it: it eases toward the high nineties and stops
- * there, because a loader that reads 100% while the page is still arriving is
- * lying.
  */
-
-/**
- * Milliseconds since navigation start, not since mount. Every deadline here is
- * measured against the visitor's wait, which began long before React did.
- */
-const since = () => performance.now();
-
-/**
- * Hydration later than this means the visitor has been looking at the resting
- * deck for a while already. Running a 1.6 second choreography at them now would
- * add to a wait that is already too long, so the short form takes over: the
- * readout completes and the panel goes.
- */
-const LATE_MOUNT_MS = 2600;
-
-/** However slow the route is, the exit begins by here. */
-const READY_DEADLINE_MS = 4200;
-
-/** A tween that never completes cannot hold the screen past this. */
-const HARD_STOP_MS = 6600;
-
-/** The short form still has a floor, so it reads as a beat rather than a blink. */
-const QUICK_FLOOR = 0.5;
 
 export function SiteIntro({ lockup }: { lockup: ReactNode }) {
   const [showing, setShowing] = useState(true);
@@ -124,13 +119,11 @@ function IntroOverlay({
       const shell = document.getElementById(SHELL_ID);
       let finished = false;
       let watchdog = 0;
-      let deadline = 0;
 
       const finish = () => {
         if (finished) return;
         finished = true;
         window.clearTimeout(watchdog);
-        window.clearTimeout(deadline);
         // Removing this one node puts back the scroll, the overlay's
         // `display: none` and, with `inert` below, every tab stop on the page.
         lock.remove();
@@ -141,15 +134,16 @@ function IntroOverlay({
       try {
         registerGsap();
 
+        // Claim it. From here the gate's twenty-second failsafe stands down and
+        // this island owns the lifecycle, however long the bundle took to
+        // arrive. Set before a single tween is built, so a throw below still
+        // leaves the `catch` in charge rather than the gate.
+        lock.setAttribute(INTRO_CLAIM_ATTRIBUTE, "");
+
         // The overlay is opaque and covers everything, so pointers are already
         // handled. This is for the keyboard: without it, tab moves focus
         // through a page nobody can see.
         shell?.setAttribute("inert", "");
-
-        watchdog = window.setTimeout(
-          finish,
-          Math.max(1500, HARD_STOP_MS - since()),
-        );
 
         const cards = gsap.utils.toArray<HTMLElement>("[data-intro-card]", fan);
         const flips = gsap.utils.toArray<HTMLElement>("[data-intro-flip]", fan);
@@ -187,48 +181,16 @@ function IntroOverlay({
           setBar(readout.value / 100);
         };
 
-        const late = since() > LATE_MOUNT_MS;
-
-        let ready = false;
-        let choreographed = false;
-        let leave = () => {};
-
-        const reveal = () => {
-          if (finished || !ready || !choreographed) return;
-          // Tells the gate's failsafe that something is alive and running the
-          // exit, so it does not pull the overlay out mid-animation.
-          lock.setAttribute(INTRO_EXIT_ATTRIBUTE, "");
-          leave();
-        };
-
-        const markReady = () => {
-          if (ready) return;
-          ready = true;
-          reveal();
-        };
-
-        whenReady().then(markReady, markReady);
-        deadline = window.setTimeout(
-          markReady,
-          Math.max(0, READY_DEADLINE_MS - since()),
-        );
-
         const media = gsap.matchMedia();
 
         media.add({ ok: MOTION_QUERY.ok }, (context) => {
           if (finished) return;
 
           const { ok } = context.conditions as { ok: boolean };
-          const full = ok && !late;
 
-          choreographed = false;
+          const master = gsap.timeline({ onComplete: finish });
 
-          const progress = gsap.timeline();
-          const outro = gsap.timeline({ paused: true, onComplete: finish });
-          let entrance: gsap.core.Timeline;
-          let idle: gsap.core.Tween | null = null;
-
-          if (full) {
+          if (ok) {
             // GSAP has to own the transform outright, declared in its own
             // units. The pose in the markup is percentages of a card; GSAP
             // reads it back off the computed matrix, which is pixels, and
@@ -246,105 +208,137 @@ function IntroOverlay({
               });
             });
 
-            entrance = gsap.timeline();
-
-            // 1. The deck squares up, and the whole stage takes the tap.
-            entrance
+            // ---- The deck arrives ------------------------------------------
+            master
               .to(
                 cards,
                 {
                   xPercent: 0,
                   yPercent: 0,
                   rotation: 0,
-                  duration: 0.32,
+                  duration: BEAT.square.duration,
                   ease: ease.out,
-                  stagger: 0.015,
+                  stagger: BEAT.square.stagger,
                 },
-                0,
+                BEAT.square.at,
               )
-              .to(fan, { scale: 1.03, duration: 0.16, ease: "power2.out" }, 0.04)
-              .to(fan, { scale: 1, duration: 0.28, ease: ease.out }, 0.2);
+              .to(
+                fan,
+                {
+                  scale: 1.03,
+                  duration: BEAT.tapIn.duration,
+                  ease: "power2.out",
+                },
+                BEAT.tapIn.at,
+              )
+              .to(
+                fan,
+                { scale: 1, duration: BEAT.tapOut.duration, ease: ease.out },
+                BEAT.tapOut.at,
+              );
 
-            // 2. The spread, from the middle out. That is the direction a fan
-            //    opens in, and it puts the hero card in place first so the rest
-            //    of the hand arranges itself around a card that is already
-            //    there.
-            entrance
+            // ---- The spread, from the middle out ---------------------------
+            // That is the direction a fan opens in, and it puts the hero card
+            // in place first so the rest of the hand arranges itself around a
+            // card that is already there.
+            master
               .to(
                 cards,
                 {
                   xPercent: (index: number) => FAN[index].x,
                   yPercent: (index: number) => FAN[index].y,
                   rotation: (index: number) => FAN[index].r,
-                  duration: 0.6,
+                  duration: BEAT.spread.duration,
                   ease: ease.out,
-                  stagger: { each: 0.07, from: "center" },
+                  stagger: { each: BEAT.spread.stagger, from: "center" },
                 },
-                0.22,
+                BEAT.spread.at,
               )
-              .to(hero, { scale: 1.06, duration: 0.6, ease: ease.out }, 0.22);
+              .to(
+                hero,
+                { scale: 1.06, duration: BEAT.lift.duration, ease: ease.out },
+                BEAT.lift.at,
+              );
 
-            // 3. The turn, outside in, so the reveal closes on the middle. The
-            //    hero turns last and alone: it is the one the composition has
-            //    been building toward.
-            entrance
+            // ---- The turn, outside in --------------------------------------
+            // So the reveal closes on the middle. The hero turns last and
+            // alone: it is the one the composition has been building toward.
+            master
               .to(
                 wingFlips,
                 {
                   rotationY: 180,
-                  duration: 0.44,
+                  duration: BEAT.turn.duration,
                   ease: ease.inOut,
-                  stagger: { each: 0.07, from: "edges" },
+                  stagger: { each: BEAT.turn.stagger, from: "edges" },
                 },
-                0.62,
+                BEAT.turn.at,
               )
               .to(
                 heroFlip,
-                { rotationY: 180, duration: 0.5, ease: ease.inOut },
-                0.84,
+                {
+                  rotationY: 180,
+                  duration: BEAT.heroTurn.duration,
+                  ease: ease.inOut,
+                },
+                BEAT.heroTurn.at,
               )
               // Set down with a little more weight than it was carried with.
-              .to(hero, { scale: 1.11, duration: 0.16, ease: "power2.out" }, 1.14)
-              .to(hero, { scale: 1.06, duration: 0.3, ease: ease.out }, 1.3);
-
-            // While the route finishes arriving. Small enough to read as the
-            // hand being held rather than as an animation still playing.
-            idle = gsap.to(fan, {
-              yPercent: -1.1,
-              rotation: 0.5,
-              duration: 2.4,
-              ease: ease.loop,
-              yoyo: true,
-              repeat: -1,
-              paused: true,
-            });
-
-            progress
-              .to(readout, {
-                value: 86,
-                duration: 1.4,
-                ease: ease.out,
-                onUpdate: paint,
-              })
-              // Approaches, never arrives. The last few points belong to the
-              // route, not to a timer.
-              .to(readout, {
-                value: 97,
-                duration: 4.4,
-                ease: "power2.out",
-                onUpdate: paint,
-              });
-
-            outro
               .to(
-                readout,
-                { value: 100, duration: 0.3, ease: ease.out, onUpdate: paint },
-                0,
+                hero,
+                {
+                  scale: 1.11,
+                  duration: BEAT.landIn.duration,
+                  ease: "power2.out",
+                },
+                BEAT.landIn.at,
               )
-              .to(fan, { yPercent: 0, rotation: 0, duration: 0.26, ease: ease.out }, 0)
-              // The hand gathers back under the ace. They land a shade smaller
-              // than it, so they end up behind a card rather than beside one
-              // and never need to be faded out.
+              .to(
+                hero,
+                { scale: 1.06, duration: BEAT.landOut.duration, ease: ease.out },
+                BEAT.landOut.at,
+              );
+
+            // ---- Presented -------------------------------------------------
+            // The ace lifts clear while the hand settles under it. This is the
+            // beat that used to be an open-ended idle loop waiting on the
+            // network; it is now a held moment of a known length, which is what
+            // it always looked like on a fast connection anyway.
+            master
+              .to(
+                hero,
+                {
+                  yPercent: -4,
+                  duration: BEAT.present.duration,
+                  ease: ease.out,
+                },
+                BEAT.present.at,
+              )
+              .to(
+                fan,
+                {
+                  yPercent: 1.6,
+                  rotation: 0.4,
+                  duration: BEAT.present.duration,
+                  ease: ease.loop,
+                },
+                BEAT.present.at,
+              )
+              .to(
+                fan,
+                {
+                  yPercent: 0,
+                  rotation: 0,
+                  duration: BEAT.level.duration,
+                  ease: ease.out,
+                },
+                BEAT.level.at,
+              );
+
+            // ---- The hand closes, and the ace leaves ------------------------
+            master
+              // They land a shade smaller than the ace, so they end up behind a
+              // card rather than beside one and never need to be faded out.
               .to(
                 wings,
                 {
@@ -352,91 +346,142 @@ function IntroOverlay({
                   yPercent: 0,
                   rotation: 0,
                   scale: 0.97,
-                  duration: 0.34,
+                  duration: BEAT.gather.duration,
                   ease: ease.inOut,
-                  stagger: { each: 0.03, from: "edges" },
+                  stagger: { each: BEAT.gather.stagger, from: "edges" },
                 },
-                0.08,
+                BEAT.gather.at,
               )
               // Drawn back before it is thrown. Without it the first frame of
               // the rush is a frame where nothing moves, and that is the frame
               // being watched.
-              .to(hero, { scale: 1, duration: 0.14, ease: ease.out }, 0.4)
-              // The readout has said 100 and the card is about to be the whole
-              // screen. It leaves under its own steam rather than being
-              // covered: the caption is a later sibling of the stage, so it
-              // paints over the growing card no matter what z the card carries.
-              .to(caption, { autoAlpha: 0, duration: 0.22, ease: ease.out }, 0.4)
+              .to(
+                hero,
+                {
+                  yPercent: 0,
+                  scale: 1,
+                  duration: BEAT.drawBack.duration,
+                  ease: ease.out,
+                },
+                BEAT.drawBack.at,
+              )
+              // The readout has said 100 for a quarter second by now. The
+              // caption leaves under its own steam rather than being covered:
+              // it is a later sibling of the stage, so it paints over the
+              // growing card no matter what z the card carries.
+              .to(
+                caption,
+                {
+                  autoAlpha: 0,
+                  duration: BEAT.caption.duration,
+                  ease: ease.out,
+                },
+                BEAT.caption.at,
+              )
               // The ink goes early, while the card is still small enough for
               // the loss to be invisible. What grows is a plain white sheet.
-              .to(heroInk, { autoAlpha: 0, duration: 0.16, ease: "none" }, 0.54)
+              .to(
+                heroInk,
+                { autoAlpha: 0, duration: BEAT.ink.duration, ease: "none" },
+                BEAT.ink.at,
+              )
               // Toward the eye, so it accelerates. This is the one easing on
               // the site allowed to start slow: it describes an object moving
               // in depth, not a control answering a press.
               .to(
                 hero,
-                { scale: coverScale(hero), duration: 0.46, ease: "power2.in" },
-                0.54,
+                {
+                  scale: coverScale(hero),
+                  duration: BEAT.rush.duration,
+                  ease: "power2.in",
+                },
+                BEAT.rush.at,
               )
               // By now the card's face is the entire screen, so this fades
               // white into the page rather than the intro into the page.
-              .to(overlay, { autoAlpha: 0, duration: 0.28, ease: ease.out }, 0.94);
+              .to(
+                overlay,
+                {
+                  autoAlpha: 0,
+                  duration: BEAT.reveal.duration,
+                  ease: ease.out,
+                },
+                BEAT.reveal.at,
+              );
+
+            // The count, one segment per act. `power1.inOut` rather than the
+            // site's usual `ease.out`: five consecutive segments each starting
+            // at full tilt reads as five separate surges, and this is meant to
+            // be one continuous count that happens to breathe at the act
+            // breaks. The few frames of gap between segments do that breathing.
+            for (const step of COUNT) {
+              master.to(
+                readout,
+                {
+                  value: step.to,
+                  duration: step.duration,
+                  ease: "power1.inOut",
+                  onUpdate: paint,
+                },
+                step.at,
+              );
+            }
           } else {
-            // Reduced motion, or a hydration late enough that choreography
-            // would be an imposition. The deck stays exactly as painted; only
-            // the readout moves, and then the panel goes.
-            entrance = gsap.timeline().to({}, { duration: QUICK_FLOOR });
-
-            progress
-              .to(readout, {
-                value: 90,
-                duration: 0.5,
-                ease: ease.out,
-                onUpdate: paint,
-              })
-              .to(readout, {
-                value: 97,
-                duration: 3.2,
-                ease: "power2.out",
-                onUpdate: paint,
-              });
-
-            outro
+            // Reduced motion. The deck stays exactly as the server painted it;
+            // only the count runs, and then the panel goes.
+            master
               .to(
                 readout,
-                { value: 100, duration: 0.26, ease: ease.out, onUpdate: paint },
-                0,
+                {
+                  value: 100,
+                  duration: QUIET.count.duration,
+                  ease: ease.out,
+                  onUpdate: paint,
+                },
+                QUIET.count.at,
               )
-              .to(overlay, { autoAlpha: 0, duration: 0.3, ease: ease.out }, 0.22);
+              .to(
+                overlay,
+                {
+                  autoAlpha: 0,
+                  duration: QUIET.reveal.duration,
+                  ease: ease.out,
+                },
+                QUIET.reveal.at,
+              );
           }
 
-          entrance.eventCallback("onComplete", () => {
-            choreographed = true;
-            idle?.play();
-            reveal();
-          });
+          // The beat map is what gets reviewed and checked; this is what
+          // actually plays. If they ever disagree, the map is lying about the
+          // length of the animation and every check written against it is
+          // measuring the wrong thing. Development only — stripped from the
+          // production bundle.
+          if (process.env.NODE_ENV !== "production") {
+            const declared = ok ? FULL_SECONDS : QUIET_SECONDS;
+            if (Math.abs(master.duration() - declared) > 0.001) {
+              console.warn(
+                `Intro timeline runs ${master.duration()}s but intro-beats declares ${declared}s.`,
+              );
+            }
+          }
 
-          // `ready` may already be true here — a cached route resolves `load`
-          // before hydration finishes. Nothing to do about it at this point:
-          // `choreographed` was just reset, so the entrance's own callback
-          // above is what will pick the reveal up.
-          leave = () => {
-            idle?.pause();
-            progress.kill();
-            outro.play();
-          };
+          // Derived from the timeline that was actually built, so it can never
+          // drift from the beats. It is insurance against a stalled playhead —
+          // a backgrounded tab stops serving frames — and never fires on a page
+          // the visitor is looking at.
+          watchdog = window.setTimeout(
+            finish,
+            master.duration() * 1000 + WATCHDOG_SLACK_MS,
+          );
 
           return () => {
-            entrance.kill();
-            idle?.kill();
-            progress.kill();
-            outro.kill();
+            window.clearTimeout(watchdog);
+            master.kill();
           };
         });
 
         return () => {
           window.clearTimeout(watchdog);
-          window.clearTimeout(deadline);
           media.revert();
           // Deliberately not removing the lock here. There are only two ways
           // this unmounts: after `finish`, which already removed it, or with
@@ -463,7 +508,7 @@ function IntroOverlay({
           that changes sixty times a second inside a live region is not
           information, it is an interruption. */}
       <p role="status" className="sr-only">
-        Loading FunFuse Games
+        FunFuse Games
       </p>
 
       <div aria-hidden className="absolute inset-0">
@@ -526,7 +571,7 @@ function IntroOverlay({
 /**
  * How far the hero card has to grow before its face is the whole viewport.
  *
- * Measured rather than guessed: the stage is capped at 30rem, so the same fixed
+ * Measured rather than guessed: the stage is capped at 34rem, so the same fixed
  * number would leave a border of page showing on a wide desktop and overshoot by
  * a factor of four on a phone. Resolved by GSAP when the tween first renders,
  * which is the instant the card is back at scale 1.
@@ -541,31 +586,4 @@ function coverScale(hero: HTMLElement) {
       1.3
     );
   };
-}
-
-/**
- * Ready enough to hand the screen over.
- *
- * `load` rather than `DOMContentLoaded`, because a hero image that pops in one
- * frame after the intro leaves is the thing the intro exists to prevent. Lazy
- * images below the fold do not hold `load`, which is the whole reason it is
- * usable here. Fonts get their own signal: the page swapping typeface behind a
- * dissolving overlay is the same jolt by a different route.
- *
- * Neither can hang the visitor — the caller races this against a deadline.
- */
-function whenReady(): Promise<unknown> {
-  const documentReady =
-    document.readyState === "complete"
-      ? Promise.resolve()
-      : new Promise<void>((resolve) => {
-          window.addEventListener("load", () => resolve(), { once: true });
-        });
-
-  const fontsReady =
-    "fonts" in document
-      ? document.fonts.ready.catch(() => undefined)
-      : Promise.resolve();
-
-  return Promise.all([documentReady, fontsReady]);
 }

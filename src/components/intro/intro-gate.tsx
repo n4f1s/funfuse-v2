@@ -1,5 +1,5 @@
 import {
-  INTRO_EXIT_ATTRIBUTE,
+  INTRO_CLAIM_ATTRIBUTE,
   INTRO_FAILSAFE_MS,
   INTRO_LOCK_CSS,
   INTRO_LOCK_ID,
@@ -21,6 +21,12 @@ import {
  * the page, then have an intro dropped on top of it.
  *
  * It writes nothing the server needs to know, so the root layout stays static.
+ *
+ * On a slow connection the HTML and CSS land well before the JavaScript, so
+ * what this script turns on is a *resting* composition — a squared deck, the
+ * lockup, a readout at zero. That is the intended state for as long as the
+ * bundle takes. The animation begins when the island initialises, and runs its
+ * full fixed length from there.
  *
  * Three reasons it stands down:
  *
@@ -44,11 +50,13 @@ export function IntroGate() {
     `s.id=${q(INTRO_LOCK_ID)};`,
     `s.textContent=${q(INTRO_LOCK_CSS)};`,
     "document.head.appendChild(s);",
-    // The last resort. If the island never hydrates — a dropped chunk, a parse
-    // error, a browser that hates us — this is what hands the page back. It
-    // needs nothing but the script that is already running.
+    // The last resort, and only that. It asks one question: has anything
+    // claimed this? An unclaimed lock after twenty seconds means the bundle is
+    // never going to run, so the page goes back to the visitor. A claimed one
+    // is left entirely alone — the island owns its own lifecycle from that
+    // moment, including its own much shorter watchdog.
     "setTimeout(function(){",
-    `if(!s.hasAttribute(${q(INTRO_EXIT_ATTRIBUTE)}))s.remove()`,
+    `if(!s.hasAttribute(${q(INTRO_CLAIM_ATTRIBUTE)}))s.remove()`,
     `},${INTRO_FAILSAFE_MS})`,
     "})();",
   ].join("");
