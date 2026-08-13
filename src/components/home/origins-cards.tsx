@@ -300,7 +300,7 @@ export function OriginsCards({ className }: { className?: string }) {
     <div
       ref={stage}
       aria-hidden
-      className={cn("relative aspect-[5/4] w-full", className)}
+      className={cn("relative aspect-5/4 w-full", className)}
     >
       {HAND.map((card, index) => {
         const slot = SLOTS[index];
@@ -310,7 +310,7 @@ export function OriginsCards({ className }: { className?: string }) {
           <div
             key={`${card.rank}${card.suit}`}
             data-card
-            className="absolute aspect-[5/7]"
+            className="absolute aspect-5/7"
             // The resting stack lives in the markup, so this is already three
             // cards before GSAP runs, or if it never does.
             style={{
@@ -319,8 +319,8 @@ export function OriginsCards({ className }: { className?: string }) {
               zIndex: slot.z,
             }}
           >
-            <div className="border-line bg-surface relative h-full w-full rounded-lg border shadow-md">
-              <span className="border-line/60 absolute inset-[8%] rounded-md border" />
+            <div className="border-line bg-surface relative h-full w-full rounded-sm border shadow-md">
+              <span className="border-line/60 absolute inset-[8%]" />
               <span
                 className={cn(
                   "absolute top-[8%] left-[11%] flex flex-col items-center gap-0.5 text-xs leading-none font-semibold",

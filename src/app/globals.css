@@ -693,6 +693,53 @@
     }
   }
 
+  /* Site intro — the first-visit ident.
+     ------------------------------------------------------------------------
+     The overlay is server rendered on every route and hidden by default. A tiny
+     inline script at the top of the body decides whether this tab has earned an
+     intro and, if so, turns it on before the parser has even reached the
+     overlay. So the first paint is either the intro or the page, never one and
+     then the other, and a session that has already seen it cannot flash on
+     reload.
+
+     The switch is a <style> element the script appends to the head, carrying:
+
+         html{overflow:hidden}.intro-overlay{display:grid}
+
+     Unlayered, so it outranks the default below without an !important. It is a
+     node rather than an attribute on <html> because the root layout renders
+     <html>, and React reconciles its attributes: anything written there before
+     hydration is a real mismatch. A node the script made itself is outside
+     React's tree, so there is nothing to disagree about.
+
+     Keeping both rules on one element is also what makes the intro impossible
+     to half-dismiss. That element *is* the display and the scroll lock, so
+     there is a single node to remove and no ordering that leaves the page
+     covered, or scrollable but covered, or uncovered but locked.
+
+     Without scripting the element is never created, so the overlay never
+     displays and no fallback is needed. See components/intro/intro-gate.tsx. */
+  .intro-overlay {
+    display: none;
+  }
+
+  /* Makes cqw a percentage of the stage, so a rank stays the same size relative
+     to the card it is printed on at every viewport. */
+  .intro-stage {
+    container-type: inline-size;
+  }
+
+  .intro-card {
+    position: absolute;
+    left: var(--intro-card-x);
+    top: var(--intro-card-y);
+    width: var(--intro-card-w);
+    aspect-ratio: 5 / 7;
+    /* Per card, not on the stage. One shared vanishing point would turn all
+       five toward the same spot; a hand turns each card about its own middle. */
+    perspective: 900px;
+  }
+
   /* Hairline that fades at both ends — reads as a seam, not a table border. */
   .rule-soft {
     height: 1px;

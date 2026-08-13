@@ -77,7 +77,7 @@ export function Origins() {
             the row and leaves a hole beside it. Below that there is no hole to
             fill, and an infinite timeline is not scenery a phone should pay
             for. */}
-        <OriginsCards className="hidden w-56 shrink-0 lg:block xl:w-64" />
+        <OriginsCards className="hidden shrink-0 lg:block lg:w-64" />
       </Container>
 
       {/* Outside the container and outside any reveal: the rows are already
