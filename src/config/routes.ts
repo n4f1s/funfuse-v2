@@ -87,14 +87,14 @@ export const routes = {
   },
   terms: {
     path: "/tos",
-    live: false,
+    live: true,
     changeFrequency: "yearly",
     priority: 0.2,
     preserved: true,
   },
   privacy: {
     path: "/privacy-policy",
-    live: false,
+    live: true,
     changeFrequency: "yearly",
     priority: 0.2,
     preserved: true,

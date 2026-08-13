@@ -82,6 +82,8 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+Current project structure
+
 ```
 funfuse-v2
 ├─ .agents
@@ -117,9 +119,15 @@ funfuse-v2
 ├─ pnpm-workspace.yaml
 ├─ postcss.config.mjs
 ├─ public
+├─ scripts
+│  └─ generate-screenshots.ts
 ├─ skills-lock.json
 ├─ src
 │  ├─ app
+│  │  ├─ careers
+│  │  │  └─ page.tsx
+│  │  ├─ contact-us
+│  │  │  └─ page.tsx
 │  │  ├─ error.tsx
 │  │  ├─ favicon.ico
 │  │  ├─ games
@@ -235,6 +243,28 @@ funfuse-v2
 │  │        ├─ cover.webp
 │  │        └─ icon.webp
 │  ├─ components
+│  │  ├─ careers
+│  │  │  ├─ apply-form.tsx
+│  │  │  ├─ career-apply.tsx
+│  │  │  ├─ career-benefits.tsx
+│  │  │  ├─ career-positions.tsx
+│  │  │  ├─ careers-hero-stage.tsx
+│  │  │  ├─ careers-hero.tsx
+│  │  │  ├─ index.ts
+│  │  │  ├─ role-id.ts
+│  │  │  └─ role-switcher.tsx
+│  │  ├─ contact
+│  │  │  ├─ contact-channels.tsx
+│  │  │  ├─ contact-form.tsx
+│  │  │  ├─ contact-hero-stage.tsx
+│  │  │  ├─ contact-hero.tsx
+│  │  │  ├─ contact-table.tsx
+│  │  │  └─ index.ts
+│  │  ├─ forms
+│  │  │  ├─ field.tsx
+│  │  │  ├─ form-parts.tsx
+│  │  │  ├─ index.ts
+│  │  │  └─ sent-panel.tsx
 │  │  ├─ games
 │  │  │  ├─ breadcrumb.tsx
 │  │  │  ├─ game-card.tsx
@@ -259,11 +289,27 @@ funfuse-v2
 │  │  │  ├─ featured-games.tsx
 │  │  │  ├─ figure-rail.tsx
 │  │  │  ├─ game-link.ts
-│  │  │  ├─ hero-stage.tsx
+│  │  │  ├─ hero-board-game-board.ts
+│  │  │  ├─ hero-board-game-parts.tsx
+│  │  │  ├─ hero-board-game.tsx
 │  │  │  ├─ hero.tsx
 │  │  │  ├─ index.ts
+│  │  │  ├─ origins-cards.tsx
+│  │  │  ├─ origins-marquee.tsx
+│  │  │  ├─ origins.tsx
 │  │  │  ├─ prop.tsx
-│  │  │  └─ studio.tsx
+│  │  │  ├─ studio.tsx
+│  │  │  ├─ trick-table-board.tsx
+│  │  │  ├─ trick-table-parts.tsx
+│  │  │  ├─ trick-table-round.ts
+│  │  │  └─ trick-table.tsx
+│  │  ├─ intro
+│  │  │  ├─ index.ts
+│  │  │  ├─ intro-beats.ts
+│  │  │  ├─ intro-cards.tsx
+│  │  │  ├─ intro-config.ts
+│  │  │  ├─ intro-gate.tsx
+│  │  │  └─ site-intro.tsx
 │  │  ├─ layout
 │  │  │  ├─ index.ts
 │  │  │  ├─ mobile-nav.tsx
@@ -281,6 +327,12 @@ funfuse-v2
 │  │  │  ├─ index.ts
 │  │  │  ├─ parallax.tsx
 │  │  │  └─ reveal.tsx
+│  │  ├─ navigation
+│  │  │  ├─ index.ts
+│  │  │  ├─ link.tsx
+│  │  │  ├─ paths.ts
+│  │  │  ├─ route-transition.tsx
+│  │  │  └─ transition-store.ts
 │  │  ├─ seo
 │  │  │  └─ json-ld.tsx
 │  │  └─ ui
@@ -288,21 +340,35 @@ funfuse-v2
 │  │     ├─ container.tsx
 │  │     ├─ hand.tsx
 │  │     ├─ index.ts
-│  │     └─ section.tsx
+│  │     ├─ section.tsx
+│  │     └─ suits.tsx
 │  ├─ config
 │  │  ├─ routes.ts
 │  │  └─ site.ts
 │  ├─ content
+│  │  ├─ careers.ts
+│  │  ├─ contact.ts
 │  │  └─ games
 │  │     ├─ art.ts
+│  │     ├─ asset-folders.ts
 │  │     ├─ details.ts
 │  │     ├─ games.ts
+│  │     ├─ generated
+│  │     │  └─ screenshots.generated.ts
 │  │     ├─ index.ts
+│  │     ├─ screenshots.ts
 │  │     └─ types.ts
 │  └─ lib
 │     ├─ cn.ts
+│     ├─ email
+│     │  ├─ messages.ts
+│     │  └─ resend.ts
+│     ├─ forms
+│     │  ├─ actions.ts
+│     │  └─ fields.ts
 │     ├─ jsonld.ts
 │     ├─ motion
+│     │  ├─ confetti.ts
 │     │  ├─ gsap.ts
 │     │  └─ tokens.ts
 │     └─ seo.ts
