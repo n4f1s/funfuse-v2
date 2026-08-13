@@ -160,13 +160,17 @@ function Pod({ player, index }: { player: Player; index: number }) {
       className="hero-game-pod"
     >
       <span data-game-halo className="hero-game-pod-halo" />
+      {/* Pips at the rounded outer end, cradle at the track end. A piece
+          resting here is anchored at the middle of the pod, so the cradle has
+          to be the half nearer the track or the piece stands beside its dish
+          rather than in it. */}
       <span className="hero-game-pod-tab">
-        <span className="hero-game-pod-cradle" />
         <span className="hero-game-pod-pips">
           {Array.from({ length: index + 1 }, (_, pip) => (
             <span key={pip} />
           ))}
         </span>
+        <span className="hero-game-pod-cradle" />
       </span>
       <span className="hero-game-pod-stem" />
     </span>
@@ -293,11 +297,11 @@ const FACE_POSE: Record<number, { x: number; y: number }> = {
  * A permanent three-quarter tilt on top of whichever face is up.
  *
  * Without it a cube showing one face is a square: its neighbours are exactly
- * edge on and take up no width at all. Fourteen degrees is enough to keep two
- * more faces in view, which is the difference between a die and a rounded
- * rectangle with dots on it.
+ * edge on and take up no width at all. Enough tilt to keep two more faces in
+ * view is the difference between a die and a rounded rectangle with dots on
+ * it; much more than that and the rounded corners open into visible seams.
  */
-export const DIE_TILT = { x: -14, y: 17 };
+export const DIE_TILT = { x: -11, y: 14 };
 
 export function diePose(face: number) {
   const pose = FACE_POSE[face] ?? FACE_POSE[1];
@@ -402,7 +406,6 @@ export function Board() {
     <>
       <div className="hero-game-plate" aria-hidden>
         <span className="hero-game-grain" />
-        <span data-game-sheen className="hero-game-sheen" />
         <span className="hero-game-glow" />
       </div>
 

@@ -114,7 +114,6 @@ export function HeroBoardGame({ className }: { className?: string }) {
       const burst = pick("[data-game-burst]");
       const impact = pick("[data-game-impact]");
       const impactRing = pick(".hero-game-impact-ring");
-      const sheen = pick("[data-game-sheen]");
 
       if (
         !field ||
@@ -132,8 +131,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
         !bannerDot ||
         !burst ||
         !impact ||
-        !impactRing ||
-        !sheen
+        !impactRing
       ) {
         return;
       }
@@ -239,10 +237,14 @@ export function HeroBoardGame({ className }: { className?: string }) {
         const setActive = (player: Player) => {
           root.dataset.turn = player.id;
           thumb.dataset.player = player.id;
+
+          // The podium slides with a little overshoot and the piece taking the
+          // turn lands on it. Two beats rather than one: a marker that only
+          // brightens is a state change, a marker that arrives is a handover.
           gsap.to(thumb, {
             xPercent: PLAYERS.indexOf(player) * 100,
-            duration: 0.36,
-            ease: ease.out,
+            duration: 0.42,
+            ease: "back.out(1.7)",
             overwrite: "auto",
           });
 
@@ -250,6 +252,18 @@ export function HeroBoardGame({ className }: { className?: string }) {
             const active = other.id === player.id;
             chips.get(other.id)?.toggleAttribute("data-active", active);
             pods.get(other.id)?.root.toggleAttribute("data-active", active);
+          }
+
+          // Multiplies with the CSS `scale` the active marker already carries,
+          // so this is a pop on top of the rest state rather than a fight
+          // with it.
+          const marker = chips.get(player.id);
+          if (marker) {
+            gsap.fromTo(
+              marker,
+              { scale: 0.82 },
+              { scale: 1, duration: 0.5, ease: "back.out(3)", overwrite: "auto" },
+            );
           }
 
           // One looping tween, retargeted, rather than a CSS keyframe per pod:
@@ -288,7 +302,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
               },
               at,
             )
-            .to(die, { y: () => -px(0.055), duration: lift, ease: "power2.out" }, at)
+            .to(die, { y: () => -px(0.04), duration: lift, ease: "power2.out" }, at)
             .to(die, { y: 0, duration: ROLL_TIME - lift, ease: "power3.in" }, at + lift)
             .to(dieShadow, { scale: 0.68, opacity: 0.4, duration: lift, ease: "power2.out" }, at)
             .to(
@@ -338,7 +352,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
             // same whichever way the token is going, including round a corner.
             .to(
               token.hop,
-              { y: () => -px(last ? 0.042 : 0.03), scale: 1.05, duration: rise, ease: "power2.out" },
+              { y: () => -px(last ? 0.03 : 0.022), scale: 1.05, duration: rise, ease: "power2.out" },
               at,
             )
             .to(token.hop, { y: 0, scale: 1, duration: STEP - rise, ease: "power2.in" }, at + rise)
@@ -419,7 +433,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
           // what the token has just lost its place in the race for, and it is
           // the one direction that is never into another piece.
           const angle = Math.atan2(from.y - 0.5, from.x - 0.5);
-          const knock = 0.05;
+          const knock = 0.038;
 
           line
             .call(
@@ -441,8 +455,8 @@ export function HeroBoardGame({ className }: { className?: string }) {
               sparks,
               { x: 0, y: 0, scale: 0.7, autoAlpha: 1 },
               {
-                x: (index: number) => Math.cos((index / sparks.length) * Math.PI * 2) * px(0.06),
-                y: (index: number) => Math.sin((index / sparks.length) * Math.PI * 2) * px(0.06),
+                x: (index: number) => Math.cos((index / sparks.length) * Math.PI * 2) * px(0.042),
+                y: (index: number) => Math.sin((index / sparks.length) * Math.PI * 2) * px(0.042),
                 scale: 0,
                 autoAlpha: 0,
                 duration: 0.46,
@@ -481,7 +495,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
               },
               at + 0.2,
             )
-            .to(token.hop, { y: () => -px(0.075), duration: 0.26, ease: "power2.out" }, at + 0.2)
+            .to(token.hop, { y: () => -px(0.055), duration: 0.26, ease: "power2.out" }, at + 0.2)
             .to(token.hop, { y: 0, duration: 0.26, ease: "power2.in" }, at + 0.46)
             // A whole turn, so the piece always comes to rest square. A partial
             // spin would have to be unwound at the reset, and unwinding it is a
@@ -533,12 +547,12 @@ export function HeroBoardGame({ className }: { className?: string }) {
             line
               .to(
                 token.flourish,
-                { scale: 1.26, y: () => -px(0.05), duration: 0.34, ease: "back.out(2)", overwrite: "auto" },
+                { scale: 1.26, y: () => -px(0.036), duration: 0.34, ease: "back.out(2)", overwrite: "auto" },
                 at + 0.12,
               )
               .to(
                 token.flourish,
-                { y: () => -px(0.038), duration: 0.9, ease: ease.loop, yoyo: true, repeat: 1 },
+                { y: () => -px(0.027), duration: 0.9, ease: ease.loop, yoyo: true, repeat: 1 },
                 at + 0.46,
               );
           }
@@ -621,7 +635,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
                 },
                 when,
               )
-              .to(token.hop, { y: () => -px(0.055), duration: 0.29, ease: "power2.out" }, when)
+              .to(token.hop, { y: () => -px(0.04), duration: 0.29, ease: "power2.out" }, when)
               .to(token.hop, { y: 0, duration: 0.29, ease: "power2.in" }, when + 0.29)
               // scaleX/scaleY rather than scale: the win dims with `scale` and
               // a landing squashes with `scaleX`/`scaleY`, and asking GSAP to
@@ -792,7 +806,7 @@ export function HeroBoardGame({ className }: { className?: string }) {
             .timeline()
             .to(token.flourish, {
               scale: 1.24,
-              y: () => -px(0.032),
+              y: () => -px(0.024),
               duration: 0.16,
               ease: "power2.out",
               overwrite: "auto",
@@ -880,21 +894,16 @@ export function HeroBoardGame({ className }: { className?: string }) {
             gsap.set(moving(), { clearProps: "willChange" });
           };
 
-          // Ambient: two elements, and neither of them is a piece.
+          // Ambient, and now only one thing: the goal breathes, because it is
+          // what every piece is walking toward.
           //
-          // The goal breathes continuously, because it is the thing every token
-          // is walking toward. The warm band crosses once and then leaves two
-          // and a half seconds of quiet, because a sheen that never stops is a
-          // loop the eye starts timing instead of a room the board sits in.
+          // There used to be a warm band crossing the board every few seconds.
+          // It read as a reddish light ray sweeping the hero on its own clock,
+          // which is a screensaver rather than a game, and it competed with the
+          // one moving thing on this board that means something. Gone.
           ambient = gsap
             .timeline({ repeat: -1, paused: true })
-            .to(coreCap, { scale: 1.05, duration: 1.8, ease: ease.loop, yoyo: true, repeat: 3 }, 0)
-            .fromTo(
-              sheen,
-              { xPercent: -160 },
-              { xPercent: 430, duration: 3.4, ease: "power1.inOut" },
-              1.4,
-            );
+            .to(coreCap, { scale: 1.05, duration: 1.9, ease: ease.loop, yoyo: true, repeat: 1 }, 0);
 
           const watcher = new IntersectionObserver(
             ([entry]) => {

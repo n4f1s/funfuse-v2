@@ -478,56 +478,41 @@
 
   /* ---- The plate ------------------------------------------------------- */
 
+  /* No frame. A hard border and a card shadow made this read as a widget
+     dropped beside the headline; what makes it part of the hero is light. The
+     board is lit from above, fades toward the warm page at its edges, and is
+     grounded by a wide low shadow rather than outlined by a hairline. */
   .hero-game-plate {
     position: absolute;
     inset: 0;
     z-index: 0;
     overflow: hidden;
-    border: 1px solid var(--color-line);
     border-radius: var(--radius-3xl);
     background:
-      radial-gradient(112% 84% at 50% -6%, oklch(1 0 0) 0%, transparent 58%),
-      radial-gradient(80% 72% at 50% 112%, var(--color-brand-50) 0%, transparent 66%),
-      linear-gradient(166deg, var(--color-ink-0) 0%, var(--color-ink-50) 100%);
+      radial-gradient(104% 80% at 50% 4%, oklch(1 0 0) 0%, transparent 66%),
+      radial-gradient(86% 74% at 50% 110%, var(--color-brand-50) 0%, transparent 68%),
+      linear-gradient(172deg, oklch(1 0 0 / 0.92) 0%, var(--color-ink-50) 100%);
     box-shadow:
-      0 1px 2px oklch(0.163 0.012 25 / 0.04),
-      0 4cqw 9cqw -3.5cqw oklch(0.163 0.012 25 / 0.24),
-      inset 0 0 0 1px oklch(1 0 0 / 0.72);
+      0 2cqw 5cqw -3cqw oklch(0.163 0.012 25 / 0.1),
+      0 9cqw 17cqw -8cqw oklch(0.163 0.012 25 / 0.18),
+      inset 0 0 0 1px oklch(1 0 0 / 0.9);
   }
 
   .hero-game-grain {
     position: absolute;
     inset: 0;
-    opacity: 0.5;
-    background-image: radial-gradient(oklch(0.395 0.015 25 / 0.13) 0.55px, transparent 0.7px);
+    opacity: 0.42;
+    background-image: radial-gradient(oklch(0.395 0.015 25 / 0.12) 0.55px, transparent 0.7px);
     background-size: 7px 7px;
-  }
-
-  /* One warm band, crossing slowly. It is the only thing on the board that
-     moves while nobody is playing, and at this opacity it reads as light
-     rather than as an animation. */
-  .hero-game-sheen {
-    position: absolute;
-    top: -30%;
-    bottom: -30%;
-    left: 0;
-    width: 26%;
-    rotate: 9deg;
-    background: linear-gradient(
-      100deg,
-      transparent,
-      color-mix(in oklch, var(--color-brand-100) 62%, transparent) 50%,
-      transparent
-    );
   }
 
   .hero-game-glow {
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      34% 34% at 50% 50%,
-      color-mix(in oklch, var(--turn) 12%, transparent) 0%,
-      transparent 70%
+      36% 36% at 50% 50%,
+      color-mix(in oklch, var(--turn) 9%, transparent) 0%,
+      transparent 72%
     );
     transition: background var(--duration-overlay) var(--ease-out);
   }
@@ -678,12 +663,14 @@
 
   /* ---- Pods ------------------------------------------------------------- */
 
+  /* Sized off the piece it holds. A berth two pieces wide reads as a berth; the
+     blob it used to be was four pieces wide and read as scenery. */
   .hero-game-pod {
     position: absolute;
     left: var(--x);
     top: var(--y);
-    width: 21%;
-    height: 12.4%;
+    width: 15%;
+    height: 9.4%;
     translate: -50% -50%;
     rotate: var(--angle);
   }
@@ -694,18 +681,18 @@
     display: grid;
     align-items: center;
     justify-items: center;
-    gap: 4%;
-    grid-template-rows: 1fr auto;
-    padding: 8% 10% 9%;
-    border: 1px solid color-mix(in oklch, var(--piece) 34%, var(--color-line));
+    gap: 3%;
+    grid-template-rows: auto 1fr;
+    padding: 9% 12% 10%;
+    border: 1px solid color-mix(in oklch, var(--piece) 32%, var(--color-line));
     /* Rounder on the outside than the inside: it docks against the track. */
-    border-radius: 44% 44% 26% 26% / 52% 52% 30% 30%;
+    border-radius: 42% 42% 24% 24% / 54% 54% 30% 30%;
     background:
-      linear-gradient(180deg, oklch(1 0 0 / 0.86) 0%, transparent 46%),
-      color-mix(in oklch, var(--piece) 13%, var(--color-surface));
+      linear-gradient(180deg, oklch(1 0 0 / 0.88) 0%, transparent 48%),
+      color-mix(in oklch, var(--piece) 12%, var(--color-surface));
     box-shadow:
-      inset 0 0 0 0.5cqw oklch(1 0 0 / 0.7),
-      0 0.8cqw 1.8cqw -0.6cqw oklch(0.163 0.012 25 / 0.18);
+      inset 0 0 0 0.35cqw oklch(1 0 0 / 0.72),
+      0 0.6cqw 1.3cqw -0.5cqw oklch(0.163 0.012 25 / 0.16);
     transition:
       border-color var(--duration-overlay) var(--ease-out),
       background-color var(--duration-overlay) var(--ease-out);
@@ -714,44 +701,44 @@
   /* The cradle the token sits in. A recess, not a ring: the token has its own
      contact shadow and the two have to look like one object at rest. */
   .hero-game-pod-cradle {
-    width: 42%;
+    width: 38%;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: color-mix(in oklch, var(--piece) 24%, var(--color-surface));
+    background: color-mix(in oklch, var(--piece) 22%, var(--color-surface));
     box-shadow:
-      inset 0 0.5cqw 0.9cqw oklch(0.163 0.012 25 / 0.16),
-      0 0.2cqw 0 oklch(1 0 0 / 0.75);
+      inset 0 0.35cqw 0.6cqw oklch(0.163 0.012 25 / 0.15),
+      0 0.15cqw 0 oklch(1 0 0 / 0.75);
   }
 
   /* One to four pips. Says which seat this is without a word of text. */
   .hero-game-pod-pips {
     display: flex;
-    gap: 0.55cqw;
+    gap: 0.4cqw;
   }
 
   .hero-game-pod-pips > span {
-    width: 0.85cqw;
+    width: 0.62cqw;
     aspect-ratio: 1;
     border-radius: 50%;
     background: color-mix(in oklch, var(--piece) 74%, var(--color-ink-700));
-    opacity: 0.62;
+    opacity: 0.6;
   }
 
   /* Joins the pod to its entry tile. */
   .hero-game-pod-stem {
     position: absolute;
     left: 50%;
-    bottom: -18%;
-    width: 22%;
-    height: 26%;
+    bottom: -16%;
+    width: 20%;
+    height: 24%;
     translate: -50% 0;
     border-radius: 0 0 40% 40%;
-    background: color-mix(in oklch, var(--piece) 22%, var(--color-surface));
+    background: color-mix(in oklch, var(--piece) 20%, var(--color-surface));
   }
 
   .hero-game-pod-halo {
     position: absolute;
-    inset: -14%;
+    inset: -16%;
     border-radius: 44%;
     background: radial-gradient(
       60% 60% at 50% 50%,
@@ -787,7 +774,7 @@
     left: 50%;
     top: 50%;
     display: grid;
-    width: 25%;
+    width: 22%;
     aspect-ratio: 1;
     place-items: center;
     translate: -50% -50%;
@@ -799,7 +786,7 @@
     overflow: visible;
     fill: none;
     stroke-linecap: round;
-    stroke-width: 5.4;
+    stroke-width: 6.6;
   }
 
   .hero-game-arc-track {
@@ -880,13 +867,29 @@
     z-index: 4;
   }
 
+  /* Sized against the tile, not against the board.
+     ------------------------------------------------------------------------
+     A track tile is 7.2% across, so it is 3.6cqw from its middle to its edge.
+     The piece is 5cqw wide, which leaves it 1.1cqw of tile on either side, and
+     the anchor sits at 66% of its height so its base lands 2cqw below the
+     middle of the tile: standing on the square rather than straddling it. The
+     top clears the tile by a third of a millimetre's worth of board, which is
+     what a piece standing on a square is supposed to do. */
   .hero-game-token {
     position: absolute;
     left: 0;
     top: 0;
-    width: 8.6cqw;
-    height: 11.4cqw;
-    translate: -50% -64%;
+    width: 5cqw;
+    height: 5.9cqw;
+    translate: -50% -66%;
+  }
+
+  /* The piece is now smaller than a fingertip. This widens what can be tapped
+     without widening what can be seen. */
+  .hero-game-token::before {
+    content: "";
+    position: absolute;
+    inset: -22%;
   }
 
   .hero-game-token-hop,
@@ -900,64 +903,69 @@
   .hero-game-token-shadow {
     position: absolute;
     left: 50%;
-    bottom: -6%;
-    width: 92%;
-    height: 22%;
+    bottom: -3%;
+    width: 84%;
+    height: 20%;
     translate: -50% 0;
     border-radius: 50%;
     background: radial-gradient(
       50% 50% at 50% 50%,
-      oklch(0.163 0.012 25 / 0.3) 0%,
-      transparent 72%
+      oklch(0.163 0.012 25 / 0.28) 0%,
+      transparent 74%
     );
   }
 
   .hero-game-token-body {
     position: absolute;
     inset: 0;
-    border: 1px solid color-mix(in oklch, var(--piece) 62%, var(--color-ink-700));
-    /* Tall shoulders, narrow waist, flat base. A silhouette a hand could pick
-       up, rather than a circle with a highlight on it. */
-    border-radius: 50% 50% 40% 40% / 40% 40% 26% 26%;
+    border: 1px solid color-mix(in oklch, var(--piece) 68%, var(--color-ink-700));
+    /* Squat, round shouldered, wide footed. The old silhouette was a chess
+       pawn: tall, formal, narrow at the waist. This one is nearly as wide as it
+       is tall, which is the whole of why a shape reads as friendly. */
+    border-radius: 52% 52% 46% 46% / 60% 60% 40% 40%;
     background:
       linear-gradient(
-        128deg,
-        color-mix(in oklch, var(--piece) 62%, oklch(1 0 0)) 0%,
-        var(--piece) 46%,
-        color-mix(in oklch, var(--piece) 72%, var(--color-ink-950)) 100%
+        152deg,
+        color-mix(in oklch, var(--piece) 52%, oklch(1 0 0)) 0%,
+        var(--piece) 52%,
+        color-mix(in oklch, var(--piece) 76%, var(--color-ink-950)) 100%
       );
     box-shadow:
-      inset 0.5cqw 0.5cqw 1cqw oklch(1 0 0 / 0.42),
-      inset -0.5cqw -0.9cqw 1.1cqw oklch(0.163 0.012 25 / 0.24),
-      0 0.5cqw 1cqw -0.4cqw oklch(0.163 0.012 25 / 0.4);
+      inset 0.35cqw 0.4cqw 0.7cqw oklch(1 0 0 / 0.5),
+      inset -0.3cqw -0.55cqw 0.7cqw oklch(0.163 0.012 25 / 0.22),
+      0 0.3cqw 0.6cqw -0.25cqw oklch(0.163 0.012 25 / 0.35);
     transition:
       translate var(--duration-hover) var(--ease-out),
       scale var(--duration-hover) var(--ease-out),
       box-shadow var(--duration-hover) var(--ease-out);
   }
 
-  /* The specular. Off centre and soft edged, because a hard white dot reads as
-     a sticker and a gradient reads as a curved surface under one light. */
+  /* Two highlights, not one: a broad soft dome that says the surface is
+     curved, and a small hard catchlight inside it that says it is glossy. The
+     catchlight is the whole difference between a moulded piece and a shape. */
   .hero-game-token-gloss {
     position: absolute;
-    left: 26%;
-    top: 12%;
-    width: 42%;
-    height: 34%;
+    left: 20%;
+    top: 8%;
+    width: 50%;
+    height: 40%;
     border-radius: 50%;
-    background: radial-gradient(60% 60% at 40% 34%, oklch(1 0 0 / 0.85) 0%, transparent 72%);
+    background:
+      radial-gradient(38% 32% at 36% 28%, oklch(1 0 0 / 0.98) 0%, transparent 68%),
+      radial-gradient(72% 66% at 50% 44%, oklch(1 0 0 / 0.46) 0%, transparent 76%);
   }
 
-  /* Where the piece meets the table. */
+  /* The foot. Wide and shallow, so the piece looks set down rather than
+     balanced. */
   .hero-game-token-collar {
     position: absolute;
-    right: 10%;
-    bottom: 2%;
-    left: 10%;
-    height: 20%;
+    right: 7%;
+    bottom: 1%;
+    left: 7%;
+    height: 17%;
     border-radius: 50%;
-    background: color-mix(in oklch, var(--piece) 74%, var(--color-ink-950));
-    box-shadow: inset 0 0.3cqw 0.5cqw oklch(1 0 0 / 0.26);
+    background: color-mix(in oklch, var(--piece) 78%, var(--color-ink-950));
+    box-shadow: inset 0 0.25cqw 0.4cqw oklch(1 0 0 / 0.3);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -966,16 +974,16 @@
     }
 
     .hero-game-token:hover .hero-game-token-body {
-      translate: 0 -0.9cqw;
-      scale: 1.07;
+      translate: 0 -0.55cqw;
+      scale: 1.09;
       box-shadow:
-        inset 0.5cqw 0.5cqw 1cqw oklch(1 0 0 / 0.5),
-        inset -0.5cqw -0.9cqw 1.1cqw oklch(0.163 0.012 25 / 0.24),
-        0 1.4cqw 2.2cqw -0.6cqw oklch(0.163 0.012 25 / 0.42);
+        inset 0.35cqw 0.4cqw 0.7cqw oklch(1 0 0 / 0.58),
+        inset -0.3cqw -0.55cqw 0.7cqw oklch(0.163 0.012 25 / 0.22),
+        0 0.9cqw 1.4cqw -0.4cqw oklch(0.163 0.012 25 / 0.4);
     }
 
     .hero-game-token:active .hero-game-token-body {
-      scale: 0.97;
+      scale: 0.96;
       transition-duration: var(--duration-press);
     }
   }
@@ -1049,10 +1057,10 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 9cqw;
+    width: 6.4cqw;
     aspect-ratio: 1;
     translate: -50% -50%;
-    border: 0.45cqw solid color-mix(in oklch, var(--turn) 68%, transparent);
+    border: 0.35cqw solid color-mix(in oklch, var(--turn) 68%, transparent);
     border-radius: 50%;
     opacity: 0;
   }
@@ -1061,7 +1069,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 1.15cqw;
+    width: 0.9cqw;
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: 50%;
@@ -1131,33 +1139,40 @@
 
   /* Hangs off the top edge opposite the dice tray, so the board is anchored on
      a diagonal rather than boxed in by its own frame. The overhang is vertical
-     only: a horizontal one on a narrow phone is a scrollbar. */
+     only: a horizontal one on a narrow phone is a scrollbar.
+     ------------------------------------------------------------------------
+     Four coloured dots in a white pill are a browser window's traffic lights,
+     which is exactly what this used to look like. So the markers are the
+     pieces themselves in miniature: the same silhouette, the same gradient,
+     the same colours. Whose turn it is now reads as "that piece is up" rather
+     than as three greyed lights and a lit one. */
   .hero-game-rail {
     position: absolute;
-    left: 5%;
-    top: -3.4%;
+    left: 5.5%;
+    top: -3%;
     z-index: 7;
     display: flex;
-    width: 30%;
+    width: 26%;
     align-items: center;
-    padding: 0.9cqw;
+    padding: 0.7cqw;
     border: 1px solid var(--color-line);
     border-radius: 999px;
-    background: oklch(1 0 0 / 0.96);
+    background: oklch(1 0 0 / 0.97);
     box-shadow:
-      0 1.4cqw 3cqw -1cqw oklch(0.163 0.012 25 / 0.24),
+      0 1.2cqw 2.6cqw -1cqw oklch(0.163 0.012 25 / 0.22),
       inset 0 0 0 1px oklch(1 0 0 / 0.8);
   }
 
+  /* The podium the active piece stands on. */
   .hero-game-rail-thumb {
     position: absolute;
-    left: 0.9cqw;
-    top: 0.9cqw;
-    bottom: 0.9cqw;
-    width: calc((100% - 1.8cqw) / 4);
+    left: 0.7cqw;
+    top: 0.7cqw;
+    bottom: 0.7cqw;
+    width: calc((100% - 1.4cqw) / 4);
     border-radius: 999px;
-    background: color-mix(in oklch, var(--piece) 18%, oklch(1 0 0));
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--piece) 44%, transparent);
+    background: color-mix(in oklch, var(--piece) 16%, oklch(1 0 0));
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--piece) 40%, transparent);
     transition: background-color var(--duration-overlay) var(--ease-out);
   }
 
@@ -1166,34 +1181,47 @@
     display: grid;
     flex: 1;
     place-items: center;
-    padding: 1cqw 0;
+    padding: 0.9cqw 0;
   }
 
   .hero-game-chip {
     width: 1.9cqw;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--piece);
-    opacity: 0.42;
+    height: 2.3cqw;
+    /* The token silhouette, shrunk. */
+    border-radius: 52% 52% 46% 46% / 60% 60% 40% 40%;
+    background: linear-gradient(
+      152deg,
+      color-mix(in oklch, var(--piece) 52%, oklch(1 0 0)) 0%,
+      var(--piece) 58%,
+      color-mix(in oklch, var(--piece) 78%, var(--color-ink-950)) 100%
+    );
+    opacity: 0.34;
     transition:
-      opacity var(--duration-hover) var(--ease-out),
-      scale var(--duration-overlay) var(--ease-out);
+      opacity var(--duration-overlay) var(--ease-out),
+      translate var(--duration-overlay) var(--ease-out),
+      scale var(--duration-overlay) var(--ease-out),
+      filter var(--duration-overlay) var(--ease-out);
+    /* Waiting pieces are drained rather than faded to grey, so the rail keeps
+       four identifiable colours while only one of them is up. */
+    filter: saturate(0.45);
   }
 
   .hero-game-chip[data-active] {
     opacity: 1;
-    scale: 1.32;
+    scale: 1.16;
+    translate: 0 -0.3cqw;
+    filter: saturate(1);
   }
 
   /* ---- The dice tray ---------------------------------------------------- */
 
   .hero-game-tray {
     position: absolute;
-    right: 4%;
-    bottom: -8%;
+    right: 4.5%;
+    bottom: -6.5%;
     z-index: 7;
     display: grid;
-    width: 21%;
+    width: 17%;
     aspect-ratio: 1;
     padding: 0;
     place-items: center;
@@ -1246,8 +1274,8 @@
     position: absolute;
     left: 50%;
     bottom: 17%;
-    width: 15cqw;
-    height: 3.4cqw;
+    width: 11.6cqw;
+    height: 2.5cqw;
     translate: -50% 0;
     border-radius: 50%;
     background: radial-gradient(
@@ -1258,7 +1286,7 @@
   }
 
   .hero-game-die {
-    --die-size: 12.4cqw;
+    --die-size: 9.6cqw;
     --die-half: calc(var(--die-size) / 2);
 
     position: relative;
@@ -1278,7 +1306,7 @@
     place-items: center;
     /* Rounded, like a real die. The gaps this leaves at the cube's corners are
        exactly the rounding, which is why the radius is not larger. */
-    border-radius: 18%;
+    border-radius: 15%;
     background:
       radial-gradient(88% 78% at 26% 18%, oklch(1 0 0) 0%, transparent 78%),
       linear-gradient(150deg, var(--color-ink-0) 0%, var(--color-ink-100) 100%);
@@ -1417,26 +1445,36 @@
     }
 
     .hero-game-token {
-      width: 10cqw;
-      height: 13.2cqw;
+      width: 5.9cqw;
+      height: 6.9cqw;
     }
 
     .hero-game-rail {
-      left: 4%;
-      width: 36%;
+      left: 4.5%;
+      width: 32%;
+    }
+
+    .hero-game-chip {
+      width: 2.2cqw;
+      height: 2.6cqw;
     }
 
     .hero-game-tray {
-      width: 25%;
-      bottom: -7%;
+      width: 20.5%;
+      bottom: -6%;
     }
 
     .hero-game-die {
-      --die-size: 14.4cqw;
+      --die-size: 11.4cqw;
     }
 
     .hero-game-die-shadow {
-      width: 17cqw;
+      width: 13.6cqw;
+    }
+
+    .hero-game-pod {
+      width: 17%;
+      height: 10.4%;
     }
 
     .hero-game-inner,
