@@ -10,8 +10,13 @@
  * deserve them. It draws to a fixed canvas of its own and cleans up after
  * itself, so there is nothing to mount and nothing to tear down.
  *
- * Colours are the brand ramp and nothing else. Confetti in a hue we do not own
- * is a second accent colour, which this site does not have.
+ * Colours default to the brand ramp and nothing else. Confetti in a hue we do
+ * not own is a second accent colour, which this site does not have. The one
+ * caller that passes its own is the hero board, whose four game pieces are
+ * artwork rather than UI, and where paper in the losing player's colour would
+ * be saying the wrong thing.
+ *
+ * canvas-confetti parses hex and nothing else, so callers pass hex.
  */
 
 const COLORS = ["#eb3845", "#c92736", "#ffa39f", "#ffe3e1", "#ffffff"];
@@ -73,6 +78,7 @@ const HUGE: Shot[] = [
 export async function celebrate(
   source: HTMLElement,
   size: "modest" | "huge" = "modest",
+  colors: readonly string[] = COLORS,
 ): Promise<void> {
   if (
     typeof window === "undefined" ||
@@ -101,7 +107,7 @@ export async function celebrate(
           angle: shot.angle,
           ticks: 200,
           decay: 0.9,
-          colors: COLORS,
+          colors: [...colors],
           disableForReducedMotion: true,
           origin: {
             x:

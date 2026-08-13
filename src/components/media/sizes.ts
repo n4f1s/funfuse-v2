@@ -29,9 +29,6 @@ export const sizePresets = {
   /** Horizontal scroller cards — fixed-ish width at every breakpoint. */
   carouselCard: "(min-width: 768px) 320px, 72vw",
 
-  /** One card in the homepage hero fan. Three overlap, so each is narrow. */
-  heroCard: "(min-width: 1280px) 320px, (min-width: 1024px) 25vw, 42vw",
-
   /**
    * Large landscape plate in a horizontal gallery.
    *

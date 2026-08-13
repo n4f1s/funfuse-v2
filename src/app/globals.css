@@ -403,6 +403,1048 @@
     pointer-events: none;
   }
 
+  /* ======================================================================
+     Hero mini game
+     ----------------------------------------------------------------------
+     A four player race, drawn entirely in CSS on top of geometry computed in
+     components/home/hero-board-game-board.ts. Every position arrives as a
+     custom property, because forty tiles at forty points and angles is a data
+     structure rather than a set of utilities.
+
+     Three rules hold this together:
+
+       1. `cqw` throughout. The stage is an inline-size container, so one
+          shadow, one hairline and one radius serve a 320px phone slot and a
+          480px desktop slot at the same visual weight. Nothing here is px.
+
+       2. CSS owns states, GSAP owns choreography, and they never touch the
+          same property. States use the `translate` / `rotate` / `scale`
+          properties; GSAP writes `transform`. The browser composes the two, so
+          a hover can never be stamped on by a tween or the other way round.
+
+       3. Depth is layered in z, not painted. On a fine pointer the board gets a
+          few degrees of parallax and the separation is already there; on touch
+          the whole 3D branch is switched off and the board is flat.
+
+     The four piece colours are game artwork, not a second brand accent: they
+     live on this component and are deliberately not in the `@theme` block, so
+     no utility can reach them and no other section can grow a blue.           */
+
+  .hero-game-stage {
+    --game-red: var(--color-brand-500);
+    --game-blue: #4a86c8;
+    --game-green: #3f9e7c;
+    --game-gold: #d99b3d;
+
+    --turn: var(--game-red);
+
+    position: relative;
+    aspect-ratio: 1;
+    container-type: inline-size;
+  }
+
+  .hero-game-stage[data-turn="red"] {
+    --turn: var(--game-red);
+  }
+  .hero-game-stage[data-turn="blue"] {
+    --turn: var(--game-blue);
+  }
+  .hero-game-stage[data-turn="green"] {
+    --turn: var(--game-green);
+  }
+  .hero-game-stage[data-turn="gold"] {
+    --turn: var(--game-gold);
+  }
+
+  /* Every coloured part of the board reads `--piece`, so one rule per player
+     colours pods, tiles, tokens, chips and arcs alike. */
+  .hero-game-stage [data-player="red"] {
+    --piece: var(--game-red);
+  }
+  .hero-game-stage [data-player="blue"] {
+    --piece: var(--game-blue);
+  }
+  .hero-game-stage [data-player="green"] {
+    --piece: var(--game-green);
+  }
+  .hero-game-stage [data-player="gold"] {
+    --piece: var(--game-gold);
+  }
+
+  .hero-game-tilt {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---- The plate ------------------------------------------------------- */
+
+  .hero-game-plate {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-3xl);
+    background:
+      radial-gradient(112% 84% at 50% -6%, oklch(1 0 0) 0%, transparent 58%),
+      radial-gradient(80% 72% at 50% 112%, var(--color-brand-50) 0%, transparent 66%),
+      linear-gradient(166deg, var(--color-ink-0) 0%, var(--color-ink-50) 100%);
+    box-shadow:
+      0 1px 2px oklch(0.163 0.012 25 / 0.04),
+      0 4cqw 9cqw -3.5cqw oklch(0.163 0.012 25 / 0.24),
+      inset 0 0 0 1px oklch(1 0 0 / 0.72);
+  }
+
+  .hero-game-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background-image: radial-gradient(oklch(0.395 0.015 25 / 0.13) 0.55px, transparent 0.7px);
+    background-size: 7px 7px;
+  }
+
+  /* One warm band, crossing slowly. It is the only thing on the board that
+     moves while nobody is playing, and at this opacity it reads as light
+     rather than as an animation. */
+  .hero-game-sheen {
+    position: absolute;
+    top: -30%;
+    bottom: -30%;
+    left: 0;
+    width: 26%;
+    rotate: 9deg;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      color-mix(in oklch, var(--color-brand-100) 62%, transparent) 50%,
+      transparent
+    );
+  }
+
+  .hero-game-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      34% 34% at 50% 50%,
+      color-mix(in oklch, var(--turn) 12%, transparent) 0%,
+      transparent 70%
+    );
+    transition: background var(--duration-overlay) var(--ease-out);
+  }
+
+  .hero-game-field {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* Faint furniture in the space between the track and the goal: an inner
+     bound the four lanes cross, so that region reads as part of the board
+     rather than as space left over. Sized to clear the track at the corners
+     and the progress ring in the middle. */
+  .hero-game-inner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 42%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border: 1px dashed color-mix(in oklch, var(--color-line-strong) 62%, transparent);
+    border-radius: 26%;
+    opacity: 0.45;
+  }
+
+  /* ---- The track ------------------------------------------------------- */
+
+  .hero-game-tile,
+  .hero-game-lane {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    rotate: var(--angle);
+    transition:
+      scale var(--duration-hover) var(--ease-out),
+      opacity var(--duration-hover) var(--ease-out);
+  }
+
+  /* The face is a separate box from the tile so the tile can carry position
+     and the face can carry material. It also gives every tile an inner groove
+     for free, which is what stops forty rounded squares reading as forty
+     rounded squares. */
+  .hero-game-tile-face,
+  .hero-game-lane-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-line);
+    border-radius: 30%;
+    background: linear-gradient(155deg, oklch(1 0 0) 0%, var(--color-ink-50) 100%);
+    box-shadow:
+      inset 0 0.4cqw 0.7cqw oklch(1 0 0 / 0.95),
+      inset 0 -0.45cqw 0.7cqw oklch(0.163 0.012 25 / 0.05),
+      0 0.4cqw 0.8cqw -0.25cqw oklch(0.163 0.012 25 / 0.1);
+    transition:
+      background-color var(--duration-hover) var(--ease-out),
+      border-color var(--duration-hover) var(--ease-out),
+      box-shadow var(--duration-hover) var(--ease-out);
+  }
+
+  .hero-game-tile-face::after {
+    content: "";
+    position: absolute;
+    inset: 18%;
+    border-radius: 32%;
+    box-shadow: inset 0 0 0 1px oklch(0.163 0.012 25 / 0.045);
+  }
+
+  .hero-game-mark {
+    position: relative;
+    width: 46%;
+    color: currentColor;
+  }
+
+  /* Safe ground. Brand tint, because "you cannot be taken here" is the one
+     piece of the rules the site's own colour should be saying. */
+  .hero-game-tile-safe .hero-game-tile-face {
+    border-color: color-mix(in oklch, var(--piece, var(--color-accent)) 34%, var(--color-line));
+    background: linear-gradient(
+      155deg,
+      oklch(1 0 0) 0%,
+      color-mix(in oklch, var(--piece, var(--color-accent)) 14%, var(--color-surface)) 100%
+    );
+    color: color-mix(in oklch, var(--piece, var(--color-accent)) 82%, var(--color-ink-900));
+  }
+
+  /* An entry tile: its owner's colour, and a bar along the edge the pod is
+     docked against, so the two read as one piece of the board. Local -y is
+     outward, which is a positive y offset on an inset shadow. */
+  .hero-game-tile[data-role="start"] .hero-game-tile-face {
+    border-color: color-mix(in oklch, var(--piece) 52%, var(--color-line));
+    box-shadow:
+      inset 0 -0.4cqw 0.7cqw oklch(1 0 0 / 0.9),
+      inset 0 0.9cqw 0 -0.45cqw color-mix(in oklch, var(--piece) 46%, transparent),
+      0 0.5cqw 1cqw -0.3cqw color-mix(in oklch, var(--piece) 30%, transparent);
+  }
+
+  /* A gate. Where this player leaves the shared track and turns inward. */
+  .hero-game-tile[data-role="gate"] .hero-game-tile-face {
+    border-color: color-mix(in oklch, var(--piece) 44%, var(--color-line));
+    background: linear-gradient(
+      155deg,
+      oklch(1 0 0) 0%,
+      color-mix(in oklch, var(--piece) 11%, var(--color-surface)) 100%
+    );
+    color: color-mix(in oklch, var(--piece) 74%, var(--color-ink-900));
+  }
+
+  /* A tile is rotated to its heading, so its local +x is the way round the
+     board and its local +y is inward. The chevron is drawn pointing +x, so a
+     quarter turn clockwise aims it at the core, which is where this tile sends
+     its owner. A quarter the other way points it off the board. */
+  .hero-game-tile[data-role="gate"] .hero-game-mark {
+    width: 38%;
+    rotate: 90deg;
+  }
+
+  /* ---- Approach lanes --------------------------------------------------- */
+
+  .hero-game-lane-face {
+    border-color: color-mix(in oklch, var(--piece) 26%, var(--color-line));
+    background: linear-gradient(
+      155deg,
+      color-mix(in oklch, var(--piece) 8%, oklch(1 0 0)) 0%,
+      color-mix(in oklch, var(--piece) 18%, var(--color-surface)) 100%
+    );
+    border-radius: 34%;
+  }
+
+  /* The lane fills behind the token, so how far a player has climbed is
+     readable from across the page without watching the token. */
+  .hero-game-lane[data-lit] .hero-game-lane-face {
+    border-color: color-mix(in oklch, var(--piece) 66%, transparent);
+    background: linear-gradient(
+      155deg,
+      color-mix(in oklch, var(--piece) 68%, oklch(1 0 0)) 0%,
+      var(--piece) 100%
+    );
+    box-shadow:
+      inset 0 0.4cqw 0.7cqw oklch(1 0 0 / 0.4),
+      0 0.5cqw 1.2cqw -0.3cqw color-mix(in oklch, var(--piece) 46%, transparent);
+  }
+
+  /* ---- Pods ------------------------------------------------------------- */
+
+  .hero-game-pod {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 21%;
+    height: 12.4%;
+    translate: -50% -50%;
+    rotate: var(--angle);
+  }
+
+  .hero-game-pod-tab {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    gap: 4%;
+    grid-template-rows: 1fr auto;
+    padding: 8% 10% 9%;
+    border: 1px solid color-mix(in oklch, var(--piece) 34%, var(--color-line));
+    /* Rounder on the outside than the inside: it docks against the track. */
+    border-radius: 44% 44% 26% 26% / 52% 52% 30% 30%;
+    background:
+      linear-gradient(180deg, oklch(1 0 0 / 0.86) 0%, transparent 46%),
+      color-mix(in oklch, var(--piece) 13%, var(--color-surface));
+    box-shadow:
+      inset 0 0 0 0.5cqw oklch(1 0 0 / 0.7),
+      0 0.8cqw 1.8cqw -0.6cqw oklch(0.163 0.012 25 / 0.18);
+    transition:
+      border-color var(--duration-overlay) var(--ease-out),
+      background-color var(--duration-overlay) var(--ease-out);
+  }
+
+  /* The cradle the token sits in. A recess, not a ring: the token has its own
+     contact shadow and the two have to look like one object at rest. */
+  .hero-game-pod-cradle {
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--piece) 24%, var(--color-surface));
+    box-shadow:
+      inset 0 0.5cqw 0.9cqw oklch(0.163 0.012 25 / 0.16),
+      0 0.2cqw 0 oklch(1 0 0 / 0.75);
+  }
+
+  /* One to four pips. Says which seat this is without a word of text. */
+  .hero-game-pod-pips {
+    display: flex;
+    gap: 0.55cqw;
+  }
+
+  .hero-game-pod-pips > span {
+    width: 0.85cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--piece) 74%, var(--color-ink-700));
+    opacity: 0.62;
+  }
+
+  /* Joins the pod to its entry tile. */
+  .hero-game-pod-stem {
+    position: absolute;
+    left: 50%;
+    bottom: -18%;
+    width: 22%;
+    height: 26%;
+    translate: -50% 0;
+    border-radius: 0 0 40% 40%;
+    background: color-mix(in oklch, var(--piece) 22%, var(--color-surface));
+  }
+
+  .hero-game-pod-halo {
+    position: absolute;
+    inset: -14%;
+    border-radius: 44%;
+    background: radial-gradient(
+      60% 60% at 50% 50%,
+      color-mix(in oklch, var(--piece) 34%, transparent) 0%,
+      transparent 72%
+    );
+    opacity: 0;
+  }
+
+  .hero-game-pod[data-active] .hero-game-pod-tab {
+    border-color: color-mix(in oklch, var(--piece) 66%, transparent);
+    background:
+      linear-gradient(180deg, oklch(1 0 0 / 0.86) 0%, transparent 46%),
+      color-mix(in oklch, var(--piece) 22%, var(--color-surface));
+  }
+
+  .hero-game-pod[data-active] .hero-game-pod-pips > span {
+    opacity: 1;
+  }
+
+  /* Reduced motion never runs the halo tween, so the resting turn has to be
+     legible from the markup alone. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-game-pod[data-active] .hero-game-pod-halo {
+      opacity: 0.55;
+    }
+  }
+
+  /* ---- The core --------------------------------------------------------- */
+
+  .hero-game-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    width: 25%;
+    aspect-ratio: 1;
+    place-items: center;
+    translate: -50% -50%;
+  }
+
+  .hero-game-arcs {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 5.4;
+  }
+
+  .hero-game-arc-track {
+    stroke: var(--color-ink-200);
+  }
+
+  .hero-game-arc {
+    stroke: var(--piece);
+    transition: stroke-dashoffset 420ms var(--ease-out);
+  }
+
+  .hero-game-core-disc {
+    position: relative;
+    display: grid;
+    width: 68%;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid var(--color-line);
+    /* A superellipse rather than a circle: the whole board is rounded squares,
+       and a circle in the middle of it reads as a different game. */
+    border-radius: 34%;
+    background:
+      radial-gradient(72% 62% at 34% 22%, oklch(1 0 0) 0%, transparent 72%),
+      linear-gradient(158deg, var(--color-ink-0) 0%, var(--color-ink-50) 100%);
+    box-shadow:
+      0 1.4cqw 3cqw -0.8cqw oklch(0.163 0.012 25 / 0.16),
+      inset 0 0 0 0.6cqw oklch(1 0 0 / 0.85);
+    transition:
+      border-color var(--duration-overlay) var(--ease-out),
+      background var(--duration-overlay) var(--ease-out);
+  }
+
+  .hero-game-core-ring {
+    position: absolute;
+    inset: 14%;
+    border: 1px dashed color-mix(in oklch, var(--color-line-strong) 78%, transparent);
+    border-radius: 34%;
+  }
+
+  .hero-game-core-cap {
+    display: grid;
+    width: 46%;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 40%;
+    background: linear-gradient(160deg, oklch(1 0 0) 0%, var(--color-brand-50) 100%);
+    box-shadow: 0 0.6cqw 1.4cqw -0.3cqw oklch(0.163 0.012 25 / 0.14);
+    color: var(--color-accent);
+    transition: color var(--duration-overlay) var(--ease-out);
+  }
+
+  .hero-game-core-cap .hero-game-mark {
+    width: 56%;
+  }
+
+  /* Taken. The goal floods with the winner's colour, which is the whole point
+     of keeping it neutral for the rest of the match. */
+  .hero-game-core-disc[data-won] {
+    border-color: color-mix(in oklch, var(--piece) 62%, transparent);
+    background:
+      radial-gradient(72% 62% at 34% 22%, oklch(1 0 0 / 0.6) 0%, transparent 72%),
+      linear-gradient(
+        158deg,
+        color-mix(in oklch, var(--piece) 24%, oklch(1 0 0)) 0%,
+        color-mix(in oklch, var(--piece) 46%, oklch(1 0 0)) 100%
+      );
+  }
+
+  .hero-game-core-disc[data-won] .hero-game-core-cap {
+    color: color-mix(in oklch, var(--piece) 88%, var(--color-ink-900));
+  }
+
+  /* ---- Tokens ----------------------------------------------------------- */
+
+  .hero-game-pieces {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+  }
+
+  .hero-game-token {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8.6cqw;
+    height: 11.4cqw;
+    translate: -50% -64%;
+  }
+
+  .hero-game-token-hop,
+  .hero-game-token-flourish {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The contact shadow. A sibling rather than a `drop-shadow` filter: a filter
+     flattens 3D, and this board tilts. */
+  .hero-game-token-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -6%;
+    width: 92%;
+    height: 22%;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      oklch(0.163 0.012 25 / 0.3) 0%,
+      transparent 72%
+    );
+  }
+
+  .hero-game-token-body {
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in oklch, var(--piece) 62%, var(--color-ink-700));
+    /* Tall shoulders, narrow waist, flat base. A silhouette a hand could pick
+       up, rather than a circle with a highlight on it. */
+    border-radius: 50% 50% 40% 40% / 40% 40% 26% 26%;
+    background:
+      linear-gradient(
+        128deg,
+        color-mix(in oklch, var(--piece) 62%, oklch(1 0 0)) 0%,
+        var(--piece) 46%,
+        color-mix(in oklch, var(--piece) 72%, var(--color-ink-950)) 100%
+      );
+    box-shadow:
+      inset 0.5cqw 0.5cqw 1cqw oklch(1 0 0 / 0.42),
+      inset -0.5cqw -0.9cqw 1.1cqw oklch(0.163 0.012 25 / 0.24),
+      0 0.5cqw 1cqw -0.4cqw oklch(0.163 0.012 25 / 0.4);
+    transition:
+      translate var(--duration-hover) var(--ease-out),
+      scale var(--duration-hover) var(--ease-out),
+      box-shadow var(--duration-hover) var(--ease-out);
+  }
+
+  /* The specular. Off centre and soft edged, because a hard white dot reads as
+     a sticker and a gradient reads as a curved surface under one light. */
+  .hero-game-token-gloss {
+    position: absolute;
+    left: 26%;
+    top: 12%;
+    width: 42%;
+    height: 34%;
+    border-radius: 50%;
+    background: radial-gradient(60% 60% at 40% 34%, oklch(1 0 0 / 0.85) 0%, transparent 72%);
+  }
+
+  /* Where the piece meets the table. */
+  .hero-game-token-collar {
+    position: absolute;
+    right: 10%;
+    bottom: 2%;
+    left: 10%;
+    height: 20%;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--piece) 74%, var(--color-ink-950));
+    box-shadow: inset 0 0.3cqw 0.5cqw oklch(1 0 0 / 0.26);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-game-token {
+      cursor: pointer;
+    }
+
+    .hero-game-token:hover .hero-game-token-body {
+      translate: 0 -0.9cqw;
+      scale: 1.07;
+      box-shadow:
+        inset 0.5cqw 0.5cqw 1cqw oklch(1 0 0 / 0.5),
+        inset -0.5cqw -0.9cqw 1.1cqw oklch(0.163 0.012 25 / 0.24),
+        0 1.4cqw 2.2cqw -0.6cqw oklch(0.163 0.012 25 / 0.42);
+    }
+
+    .hero-game-token:active .hero-game-token-body {
+      scale: 0.97;
+      transition-duration: var(--duration-press);
+    }
+  }
+
+  /* ---- The route highlight ---------------------------------------------- */
+
+  /* Tapping a token lights its whole route for a moment: every tile it passes,
+     its lane and its pod. Done with one attribute and the cascade rather than
+     forty tweens, so it is interruptible and costs nothing to undo. */
+  .hero-game-field[data-focus="red"] [data-owner~="red"] .hero-game-tile-face,
+  .hero-game-field[data-focus="blue"] [data-owner~="blue"] .hero-game-tile-face,
+  .hero-game-field[data-focus="green"] [data-owner~="green"] .hero-game-tile-face,
+  .hero-game-field[data-focus="gold"] [data-owner~="gold"] .hero-game-tile-face {
+    border-color: color-mix(in oklch, var(--focus-piece) 44%, var(--color-line));
+    background: linear-gradient(
+      155deg,
+      oklch(1 0 0) 0%,
+      color-mix(in oklch, var(--focus-piece) 15%, var(--color-surface)) 100%
+    );
+    box-shadow:
+      inset 0 0.4cqw 0.7cqw oklch(1 0 0 / 0.9),
+      0 0.6cqw 1.4cqw -0.4cqw color-mix(in oklch, var(--focus-piece) 40%, transparent);
+  }
+
+  .hero-game-field[data-focus="red"] {
+    --focus-piece: var(--game-red);
+  }
+  .hero-game-field[data-focus="blue"] {
+    --focus-piece: var(--game-blue);
+  }
+  .hero-game-field[data-focus="green"] {
+    --focus-piece: var(--game-green);
+  }
+  .hero-game-field[data-focus="gold"] {
+    --focus-piece: var(--game-gold);
+  }
+
+  .hero-game-field[data-focus="red"] .hero-game-lane[data-player="red"],
+  .hero-game-field[data-focus="blue"] .hero-game-lane[data-player="blue"],
+  .hero-game-field[data-focus="green"] .hero-game-lane[data-player="green"],
+  .hero-game-field[data-focus="gold"] .hero-game-lane[data-player="gold"] {
+    scale: 1.14;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-game-tile:hover {
+      scale: 1.1;
+    }
+
+    .hero-game-tile:hover .hero-game-tile-face {
+      border-color: var(--color-line-strong);
+      box-shadow:
+        inset 0 0.4cqw 0.7cqw oklch(1 0 0 / 0.95),
+        0 0.9cqw 1.6cqw -0.4cqw oklch(0.163 0.012 25 / 0.2);
+    }
+  }
+
+  /* ---- Capture ---------------------------------------------------------- */
+
+  .hero-game-impact {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .hero-game-impact-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 9cqw;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border: 0.45cqw solid color-mix(in oklch, var(--turn) 68%, transparent);
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  .hero-game-spark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.15cqw;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--turn) 82%, oklch(1 0 0));
+    opacity: 0;
+  }
+
+  /* ---- The win ---------------------------------------------------------- */
+
+  .hero-game-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: radial-gradient(
+      66% 66% at 50% 50%,
+      oklch(1 0 0 / 0.24) 0%,
+      oklch(1 0 0 / 0.78) 76%
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-game-banner {
+    position: absolute;
+    left: 50%;
+    top: 71%;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 1.4cqw;
+    padding: 1.1cqw 3cqw 1.2cqw;
+    translate: -50% -50%;
+    border: 1px solid color-mix(in oklch, var(--piece, var(--color-accent)) 40%, var(--color-line));
+    border-radius: 999px;
+    background: oklch(1 0 0 / 0.94);
+    box-shadow:
+      0 1.6cqw 3.4cqw -1cqw color-mix(in oklch, var(--piece, var(--color-accent)) 34%, transparent),
+      inset 0 0 0 1px oklch(1 0 0 / 0.8);
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: clamp(0.6rem, 2.9cqw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-game-banner-dot {
+    width: 1.9cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--piece, var(--color-accent));
+    box-shadow: 0 0 0 0.5cqw color-mix(in oklch, var(--piece, var(--color-accent)) 22%, transparent);
+  }
+
+  .hero-game-burst {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+  }
+
+  /* ---- The turn rail ---------------------------------------------------- */
+
+  /* Hangs off the top edge opposite the dice tray, so the board is anchored on
+     a diagonal rather than boxed in by its own frame. The overhang is vertical
+     only: a horizontal one on a narrow phone is a scrollbar. */
+  .hero-game-rail {
+    position: absolute;
+    left: 5%;
+    top: -3.4%;
+    z-index: 7;
+    display: flex;
+    width: 30%;
+    align-items: center;
+    padding: 0.9cqw;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: oklch(1 0 0 / 0.96);
+    box-shadow:
+      0 1.4cqw 3cqw -1cqw oklch(0.163 0.012 25 / 0.24),
+      inset 0 0 0 1px oklch(1 0 0 / 0.8);
+  }
+
+  .hero-game-rail-thumb {
+    position: absolute;
+    left: 0.9cqw;
+    top: 0.9cqw;
+    bottom: 0.9cqw;
+    width: calc((100% - 1.8cqw) / 4);
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--piece) 18%, oklch(1 0 0));
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--piece) 44%, transparent);
+    transition: background-color var(--duration-overlay) var(--ease-out);
+  }
+
+  .hero-game-rail-slot {
+    position: relative;
+    display: grid;
+    flex: 1;
+    place-items: center;
+    padding: 1cqw 0;
+  }
+
+  .hero-game-chip {
+    width: 1.9cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--piece);
+    opacity: 0.42;
+    transition:
+      opacity var(--duration-hover) var(--ease-out),
+      scale var(--duration-overlay) var(--ease-out);
+  }
+
+  .hero-game-chip[data-active] {
+    opacity: 1;
+    scale: 1.32;
+  }
+
+  /* ---- The dice tray ---------------------------------------------------- */
+
+  .hero-game-tray {
+    position: absolute;
+    right: 4%;
+    bottom: -8%;
+    z-index: 7;
+    display: grid;
+    width: 21%;
+    aspect-ratio: 1;
+    padding: 0;
+    place-items: center;
+    /* The die's own vanishing point. Without it the cube renders flat and the
+       tumble reads as a square swapping its dots. */
+    perspective: 30cqw;
+    border: 1px solid var(--color-line);
+    border-radius: 34%;
+    background:
+      radial-gradient(80% 70% at 32% 20%, oklch(1 0 0) 0%, transparent 76%),
+      linear-gradient(158deg, var(--color-ink-0) 0%, var(--color-ink-50) 100%);
+    box-shadow:
+      0 2cqw 4.4cqw -1.4cqw oklch(0.163 0.012 25 / 0.3),
+      inset 0 0 0 1px oklch(1 0 0 / 0.8);
+    transition:
+      translate var(--duration-hover) var(--ease-out),
+      scale var(--duration-press) var(--ease-out),
+      box-shadow var(--duration-hover) var(--ease-out);
+  }
+
+  .hero-game-tray:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  /* The well the die sits in. Gives the tray a floor, so the die reads as
+     resting in something rather than floating over a white pill. */
+  .hero-game-tray-well {
+    position: absolute;
+    inset: 16%;
+    border-radius: 34%;
+    background: linear-gradient(158deg, var(--color-ink-50) 0%, var(--color-ink-100) 100%);
+    box-shadow: inset 0 0.6cqw 1.2cqw oklch(0.163 0.012 25 / 0.09);
+  }
+
+  /* Carries the active player's colour, and is flashed by GSAP when the die
+     lands. Two jobs, one node: a second ring would be a second layer. */
+  .hero-game-tray-ring {
+    position: absolute;
+    inset: 8%;
+    border: 0.5cqw solid color-mix(in oklch, var(--turn) 60%, transparent);
+    border-radius: 34%;
+    opacity: 0.5;
+    transition:
+      border-color var(--duration-overlay) var(--ease-out),
+      scale var(--duration-hover) var(--ease-out);
+  }
+
+  .hero-game-die-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 17%;
+    width: 15cqw;
+    height: 3.4cqw;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      oklch(0.163 0.012 25 / 0.28) 0%,
+      transparent 72%
+    );
+  }
+
+  .hero-game-die {
+    --die-size: 12.4cqw;
+    --die-half: calc(var(--die-size) / 2);
+
+    position: relative;
+    width: var(--die-size);
+    height: var(--die-size);
+    transform-style: preserve-3d;
+  }
+
+  .hero-game-die-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    padding: 12%;
+    gap: 4%;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    place-items: center;
+    /* Rounded, like a real die. The gaps this leaves at the cube's corners are
+       exactly the rounding, which is why the radius is not larger. */
+    border-radius: 18%;
+    background:
+      radial-gradient(88% 78% at 26% 18%, oklch(1 0 0) 0%, transparent 78%),
+      linear-gradient(150deg, var(--color-ink-0) 0%, var(--color-ink-100) 100%);
+    box-shadow:
+      inset 0 0 0 1px oklch(0.163 0.012 25 / 0.08),
+      inset 0.5cqw 0.6cqw 1cqw oklch(1 0 0 / 0.9),
+      inset -0.5cqw -0.7cqw 1cqw oklch(0.163 0.012 25 / 0.09);
+    backface-visibility: hidden;
+  }
+
+  .hero-game-pip {
+    width: 68%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: linear-gradient(150deg, var(--color-ink-700) 0%, var(--color-ink-950) 100%);
+    box-shadow:
+      inset 0 0.25cqw 0.3cqw oklch(1 0 0 / 0.24),
+      0 0.15cqw 0.2cqw oklch(1 0 0 / 0.5);
+  }
+
+  .hero-game-pip-off {
+    visibility: hidden;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-game-tray {
+      cursor: pointer;
+    }
+
+    .hero-game-tray:hover {
+      translate: 0 -0.8cqw;
+      box-shadow:
+        0 3cqw 6cqw -1.6cqw oklch(0.163 0.012 25 / 0.34),
+        inset 0 0 0 1px oklch(1 0 0 / 0.8);
+    }
+
+    /* Border and `scale`, not opacity. GSAP flashes this ring on every landing
+       and leaves an inline opacity behind, which a stylesheet cannot outrank. */
+    .hero-game-tray:hover .hero-game-tray-ring {
+      border-color: color-mix(in oklch, var(--turn) 92%, transparent);
+      scale: 1.05;
+    }
+  }
+
+  .hero-game-tray:active {
+    scale: 0.97;
+  }
+
+  /* The visitor has the die. One quiet ring, twice, rather than a label. */
+  .hero-game-tray[data-manual]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in oklch, var(--turn) 55%, transparent);
+    border-radius: 34%;
+    animation: hero-game-ping 1.9s var(--ease-out) infinite;
+    pointer-events: none;
+  }
+
+  @keyframes hero-game-ping {
+    0% {
+      opacity: 0.7;
+      scale: 1;
+    }
+    70%,
+    100% {
+      opacity: 0;
+      scale: 1.18;
+    }
+  }
+
+  /* Reduced motion keeps every colour change on this board and drops every
+     pointer transform. The die is disabled by the island, so it also stops
+     inviting a press it will not answer. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-game-token:hover .hero-game-token-body,
+    .hero-game-token:active .hero-game-token-body,
+    .hero-game-tile:hover,
+    .hero-game-tray:hover,
+    .hero-game-tray:active,
+    .hero-game-tray:hover .hero-game-tray-ring {
+      translate: 0;
+      scale: 1;
+    }
+
+    .hero-game-token,
+    .hero-game-tray {
+      cursor: default;
+    }
+  }
+
+  .hero-game-tray:disabled {
+    cursor: default;
+  }
+
+  /* ---- Depth ------------------------------------------------------------
+     Desktop only. `preserve-3d` and a perspective everywhere would put every
+     layer of this board on the GPU on a mid-range Android for the sake of an
+     effect that device cannot even trigger.                                 */
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-game-stage {
+      perspective: 1100px;
+    }
+
+    .hero-game-tilt,
+    .hero-game-field,
+    .hero-game-pieces {
+      transform-style: preserve-3d;
+    }
+
+    .hero-game-pieces {
+      transform: translateZ(14px);
+    }
+
+    /* translateZ only. Centring is the `translate` property on the base rule,
+       and repeating it here would move the core half its width again. */
+    .hero-game-core {
+      transform: translateZ(6px);
+    }
+
+    .hero-game-rail,
+    .hero-game-tray {
+      transform: translateZ(26px);
+    }
+  }
+
+  /* ---- Narrow slots ------------------------------------------------------
+     Not the desktop board scaled down. Below sm the tokens and the die grow
+     relative to the board, the chrome tightens, and the shadows lose a stop:
+     the same composition, drawn for a hand rather than a cursor.            */
+
+  @media (max-width: 39.99rem) {
+    .hero-game-plate {
+      border-radius: var(--radius-2xl);
+    }
+
+    .hero-game-token {
+      width: 10cqw;
+      height: 13.2cqw;
+    }
+
+    .hero-game-rail {
+      left: 4%;
+      width: 36%;
+    }
+
+    .hero-game-tray {
+      width: 25%;
+      bottom: -7%;
+    }
+
+    .hero-game-die {
+      --die-size: 14.4cqw;
+    }
+
+    .hero-game-die-shadow {
+      width: 17cqw;
+    }
+
+    .hero-game-inner,
+    .hero-game-core-ring {
+      display: none;
+    }
+  }
+
   /* Horizontal gallery track. A real scroll container, not a pinned section:
      it stays keyboard reachable, it never blocks vertical scrolling, and touch
      gets the platform's own momentum. */

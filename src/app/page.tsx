@@ -17,7 +17,7 @@ import { createMetadata } from "@/lib/seo";
  * Eight bands, alternating tone so the sections separate without a box being
  * drawn around anything: canvas hero, surface, the one tinted band, canvas,
  * surface, sunken table, canvas, sunken sign-off. Every section is a Server
- * Component; the client islands (`HeroStage`, `Hand`, `Parallax`,
+ * Component; the client islands (`HeroBoardGame`, `Hand`, `Parallax`,
  * `OriginsMarquee`, `TrickTableBoard`) are leaves, and all but the table take
  * server-rendered markup as children.
  *
