@@ -82,7 +82,6 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
-Current project structure
 
 ```
 funfuse-v2
@@ -129,6 +128,8 @@ funfuse-v2
 │  │  ├─ contact-us
 │  │  │  └─ page.tsx
 │  │  ├─ error.tsx
+│  │  ├─ faq
+│  │  │  └─ page.tsx
 │  │  ├─ favicon.ico
 │  │  ├─ games
 │  │  │  └─ page.tsx
@@ -136,6 +137,8 @@ funfuse-v2
 │  │  ├─ layout.tsx
 │  │  ├─ not-found.tsx
 │  │  ├─ page.tsx
+│  │  ├─ privacy-policy
+│  │  │  └─ page.tsx
 │  │  ├─ project-genre
 │  │  │  └─ [genre]
 │  │  │     └─ page.tsx
@@ -143,7 +146,10 @@ funfuse-v2
 │  │  │  └─ [slug]
 │  │  │     └─ page.tsx
 │  │  ├─ robots.ts
-│  │  └─ sitemap.ts
+│  │  ├─ sitemap.ts
+│  │  └─ tos
+│  │     ├─ page.tsx
+│  │     └─ terms-decor.tsx
 │  ├─ assets
 │  │  ├─ brand
 │  │  │  ├─ funfuse-games-icon.png
@@ -260,6 +266,11 @@ funfuse-v2
 │  │  │  ├─ contact-hero.tsx
 │  │  │  ├─ contact-table.tsx
 │  │  │  └─ index.ts
+│  │  ├─ faq
+│  │  │  ├─ faq-accordion.tsx
+│  │  │  ├─ faq-decor.tsx
+│  │  │  ├─ faq-hero.tsx
+│  │  │  └─ index.ts
 │  │  ├─ forms
 │  │  │  ├─ field.tsx
 │  │  │  ├─ form-parts.tsx
@@ -348,6 +359,7 @@ funfuse-v2
 │  ├─ content
 │  │  ├─ careers.ts
 │  │  ├─ contact.ts
+│  │  ├─ faq.ts
 │  │  └─ games
 │  │     ├─ art.ts
 │  │     ├─ asset-folders.ts

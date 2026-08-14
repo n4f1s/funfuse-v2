@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { liveRoutes, routes } from "@/config/routes";
+import { getLegacyBlogPosts, getNewBlogPosts } from "@/content/blog";
 import { gameHref, getAllGames } from "@/content/games";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -41,5 +42,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       }))
     : [];
 
-  return [...staticEntries, ...gameEntries];
+  const legacyBlogEntries = routes.blogs.live
+    ? getLegacyBlogPosts().map((post) => ({
+        url: absoluteUrl(post.canonicalPath),
+        ...(post.modifiedAt ? { lastModified: new Date(`${post.modifiedAt}T00:00:00Z`) } : {}),
+        changeFrequency: "yearly" as const,
+        priority: 0.4,
+      }))
+    : [];
+
+  // New articles deliberately do not expose a made-up historical date. They
+  // enter the sitemap without lastModified until a real publication update.
+  const newBlogEntries = routes.blogs.live
+    ? getNewBlogPosts().map((post) => ({
+        url: absoluteUrl(post.canonicalPath),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }))
+    : [];
+
+  return [...staticEntries, ...gameEntries, ...legacyBlogEntries, ...newBlogEntries];
 }

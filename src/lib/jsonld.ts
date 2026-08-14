@@ -5,6 +5,8 @@ import {
   playStoreUrl,
   type Game,
 } from "@/content/games";
+import type { BlogPost } from "@/content/blog";
+import type { GameArtwork } from "@/content/games";
 
 import { absoluteUrl } from "./seo";
 
@@ -117,6 +119,55 @@ export function faqSchema(
       name: entry.question,
       acceptedAnswer: { "@type": "Answer", text: entry.answer },
     })),
+  };
+}
+
+/** Source-controlled editorial content. Dates are omitted until they are real. */
+export function articleSchema(post: BlogPost, artwork: GameArtwork | null): Thing {
+  const image = artwork
+    ? {
+        "@type": "ImageObject",
+        url: absoluteUrl(artwork.src.src),
+        width: artwork.src.width,
+        height: artwork.src.height,
+      }
+    : undefined;
+
+  return {
+    "@type": "Article",
+    "@id": `${absoluteUrl(post.canonicalPath)}#article`,
+    mainEntityOfPage: absoluteUrl(post.canonicalPath),
+    url: absoluteUrl(post.canonicalPath),
+    headline: post.title,
+    description: post.seo.description,
+    articleSection: post.categories,
+    keywords: [post.seo.primaryKeyword, ...post.seo.secondaryKeywords].join(", "),
+    inLanguage: site.lang,
+    publisher: { "@id": ORGANIZATION_ID },
+    ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+    ...(post.modifiedAt ? { dateModified: post.modifiedAt } : {}),
+    ...(image ? { image } : {}),
+  };
+}
+
+export function blogIndexSchema(posts: readonly BlogPost[]): Thing {
+  return {
+    "@type": "CollectionPage",
+    "@id": `${absoluteUrl("/blogs/")}#collection`,
+    url: absoluteUrl("/blogs/"),
+    name: "FunFuse Games Blog",
+    description: "Rules, strategy and game guides from FunFuse Games.",
+    inLanguage: site.lang,
+    isPartOf: { "@id": WEBSITE_ID },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: posts.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: absoluteUrl(post.canonicalPath),
+        name: post.title,
+      })),
+    },
   };
 }
 

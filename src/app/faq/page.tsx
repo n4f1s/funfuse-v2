@@ -1,4 +1,5 @@
 import { FaqAccordion, FaqDecor, FaqHero } from "@/components/faq";
+import { Link } from "@/components/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/ui";
 import { routes } from "@/config/routes";
@@ -33,12 +34,12 @@ export default function FaqPage() {
                   <p className="mt-4 text-sm leading-6 text-muted">
                     Browse the most common questions from FunFuse players.
                   </p>
-                  <a
+                  <Link
                     href="/privacy-policy/"
                     className="mt-5 inline-flex text-sm font-semibold text-accent-text underline decoration-accent/30 underline-offset-4 hover:text-accent-pressed"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </div>
               </aside>
 

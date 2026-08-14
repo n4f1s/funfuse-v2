@@ -42,7 +42,7 @@ export const routes = {
   /** Preserved. Blog listing. */
   blogs: {
     path: "/blogs",
-    live: false,
+    live: true,
     changeFrequency: "weekly",
     priority: 0.6,
     preserved: true,
@@ -125,27 +125,12 @@ export const genreRoutes: RouteEntry[] = Object.keys(legacyGenreRoutes).map(
 /**
  * Blog posts published at the site root by WordPress. They stay at the root.
  *
- * These are listed here so the preservation decision is explicit and the paths
- * are checked against the redirect table at build time. Ownership moves to a
- * blog content module when the blog ships; at that point these entries come
- * out and the sitemap reads the posts directly.
+ * Their source of truth is now `src/content/blog.ts`, which also owns sitemap
+ * metadata. Keeping a route registry record here would duplicate that data.
  */
-export const legacyPostRoutes: RouteEntry[] = [
-  "/tongits-star-offline-2",
-  "/hazari-grand-1000-points-game",
-  "/poker-full-house-offline",
-].map((path) => ({
-  path,
-  live: false,
-  changeFrequency: "yearly",
-  priority: 0.4,
-  preserved: true,
-}));
-
 export const allRoutes: RouteEntry[] = [
   ...Object.values(routes),
   ...genreRoutes,
-  ...legacyPostRoutes,
 ];
 
 export const liveRoutes: RouteEntry[] = allRoutes.filter((route) => route.live);

@@ -44,6 +44,8 @@ function splitQuery(path: string): [string, string?] {
 type CreateMetadataInput = {
   /** Page title without the site suffix. Omit on the homepage. */
   title?: string;
+  /** A complete title supplied by source content, without the layout suffix. */
+  titleAbsolute?: string;
   description: string;
   /** Route path, e.g. "/games/tongit". Used for the canonical URL. */
   path: string;
@@ -57,6 +59,7 @@ type CreateMetadataInput = {
 
 export function createMetadata({
   title,
+  titleAbsolute,
   description,
   path,
   image,
@@ -74,12 +77,12 @@ export function createMetadata({
       }
     : undefined;
 
-  const fullTitle = title ? `${title} | ${site.name}` : site.defaultTitle;
+  const fullTitle = titleAbsolute ?? (title ? `${title} | ${site.name}` : site.defaultTitle);
 
   return {
     // The key must be absent, not `undefined`: an explicit undefined overrides
     // the layout's `title.default` and the page ships with no <title> at all.
-    ...(title ? { title } : {}),
+    ...(titleAbsolute ? { title: { absolute: titleAbsolute } } : title ? { title } : {}),
     description,
     keywords,
     alternates: { canonical },
