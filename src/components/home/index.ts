@@ -1,3 +1,4 @@
+export { HomeBlog, HomeBlogFallback } from "./blog";
 export { Catalogue } from "./catalogue";
 export { Closing } from "./closing";
 export { Craft } from "./craft";

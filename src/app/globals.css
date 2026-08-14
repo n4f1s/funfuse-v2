@@ -1997,6 +1997,15 @@
   .blog-toc-mobile summary::-webkit-details-marker { display: none; }
   .blog-toc-mobile summary { list-style: none; }
 
+  @media (max-width: 63.999rem) {
+    .blog-toc-mobile .blog-toc-list { gap: 0.25rem; }
+
+    .blog-toc-mobile .blog-toc-link {
+      min-height: 2.75rem;
+      padding-block: 0.625rem;
+    }
+  }
+
   /* ---- Article body -----------------------------------------------------
      The reading surface. Everything here is tuned for one thing: a stranger
      learning a card game they have never played, on a phone, in one sitting. */

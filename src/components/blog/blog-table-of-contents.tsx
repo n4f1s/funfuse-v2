@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type MouseEvent, useEffect, useState } from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -26,30 +26,38 @@ export function BlogTableOfContents({
   target: string;
 }) {
   const active = useActiveHeading(items, target);
+  const activeItem = items.find((item) => item.id === active);
 
   return (
     <>
-      <aside className="order-first lg:hidden">
+      <aside className="order-first sticky top-[calc(var(--header-height)+0.75rem)] z-20 -mx-1 lg:hidden">
         <details className="blog-toc-mobile group rounded-lg border border-line bg-surface">
-          <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-semibold text-heading">
-            On this page
+          <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 px-5 py-3 text-left text-heading">
+            <span className="min-w-0">
+              <span className="block text-2xs font-semibold uppercase tracking-[0.13em] text-faint">
+                On this page
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium">
+                {activeItem?.text ?? `${items.length} sections`}
+              </span>
+            </span>
             <span
               aria-hidden="true"
-              className="text-muted transition-transform duration-[var(--duration-popover)] ease-out group-open:rotate-180"
+              className="shrink-0 text-muted transition-transform duration-[var(--duration-popover)] ease-out group-open:rotate-180"
             >
               &#9662;
             </span>
           </summary>
-          <div className="px-5 pb-5">
-            <TocList items={items} active={active} />
+          <div className="max-h-[min(52dvh,22rem)] overflow-y-auto overscroll-contain px-5 pb-5">
+            <TocList items={items} active={active} onNavigate={closeMobileToc} />
           </div>
         </details>
       </aside>
 
-      <aside className="hidden lg:block">
+      <aside className="hidden self-start lg:sticky lg:top-[calc(var(--header-height)+2.5rem)] lg:block">
         <nav
           aria-label="On this page"
-          className="sticky top-[calc(var(--header-height)+2.5rem)] max-h-[calc(100dvh-var(--header-height)-5rem)] overflow-y-auto"
+          className="max-h-[calc(100dvh-var(--header-height)-5rem)] overflow-y-auto pr-2"
         >
           <p className="text-2xs font-semibold uppercase tracking-[0.13em] text-faint">
             On this page
@@ -65,10 +73,12 @@ function TocList({
   items,
   active,
   className,
+  onNavigate,
 }: {
   items: readonly TocItem[];
   active: string | null;
   className?: string;
+  onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <ol className={cn("blog-toc-list", className)}>
@@ -84,6 +94,7 @@ function TocList({
                 "blog-toc-link",
                 isActive ? "blog-toc-link--active" : "",
               )}
+              onClick={onNavigate}
             >
               {item.text}
             </a>
@@ -92,6 +103,10 @@ function TocList({
       })}
     </ol>
   );
+}
+
+function closeMobileToc(event: MouseEvent<HTMLAnchorElement>) {
+  event.currentTarget.closest("details")?.removeAttribute("open");
 }
 
 function useActiveHeading(items: readonly TocItem[], target: string) {

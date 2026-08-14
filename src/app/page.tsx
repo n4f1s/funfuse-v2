@@ -1,9 +1,13 @@
+import { Suspense } from "react";
+
 import {
   Catalogue,
   Closing,
   Craft,
   FeaturedGames,
   Hero,
+  HomeBlog,
+  HomeBlogFallback,
   Origins,
   Studio,
   TrickTable,
@@ -14,9 +18,9 @@ import { createMetadata } from "@/lib/seo";
 /**
  * Homepage.
  *
- * Eight bands, alternating tone so the sections separate without a box being
+ * Nine bands, alternating tone so the sections separate without a box being
  * drawn around anything: canvas hero, surface, the one tinted band, canvas,
- * surface, sunken table, canvas, sunken sign-off. Every section is a Server
+ * surface, sunken table, canvas, surface guides, sunken sign-off. Every section is a Server
  * Component; the client islands (`HeroBoardGame`, `Hand`, `Parallax`,
  * `OriginsMarquee`, `TrickTableBoard`) are leaves, and all but the table take
  * server-rendered markup as children.
@@ -41,6 +45,9 @@ export default function HomePage() {
       <Craft />
       <TrickTable />
       <Catalogue />
+      <Suspense fallback={<HomeBlogFallback />}>
+        <HomeBlog />
+      </Suspense>
       <Closing />
     </>
   );

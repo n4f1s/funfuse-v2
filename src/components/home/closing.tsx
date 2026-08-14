@@ -1,4 +1,4 @@
-import logo from "@/assets/brand/funfuse-games-logo.webp";
+import logo from "@/assets/decorative/props/circular-logo.png";
 import boys from "@/assets/decorative/characters/cheerful-boys-pair.png";
 import { Media } from "@/components/media";
 import { Parallax, Reveal } from "@/components/motion";
@@ -27,10 +27,10 @@ export function Closing() {
           tone="none"
           rounded="none"
           fit="contain"
-          className="w-36 sm:w-52"
+          className="w-18 sm:w-24 animate-spin [animation-duration:6s]"
         />
 
-        <h2 className="text-h2 text-heading mt-10 font-semibold tracking-tightest">
+        <h2 className="text-h2 text-heading mt-4 font-semibold tracking-tightest">
           Play one you already know
         </h2>
 
@@ -43,17 +43,13 @@ export function Closing() {
           <Button
             href={site.socials.googlePlay}
             size="lg"
+            variant="secondary"
             className="w-full sm:w-auto"
           >
             Browse on Google Play
           </Button>
-          <Button
-            href={`mailto:${site.email}`}
-            variant="secondary"
-            size="lg"
-            className="w-full sm:w-auto"
-          >
-            {site.email}
+          <Button href="/contact-us" size="lg" className="w-full sm:w-auto">
+            Contact us
           </Button>
         </div>
       </Reveal>
