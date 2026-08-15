@@ -2489,6 +2489,43 @@
     .article-team-board > :nth-child(n + 3),
     .article-nine-display > :nth-child(n + 3) { border-top: 0; }
   }
+
+  /* ======================================================================
+     Studio hero
+     ----------------------------------------------------------------------
+     Two plates of the same room in one box: a pencil version underneath, the
+     colour version on top of it, clipped to a marker stroke that follows the
+     pointer. Only three things cannot be said in utilities, and they are all
+     here. The choreography is in components/studio/studio-stage.tsx.        */
+
+  /* The colour plate. Hidden until the island decides which of the three
+     endings this visitor gets, because every one of them starts from nothing
+     painted. GSAP owns `opacity` on this element from that point on. */
+  .studio-paint {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  /* No script, no island, and a studio that stays in pencil forever. The
+     colour plate is in the server HTML, so the fallback is one declaration:
+     show it, unclipped. Same query the reveal primitives use. */
+  @media (scripting: none) {
+    .studio-paint {
+      opacity: 1;
+    }
+  }
+
+  /* Holds the clipPath. Zero-sized rather than `display: none`, which drops
+     the definition along with the box in some engines. */
+  .studio-brush-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
 }
 
 /* ==========================================================================

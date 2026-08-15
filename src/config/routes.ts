@@ -51,7 +51,7 @@ export const routes = {
   /** Preserved. Team and company content stays where it is indexed. */
   ourTeam: {
     path: "/our-team",
-    live: false,
+    live: true,
     changeFrequency: "monthly",
     priority: 0.7,
     preserved: true,
