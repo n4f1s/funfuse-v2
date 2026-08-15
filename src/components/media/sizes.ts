@@ -92,6 +92,28 @@ export const sizePresets = {
 
   /** Portrait 9:16 screenshot card inside a `<Hand>` scroller. */
   screenshotCard: "(min-width: 640px) 240px, 60vw",
+
+  /**
+   * A landscape screen inside a drawn device. Three of the container's five
+   * sub-columns in the right-hand half of the Studio translation block:
+   * 740px * 0.6 = 444px, minus the device's own padding. Keep in step with
+   * the `col-span-3 of 5` grid in components/studio/studio-translation.tsx.
+   */
+  deviceWide:
+    "(min-width: 1400px) 430px, (min-width: 1024px) 32vw, (min-width: 640px) 56vw, 94vw",
+
+  /** The portrait device beside it — two of the same five sub-columns. */
+  deviceTall:
+    "(min-width: 1400px) 285px, (min-width: 1024px) 21vw, (min-width: 640px) 37vw, 94vw",
+
+  /**
+   * A store icon in the Studio shelf: 6 columns at lg, 4 at sm, 3 below it.
+   * Container 1320px with gap-x-8 (32px): (1320 - 5*32)/6 = 193px. Keep in
+   * step with the grid in components/studio/studio-shelf.tsx. The sources are
+   * 600px square, so this is a ceiling rather than a target.
+   */
+  iconWall:
+    "(min-width: 1400px) 194px, (min-width: 1024px) 15vw, (min-width: 640px) 22vw, 29vw",
 } as const;
 
 export type SizePreset = keyof typeof sizePresets;

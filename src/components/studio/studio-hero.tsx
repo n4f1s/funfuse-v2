@@ -1,5 +1,5 @@
-import colourPlate from "@/assets/studio/hero-1.webp";
-import pencilPlate from "@/assets/studio/hero-2.webp";
+import colourPlate from "@/assets/studio/hero/studio-hero-1.webp";
+import pencilPlate from "@/assets/studio/hero/studio-hero-2.webp";
 import { Media } from "@/components/media";
 import { getAllGames } from "@/content/games";
 import { studioContent } from "@/content/studio";

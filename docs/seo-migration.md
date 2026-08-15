@@ -52,15 +52,14 @@ sitemap entries and JSON-LD `@id`s must all carry the slash, which is why
 | `/tongits-star-offline-2/`         | Blog post, stays at the root            |
 | `/hazari-grand-1000-points-game/`  | Blog post, stays at the root            |
 | `/poker-full-house-offline/`       | Blog post, stays at the root            |
-| `/our-team/`                       | Team and company content                |
-| `/services/`                       | What the studio does                    |
+| `/our-team/`                       | Studio: who we are, what we make, how   |
 | `/careers/`                        | Careers                                 |
 | `/contact-us/`                     | Contact                                 |
 | `/faq/`                            | FAQ                                     |
 | `/tos/`                            | Terms of Service                        |
 | `/privacy-policy/`                 | Privacy Policy                          |
 
-That is 22 of the 24 indexed URLs kept exactly as they are, plus the two
+That is 21 of the 24 indexed URLs kept exactly as they are, plus the six
 redirects below.
 
 Blog posts keep root-level slugs. The route is `app/[postSlug]/page.tsx` with
@@ -70,7 +69,7 @@ unaffected and any unknown root slug 404s.
 
 ## Permanent redirects (308)
 
-Five, each with a reason.
+Six, each with a reason.
 
 | Old                            | New       | Why                                                                                                             |
 | ------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------- |
@@ -79,6 +78,7 @@ Five, each with a reason.
 | `/project-genre/strategy/`     | `/games/` | No equivalent. The catalogue has card, board and puzzle categories; nothing maps to "strategy".                   |
 | `/category/company/`           | `/blogs/` | Every post is in this one category, so the archive duplicates the blog listing.                                   |
 | `/category/company/card-game/` | `/blogs/` | Nested duplicate of the same three posts.                                                                         |
+| `/services/`                   | `/our-team/` | Consolidated. WordPress split the studio across two pages: `/our-team/` for who we are and `/services/` for what we do. The Studio page at `/our-team/` carries both, including the three disciplines `/services/` listed, so there is no equivalent page left to serve and a thinner copy of it would compete with the real one. |
 
 **The one judgment call worth your sign-off:** `/funfuse-home/games/` is a real
 indexed URL, and preserving it strictly would mean not creating `/games/` at
@@ -86,6 +86,15 @@ all. Serving both would be duplicate content. Redirecting the CMS-artifact path
 to the clean one is the call taken here. If you would rather keep
 `/funfuse-home/games/` as the catalogue and drop `/games/`, that is a one-line
 change in `src/config/routes.ts`.
+
+**The second judgment call:** `/services/` is also a real indexed URL, and the
+rule above says preserved URLs do not move. It moves here because the first of
+the three justifications applies exactly: the content is genuinely consolidated.
+Everything `/services/` carried, including the three disciplines it listed, is
+now a section of the Studio page, and keeping a second thinner page saying the
+same thing would split the studio's own ranking signals across two URLs. The
+nav item that pointed at it and the footer link that duplicated it were both
+retired in the same commit, so nothing internal links into the redirect.
 
 ## New URLs
 
@@ -128,7 +137,7 @@ redirects, not something to fold into the first launch.
 | `/project-genre/<genre>/`  | `app/project-genre/[genre]/page.tsx`|
 | `/blogs/`                  | `app/blogs/page.tsx`                |
 | `/<post-slug>/`            | `app/[postSlug]/page.tsx`           |
-| `/our-team/`, `/services/`, `/careers/`, `/contact-us/`, `/faq/`, `/tos/`, `/privacy-policy/` | one directory each |
+| `/our-team/`, `/careers/`, `/contact-us/`, `/faq/`, `/tos/`, `/privacy-policy/` | one directory each |
 
 ## Launch checklist
 
@@ -137,7 +146,7 @@ redirects, not something to fold into the first launch.
       on any of them means something regressed. Against a running build:
 
       ```bash
-      for p in /projects/tongit/ /projects/hazari-grand/ /projects/callbreak-offline/ /projects/3-2-5-offline-fun-card-game/ /projects/gin-rummy-master-offline/ /projects/tarneeb/ /projects/ludo-challenge-offline-play/ /projects/puzzle-twist-game/ /project-genre/card-game/ /project-genre/board-game/ /blogs/ /tongits-star-offline-2/ /hazari-grand-1000-points-game/ /poker-full-house-offline/ /our-team/ /services/ /careers/ /contact-us/ /faq/ /tos/ /privacy-policy/ /; do printf "%-42s " "$p"; curl -s -o /dev/null -w "%{http_code}\n" "https://funfusegames.com$p"; done
+      for p in /projects/tongit/ /projects/hazari-grand/ /projects/callbreak-offline/ /projects/3-2-5-offline-fun-card-game/ /projects/gin-rummy-master-offline/ /projects/tarneeb/ /projects/ludo-challenge-offline-play/ /projects/puzzle-twist-game/ /project-genre/card-game/ /project-genre/board-game/ /blogs/ /tongits-star-offline-2/ /hazari-grand-1000-points-game/ /poker-full-house-offline/ /our-team/ /careers/ /contact-us/ /faq/ /tos/ /privacy-policy/ /; do printf "%-42s " "$p"; curl -s -o /dev/null -w "%{http_code}\n" "https://funfusegames.com$p"; done
       ```
 
 - [ ] Confirm the five redirects return a single 308 to the right destination.

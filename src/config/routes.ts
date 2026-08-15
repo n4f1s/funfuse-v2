@@ -48,19 +48,20 @@ export const routes = {
     preserved: true,
   },
 
-  /** Preserved. Team and company content stays where it is indexed. */
+  /**
+   * Preserved. The Studio page: who the studio is, what it makes and how.
+   *
+   * It also absorbs `/services/`, which WordPress used for the "what we do"
+   * half of the same story. There is no second page to send that URL to now,
+   * so it redirects here — see `legacyRedirects` for the reason, and
+   * docs/seo-migration.md for why that is the one case where a preserved URL
+   * is allowed to move.
+   */
   ourTeam: {
     path: "/our-team",
     live: true,
     changeFrequency: "monthly",
-    priority: 0.7,
-    preserved: true,
-  },
-  services: {
-    path: "/services",
-    live: false,
-    changeFrequency: "monthly",
-    priority: 0.7,
+    priority: 0.8,
     preserved: true,
   },
 
@@ -165,6 +166,12 @@ export const legacyRedirects: readonly {
     destination: "/games",
     reason:
       "No equivalent. The catalogue has card, board and puzzle categories; nothing maps to 'strategy'.",
+  },
+  {
+    source: "/services",
+    destination: "/our-team",
+    reason:
+      "Consolidated. WordPress split the studio across two pages: /our-team/ for who we are and /services/ for what we do. The new Studio page at /our-team/ carries both, including the three disciplines /services/ listed, so there is no equivalent page left to serve here and keeping a thinner copy of the same content would compete with it.",
   },
   {
     source: "/category/company",
