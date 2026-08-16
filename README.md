@@ -83,6 +83,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -123,6 +124,12 @@ funfuse-v2
 ├─ skills-lock.json
 ├─ src
 │  ├─ app
+│  │  ├─ [postSlug]
+│  │  │  └─ page.tsx
+│  │  ├─ blogs
+│  │  │  ├─ [slug]
+│  │  │  │  └─ page.tsx
+│  │  │  └─ page.tsx
 │  │  ├─ careers
 │  │  │  └─ page.tsx
 │  │  ├─ contact-us
@@ -147,6 +154,8 @@ funfuse-v2
 │  │  │     └─ page.tsx
 │  │  ├─ robots.ts
 │  │  ├─ sitemap.ts
+│  │  ├─ studio
+│  │  │  └─ page.tsx
 │  │  └─ tos
 │  │     ├─ page.tsx
 │  │     └─ terms-decor.tsx
@@ -174,81 +183,102 @@ funfuse-v2
 │  │  │     ├─ pencil.png
 │  │  │     ├─ pink-crystal-gem.png
 │  │  │     └─ yellow-lightning-bolt.png
-│  │  └─ games
-│  │     ├─ 3-2-5-offline
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ belote-francaise
-│  │     │  ├─ cover.webp
-│  │     │  ├─ icon.webp
-│  │     │  ├─ screenshots-1.webp
-│  │     │  ├─ screenshots-2.webp
-│  │     │  ├─ screenshots-3.webp
-│  │     │  ├─ screenshots-4.webp
-│  │     │  └─ screenshots-5.webp
-│  │     ├─ bhabhi-thulla
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ callbreak-offline
-│  │     │  ├─ cover.webp
-│  │     │  ├─ icon.webp
-│  │     │  ├─ screenshots-1.webp
-│  │     │  ├─ screenshots-2.webp
-│  │     │  ├─ screenshots-3.webp
-│  │     │  ├─ screenshots-4.webp
-│  │     │  └─ screenshots-5.webp
-│  │     ├─ capsa-susun
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ gin-rummy
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ hazari-grand
-│  │     │  ├─ cover.webp
-│  │     │  ├─ icon.webp
-│  │     │  ├─ logo.webp
-│  │     │  ├─ screenshots-1.webp
-│  │     │  ├─ screenshots-2.webp
-│  │     │  ├─ screenshots-3.webp
-│  │     │  ├─ screenshots-4.webp
-│  │     │  └─ screenshots-5.webp
-│  │     ├─ lucky-9
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ ludo-challenge
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ mau-mau
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ okey-club
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ omi-club
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ pusoy
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ pusoy-dos
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ puzzle-club
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ tarneeb
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ thousand
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     ├─ tien-len
-│  │     │  ├─ cover.webp
-│  │     │  └─ icon.webp
-│  │     └─ tongits-club-offline
-│  │        ├─ cover.webp
-│  │        └─ icon.webp
+│  │  ├─ games
+│  │  │  ├─ 3-2-5-offline
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ belote-francaise
+│  │  │  │  ├─ cover.webp
+│  │  │  │  ├─ icon.webp
+│  │  │  │  ├─ screenshots-1.webp
+│  │  │  │  ├─ screenshots-2.webp
+│  │  │  │  ├─ screenshots-3.webp
+│  │  │  │  ├─ screenshots-4.webp
+│  │  │  │  └─ screenshots-5.webp
+│  │  │  ├─ bhabhi-thulla
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ callbreak-offline
+│  │  │  │  ├─ cover.webp
+│  │  │  │  ├─ icon.webp
+│  │  │  │  ├─ screenshots-1.webp
+│  │  │  │  ├─ screenshots-2.webp
+│  │  │  │  ├─ screenshots-3.webp
+│  │  │  │  ├─ screenshots-4.webp
+│  │  │  │  └─ screenshots-5.webp
+│  │  │  ├─ capsa-susun
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ gin-rummy
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ hazari-grand
+│  │  │  │  ├─ cover.webp
+│  │  │  │  ├─ icon.webp
+│  │  │  │  ├─ logo.webp
+│  │  │  │  ├─ screenshots-1.webp
+│  │  │  │  ├─ screenshots-2.webp
+│  │  │  │  ├─ screenshots-3.webp
+│  │  │  │  ├─ screenshots-4.webp
+│  │  │  │  └─ screenshots-5.webp
+│  │  │  ├─ lucky-9
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ ludo-challenge
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ mau-mau
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ okey-club
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ omi-club
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ pusoy
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ pusoy-dos
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ puzzle-club
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ tarneeb
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ thousand
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  ├─ tien-len
+│  │  │  │  ├─ cover.webp
+│  │  │  │  └─ icon.webp
+│  │  │  └─ tongits-club-offline
+│  │  │     ├─ cover.webp
+│  │  │     └─ icon.webp
+│  │  └─ studio
+│  │     ├─ culture
+│  │     │  └─ studio-team-table.webp
+│  │     ├─ hero
+│  │     │  ├─ studio-hero-1.webp
+│  │     │  └─ studio-hero-2.webp
+│  │     ├─ process
+│  │     │  └─ studio-prototype-table.webp
+│  │     └─ props
+│  │        ├─ studio-pencil.png
+│  │        └─ studio-spark.png
 │  ├─ components
+│  │  ├─ blog
+│  │  │  ├─ blog-art.ts
+│  │  │  ├─ blog-article.tsx
+│  │  │  ├─ blog-card.tsx
+│  │  │  ├─ blog-directory.tsx
+│  │  │  ├─ blog-hero-deck.tsx
+│  │  │  ├─ blog-index.tsx
+│  │  │  ├─ blog-reading-progress.tsx
+│  │  │  ├─ blog-table-of-contents.tsx
+│  │  │  └─ index.ts
 │  │  ├─ careers
 │  │  │  ├─ apply-form.tsx
 │  │  │  ├─ career-apply.tsx
@@ -293,6 +323,7 @@ funfuse-v2
 │  │  │  ├─ screenshots-gallery.tsx
 │  │  │  └─ step-progress.tsx
 │  │  ├─ home
+│  │  │  ├─ blog.tsx
 │  │  │  ├─ catalogue.tsx
 │  │  │  ├─ closing.tsx
 │  │  │  ├─ counter.tsx
@@ -346,6 +377,22 @@ funfuse-v2
 │  │  │  └─ transition-store.ts
 │  │  ├─ seo
 │  │  │  └─ json-ld.tsx
+│  │  ├─ studio
+│  │  │  ├─ index.ts
+│  │  │  ├─ studio-closing-wash.tsx
+│  │  │  ├─ studio-closing.tsx
+│  │  │  ├─ studio-craft.tsx
+│  │  │  ├─ studio-culture.tsx
+│  │  │  ├─ studio-device.tsx
+│  │  │  ├─ studio-hero.tsx
+│  │  │  ├─ studio-premise.tsx
+│  │  │  ├─ studio-process-track.tsx
+│  │  │  ├─ studio-process.tsx
+│  │  │  ├─ studio-prop.tsx
+│  │  │  ├─ studio-shelf-wall.tsx
+│  │  │  ├─ studio-shelf.tsx
+│  │  │  ├─ studio-stage.tsx
+│  │  │  └─ studio-translation.tsx
 │  │  └─ ui
 │  │     ├─ button.tsx
 │  │     ├─ container.tsx
@@ -357,19 +404,21 @@ funfuse-v2
 │  │  ├─ routes.ts
 │  │  └─ site.ts
 │  ├─ content
+│  │  ├─ blog.ts
 │  │  ├─ careers.ts
 │  │  ├─ contact.ts
 │  │  ├─ faq.ts
-│  │  └─ games
-│  │     ├─ art.ts
-│  │     ├─ asset-folders.ts
-│  │     ├─ details.ts
-│  │     ├─ games.ts
-│  │     ├─ generated
-│  │     │  └─ screenshots.generated.ts
-│  │     ├─ index.ts
-│  │     ├─ screenshots.ts
-│  │     └─ types.ts
+│  │  ├─ games
+│  │  │  ├─ art.ts
+│  │  │  ├─ asset-folders.ts
+│  │  │  ├─ details.ts
+│  │  │  ├─ games.ts
+│  │  │  ├─ generated
+│  │  │  │  └─ screenshots.generated.ts
+│  │  │  ├─ index.ts
+│  │  │  ├─ screenshots.ts
+│  │  │  └─ types.ts
+│  │  └─ studio.ts
 │  └─ lib
 │     ├─ cn.ts
 │     ├─ email

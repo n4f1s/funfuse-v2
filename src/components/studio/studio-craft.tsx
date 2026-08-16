@@ -1,9 +1,26 @@
+import type { StaticImageData } from "next/image";
+
+import craftArtDirection from "@/assets/studio/craft/studio-art-direction.webp";
+import craftGameDesign from "@/assets/studio/craft/studio-game-design.webp";
+import craftGameDevelopment from "@/assets/studio/craft/studio-game-development.webp";
 import { Media } from "@/components/media";
 import { Parallax, Reveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 import { getAllGames } from "@/content/games";
 import { getGameArt } from "@/content/games/art";
 import { studioContent } from "@/content/studio";
+
+/**
+ * The three craft plates, keyed by the discipline title they sit beside.
+ * Studio artwork, 16:9, one per discipline, so the caption can stay
+ * evidence-driven (the shipped title the discipline is argued with) while the
+ * picture stops pretending to be that game's key art.
+ */
+const CRAFT_ART: Record<string, StaticImageData> = {
+  "Game development": craftGameDevelopment,
+  "Game design": craftGameDesign,
+  "Art direction": craftArtDirection,
+};
 
 /**
  * The three crafts, each with a shipped title as its evidence.
@@ -19,9 +36,11 @@ import { studioContent } from "@/content/studio";
  * alternate side instead, and the plates drift at alternating rates on
  * desktop, which is what keeps a three-item list from reading as a template.
  *
- * The artwork is real key art for a real game, pulled from the catalogue by
- * slug. A discipline whose evidence has no cover renders its argument without
- * a picture rather than with a stand-in.
+ * The plate beside each discipline is the studio's own 16:9 craft artwork
+ * (`src/assets/studio/craft`), mapped by discipline title. The caption stays
+ * evidence-driven: the shipped title that argues for the discipline, pulled
+ * from the catalogue by slug. Should a discipline ever lack a plate, its
+ * evidence game's cover renders instead rather than the block opening a hole.
  */
 export function StudioCraft() {
   const { craft } = studioContent;
@@ -41,7 +60,15 @@ export function StudioCraft() {
           const game = games.find(
             (candidate) => candidate.slug === discipline.evidence,
           );
-          const cover = game ? getGameArt(game.slug)?.cover : undefined;
+          // The studio plate for this discipline; the evidence game's cover is
+          // only a fallback if a discipline ever ships without one.
+          const art = CRAFT_ART[discipline.title];
+          const cover = art ? undefined : getGameArt(game?.slug ?? "")?.cover;
+          const plate = art
+            ? { src: art, alt: `Studio artwork for ${discipline.title}.` }
+            : cover
+              ? { src: cover.src, alt: cover.alt }
+              : null;
           // Second block mirrored. Three items means the first and last share
           // a side, which is what makes the middle one read as the turn rather
           // than as a pattern that ran out.
@@ -72,7 +99,7 @@ export function StudioCraft() {
                 </p>
               </Reveal>
 
-              {cover && game ? (
+              {plate ? (
                 <Parallax
                   distance={mirrored ? -52 : -84}
                   className={
@@ -83,15 +110,15 @@ export function StudioCraft() {
                 >
                   <figure>
                     <Media
-                      src={cover.src}
-                      alt={cover.alt}
+                      src={plate.src}
+                      alt={plate.alt}
                       aspect="wide"
                       sizes="half"
                       className="plate"
                     />
                     <figcaption className="text-muted mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
                       <span className="text-heading font-semibold">
-                        {game.title}
+                        {game?.title}
                       </span>
                       <span>{discipline.evidenceNote}</span>
                     </figcaption>
