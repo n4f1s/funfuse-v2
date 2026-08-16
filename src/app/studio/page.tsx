@@ -15,15 +15,15 @@ import { breadcrumbSchema, jsonLdGraph } from "@/lib/jsonld";
 import { createMetadata } from "@/lib/seo";
 
 /**
- * The Studio page, served at the preserved WordPress path `/our-team/`.
+ * The Studio page, served at the new path `/studio/`.
  *
- * **Why this URL.** The nav has said "Studio" and pointed here since before the
- * page existed (`primaryNav` in src/config/site.ts), and `/our-team/` is one of
- * the URLs carried over untouched from WordPress. A tidier `/studio/` would
- * cost the page its history for nothing. `/services/` used to hold the "what we
- * do" half of this story and is now a 308 into this page, which is the one
- * justification the redirect table accepts for retiring a preserved URL: the
- * content is genuinely consolidated. See docs/seo-migration.md.
+ * **Why this URL.** WordPress split the studio across `/our-team/` for the
+ * people and `/services/` for the work. This page carries both, plus the
+ * process, the crafts and the catalogue, so neither old title describes what is
+ * served here and neither URL was kept. Both 308 into `/studio/`, which is the
+ * name the navigation has used for this section since launch. That is the
+ * redirect table's "genuinely consolidated" justification, and the cost of it
+ * is written down in docs/seo-migration.md.
  *
  * **The order is the argument.** Hero states where a game starts. Premise says
  * the games are not ours, which makes everything after it translation rather
@@ -35,7 +35,7 @@ import { createMetadata } from "@/lib/seo";
 export const metadata = createMetadata({
   title: studioContent.hero.eyebrow,
   description: studioContent.hero.lead,
-  path: routes.ourTeam.path,
+  path: routes.studio.path,
 });
 
 export default function StudioPage() {
@@ -45,7 +45,7 @@ export default function StudioPage() {
         data={jsonLdGraph(
           breadcrumbSchema([
             { name: "Home", path: routes.home.path },
-            { name: studioContent.hero.eyebrow, path: routes.ourTeam.path },
+            { name: studioContent.hero.eyebrow, path: routes.studio.path },
           ]),
         )}
       />

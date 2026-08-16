@@ -1,9 +1,9 @@
 /**
  * FunFuse Studio page content.
  *
- * The Studio page is served at the preserved WordPress path `/our-team/` and is
- * the one page that answers who FunFuse is, what it makes and how. It absorbs
- * what the old site split across `/our-team/` and `/services/`.
+ * The Studio page is served at `/studio/` and is the one page that answers who
+ * FunFuse is, what it makes and how. It absorbs what the old site split across
+ * `/our-team/` and `/services/`; both of those 308 into it.
  *
  * **The factual line.** Every claim in this file is one of:
  *   - counted from `src/content/games` at build time (titles, traditions),

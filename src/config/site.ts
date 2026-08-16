@@ -73,9 +73,9 @@ export const primaryNav: readonly NavItem[] = [
     href: "/games",
     matchPrefixes: ["/projects", "/project-genre"],
   },
-  // One page, at the URL WordPress indexed. `/services/` used to carry half of
-  // it and now redirects here, so there is no second prefix to light up.
-  { label: "Studio", href: "/our-team" },
+  // One page. `/our-team/` and `/services/` both 308 into it, so there is no
+  // second prefix to light up.
+  { label: "Studio", href: "/studio" },
   { label: "Blog", href: "/blogs" },
   { label: "Careers", href: "/careers" },
 ] as const;
@@ -92,12 +92,15 @@ export const footerNav: readonly { title: string; items: readonly NavItem[] }[] 
       ],
     },
     {
-      title: "Studio",
+      // "Company", not "Studio": the group holds a link labelled Studio, and a
+      // heading repeating its own first item reads as a mistake.
+      title: "Company",
       items: [
         // "Our team" and "What we do" were two links into two WordPress pages.
-        // Both are now one page, and an internal link to a redirect is a hop we
-        // would be asking every crawler and every visitor to take for nothing.
-        { label: "Studio", href: "/our-team" },
+        // Both are now one page at one URL, and an internal link to a redirect
+        // is a hop we would be asking every visitor and crawler to take for
+        // nothing.
+        { label: "Studio", href: "/studio" },
         { label: "Careers", href: "/careers" },
         { label: "Blog", href: "/blogs" },
         { label: "Contact", href: "/contact-us" },

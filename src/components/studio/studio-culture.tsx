@@ -112,14 +112,28 @@ export function StudioCulture() {
           and the notebook in the middle, the board and the phones on the
           right. Any narrower box on a phone would have to throw one of those
           away, and the plate's whole argument is that they are on one table. */}
-      <Reveal as="div" y="base" delay={0.12} className="mt-14 lg:mt-20">
-        <Media
-          src={teamTable}
-          alt={culture.imageAlt}
-          aspect="banner"
-          sizes="container"
-        />
-      </Reveal>
+
+      <div
+        role="img"
+        aria-label={culture.imageAlt}
+        className="
+          h-[20rem]
+          w-full
+          overflow-hidden
+          rounded-2xl
+          bg-cover
+          bg-bottom
+          bg-fixed
+          max-lg:h-[16rem]
+          max-lg:bg-scroll
+          sm:h-[24rem]
+          lg:h-[30rem]
+          mt-14 lg:mt-20
+        "
+        style={{
+          backgroundImage: `url(${teamTable.src})`,
+        }}
+      />
     </Section>
   );
 }

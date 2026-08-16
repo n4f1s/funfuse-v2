@@ -49,20 +49,22 @@ export const routes = {
   },
 
   /**
-   * Preserved. The Studio page: who the studio is, what it makes and how.
+   * New. The Studio page: who the studio is, what it makes and how.
    *
-   * It also absorbs `/services/`, which WordPress used for the "what we do"
-   * half of the same story. There is no second page to send that URL to now,
-   * so it redirects here — see `legacyRedirects` for the reason, and
-   * docs/seo-migration.md for why that is the one case where a preserved URL
-   * is allowed to move.
+   * It replaces two WordPress pages rather than inheriting either of them.
+   * `/our-team/` held the people and `/services/` held the disciplines; this
+   * page carries both plus the process, the catalogue and the crafts, so
+   * neither old URL describes what is served here any more. Both 308 into it.
+   *
+   * Not `preserved`: this path is ours, not inherited. The two inherited ones
+   * are in `legacyRedirects` with their reason, and docs/seo-migration.md
+   * records the trade being made.
    */
-  ourTeam: {
-    path: "/our-team",
+  studio: {
+    path: "/studio",
     live: true,
     changeFrequency: "monthly",
     priority: 0.8,
-    preserved: true,
   },
 
   careers: {
@@ -81,7 +83,7 @@ export const routes = {
   },
   faq: {
     path: "/faq",
-    live: false,
+    live: true,
     changeFrequency: "monthly",
     priority: 0.5,
     preserved: true,
@@ -168,10 +170,16 @@ export const legacyRedirects: readonly {
       "No equivalent. The catalogue has card, board and puzzle categories; nothing maps to 'strategy'.",
   },
   {
-    source: "/services",
-    destination: "/our-team",
+    source: "/our-team",
+    destination: "/studio",
     reason:
-      "Consolidated. WordPress split the studio across two pages: /our-team/ for who we are and /services/ for what we do. The new Studio page at /our-team/ carries both, including the three disciplines /services/ listed, so there is no equivalent page left to serve here and keeping a thinner copy of the same content would compete with it.",
+      "Consolidated. WordPress split the studio across /our-team/ for the people and /services/ for the work. Both are now one page, which is about the studio rather than about a team roster, so neither old title describes it. /studio/ is the name the navigation has used for this section since launch. Points straight at the destination so no visitor or crawler is asked to take two hops.",
+  },
+  {
+    source: "/services",
+    destination: "/studio",
+    reason:
+      "Consolidated into the same page as /our-team/, including the three disciplines this URL listed. Keeping a thinner second copy of that content would compete with the real one.",
   },
   {
     source: "/category/company",

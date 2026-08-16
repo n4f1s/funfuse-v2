@@ -6,74 +6,31 @@ import { studioContent } from "@/content/studio";
 
 import { StudioStage } from "./studio-stage";
 
-/**
- * The Studio hero.
- *
- * One screen, two parts: the type at the top, the studio filling everything
- * under it edge to edge. Nothing is set over the artwork and nothing is set
- * under it, so the plate is the whole lower half of the first screen rather
- * than a picture with captions around it.
- *
- * The crop is anchored to the bottom at every width. The artwork's lower half
- * is the table — the cards, the sketches, the board — and its upper third is
- * empty sky that the type block above is already providing. So when the box is
- * shorter than 16:9, which is every desktop viewport, the sky is what goes and
- * the table is what stays. The sky that does survive is white, which is the
- * same white the type sits on, so the two halves read as one surface.
- *
- * The headline sits outside every reveal, as does the plate. Between them they
- * are this route's LCP candidates, and an element that starts transparent is an
- * element the browser has not painted.
- */
-
-/**
- * The stage box.
- *
- * Below sm it is 3:2 — taller than the plates, so the crop comes off the far
- * left and right (the sofa and the window frame) and the whole vertical run of
- * the artwork survives on a phone. From sm it takes whatever height is left
- * under the type on the first screen, which is always shorter than 16:9, so the
- * crop turns vertical and `object-bottom` decides which end of it goes.
- *
- * Both cases are known before the bytes arrive: a declared ratio below sm, a
- * viewport-derived flex height above it. Nothing here can shift.
- */
-const STAGE_BOX =
-  "aspect-hero w-full sm:aspect-auto sm:min-h-[20rem] sm:flex-1";
-
-/**
- * Both plates take the same fit, or they lose registration and the reveal
- * stops looking like one image changing underneath the pointer.
- */
-const PLATE_FIT = "object-bottom";
+const PLATE_POSITION = "object-bottom";
 
 export function StudioHero() {
   const { hero } = studioContent;
   const total = getAllGames().length;
 
   return (
-    <section className="relative flex flex-col overflow-hidden sm:min-h-[calc(100dvh-var(--header-height))]">
-      <div className="max-w-page mx-auto w-full px-6 pt-10 pb-9 text-center sm:px-8 sm:pt-14 sm:pb-12 lg:pt-16 lg:pb-14">
-        {/* The one eyebrow on this page. The count beside it is read from the
-            catalogue, so it cannot drift out of step with what we ship. */}
-        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-semibold tracking-wide">
-          <span className="text-accent-text">{hero.eyebrow}</span>
-          <span aria-hidden className="bg-line-strong h-3 w-px" />
-          <span className="text-muted font-medium">
-            {total} games on Google Play
-          </span>
-        </p>
-
-        {/* `text-wrap: balance` is already on every heading in globals.css, so
-            a long viewport gets even lines rather than one orphaned word. */}
-        <h1 className="text-h1 text-heading mx-auto mt-4 max-w-4xl font-bold tracking-tightest sm:mt-5">
-          {hero.title}
-          <span className="text-accent">.</span>
-        </h1>
-      </div>
-
+    <section
+      aria-labelledby="studio-hero-title"
+      className="
+        relative
+        h-[calc(100svh-var(--header-height))]
+        min-h-[36rem]
+        w-full
+        overflow-hidden
+        bg-white
+        sm:h-[calc(100dvh-var(--header-height))]
+        sm:min-h-[42rem]
+        lg:min-h-[46rem]
+      "
+    >
+      {/* Full-bleed hero artwork.
+          The colour/monochrome reveal interaction remains unchanged. */}
       <StudioStage
-        className={`${STAGE_BOX} relative isolate overflow-hidden`}
+        className="absolute inset-0 isolate h-full w-full overflow-hidden"
         base={
           <div className="absolute inset-0">
             <Media
@@ -81,33 +38,107 @@ export function StudioHero() {
               alt={hero.imageAlt}
               sizes="full"
               aspect="auto"
+              fit="cover"
               priority="lcp"
               rounded="none"
               className="h-full w-full"
-              imageClassName={PLATE_FIT}
+              imageClassName={PLATE_POSITION}
             />
           </div>
         }
         paint={
           <div className="absolute inset-0">
-            {/* Lazy on purpose. It is above the fold, so it still starts as
-                soon as layout allows, but it must not compete with the plate
-                underneath it for the LCP. `tone="none"` keeps a second loading
-                surface from being painted over the first. */}
             <Media
               src={colourPlate}
               decorative
               sizes="full"
               aspect="auto"
+              fit="cover"
               priority="lazy"
               rounded="none"
               tone="none"
               className="h-full w-full"
-              imageClassName={PLATE_FIT}
+              imageClassName={PLATE_POSITION}
             />
           </div>
         }
       />
+
+      {/* 
+        Text is intentionally removed from normal document flow.
+
+        The artwork already contains a large white/light area at the top,
+        so the content sits directly over that negative space.
+
+        pointer-events-none is important so this overlay does not interfere
+        with StudioStage's pointer/reveal interaction underneath.
+      */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          top-0
+          z-20
+          mx-auto
+          flex
+          w-full
+          justify-center
+          px-5
+          pt-[clamp(2.25rem,7vh,5.5rem)]
+          sm:px-8
+          lg:px-10
+        "
+      >
+        <div className="max-w-page mx-auto w-full text-center">
+          <p
+            className="
+              flex
+              flex-wrap
+              items-center
+              justify-center
+              gap-x-3
+              gap-y-1
+              text-xs
+              font-semibold
+              tracking-wide
+              sm:text-sm
+            "
+          >
+            <span className="text-accent-text">{hero.eyebrow}</span>
+
+            <span
+              aria-hidden
+              className="bg-line-strong h-3 w-px"
+            />
+
+            <span className="text-muted font-medium">
+              {total} games on Google Play
+            </span>
+          </p>
+
+          <h1
+            id="studio-hero-title"
+            className="
+              text-heading
+              mx-auto
+              mt-3
+              max-w-[18ch]
+              text-[clamp(2.5rem,8vw,4.5rem)]
+              leading-[0.95]
+              font-bold
+              tracking-tightest
+              sm:mt-4
+              sm:max-w-4xl
+              sm:text-[clamp(3.25rem,6vw,5.5rem)]
+              lg:mt-5
+            "
+          >
+            {hero.title}
+            <span className="text-accent">.</span>
+          </h1>
+        </div>
+      </div>
     </section>
   );
 }
