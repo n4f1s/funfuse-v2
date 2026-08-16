@@ -88,10 +88,9 @@ export function CareersHero({
           </Reveal>
         </div>
 
-        {/* Runs into the gutters below sm. The hand is width-driven, so the
-            forty pixels the page margin would take back are forty pixels off
-            every card on the narrowest screens we care most about. */}
-        <CareersHeroStage className="pointer-events-none -mx-5 mt-14 w-[calc(100%+2.5rem)] sm:mx-auto sm:mt-16 sm:w-full sm:max-w-[30rem] lg:pointer-events-auto lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mt-0 lg:max-w-none" />
+        {/* Centered and width-capped below lg, so the hand reads as a hand on a
+            phone rather than a fan that runs into the edges of the screen. */}
+        <CareersHeroStage className="pointer-events-none mx-auto mt-14 w-full max-w-[22rem] sm:mt-16 sm:max-w-[30rem] lg:pointer-events-auto lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mt-0 lg:max-w-none" />
       </Container>
     </section>
   );

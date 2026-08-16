@@ -141,16 +141,11 @@ export function CareersHeroStage({ className }: { className?: string }) {
           // Tilt is a pointer affordance. On touch a tap reports as a hover and
           // leaves the hand stuck mid-lean, so it is gated, not scaled down.
           pointer: "(hover: hover) and (pointer: fine)",
-          // An infinite tween keeps a compositor layer alive for as long as the
-          // page is open. Five of those idling on a mid-range Android is the
-          // kind of cost that never shows up in a screenshot.
-          desktop: MOTION_QUERY.desktop,
         },
         (context) => {
-          const { ok, pointer, desktop } = context.conditions as {
+          const { ok, pointer } = context.conditions as {
             ok: boolean;
             pointer: boolean;
-            desktop: boolean;
           };
 
           // Reduced motion: the hand is already dealt. A static composition is
@@ -175,21 +170,22 @@ export function CareersHeroStage({ className }: { className?: string }) {
             });
           }
 
-          if (desktop) {
-            const idles = cards.map((card, index) =>
-              gsap.to(card, {
-                y: index % 2 === 0 ? -7 : 7,
-                duration: HAND[index]?.bob ?? 3,
-                ease: ease.loop,
-                repeat: -1,
-                yoyo: true,
-              }),
-            );
+          // The idle bob runs at every viewport: the deal is an entrance, but
+          // the hand being *alive* is part of the prop. Five transform tweens
+          // at rest, no paint on any frame past the first.
+          const idles = cards.map((card, index) =>
+            gsap.to(card, {
+              y: index % 2 === 0 ? -7 : 7,
+              duration: HAND[index]?.bob ?? 3,
+              ease: ease.loop,
+              repeat: -1,
+              yoyo: true,
+            }),
+          );
 
-            cleanups.push(() => {
-              for (const idle of idles) idle.kill();
-            });
-          }
+          cleanups.push(() => {
+            for (const idle of idles) idle.kill();
+          });
 
           if (pointer) {
             // `quickTo` writes straight to the element with its own
