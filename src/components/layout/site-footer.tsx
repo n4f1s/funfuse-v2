@@ -36,7 +36,7 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-3 sm:gap-16">
+          <div className="grid gap-10 grid-cols-2 sm:grid-cols-3 sm:gap-16 justify-between">
             {footerNav.map((group) => (
               <div key={group.title}>
                 <h2 className="text-heading font-sans text-sm font-semibold tracking-normal">

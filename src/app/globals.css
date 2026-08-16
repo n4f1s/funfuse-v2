@@ -1888,6 +1888,14 @@
     pointer-events: none;
   }
 
+  /* The stage is `hidden lg:block`, so below the cut the blob floats alone in
+     empty canvas. Hide with it. */
+  @media (width < 64rem) {
+    .blog-hero::after {
+      display: none;
+    }
+  }
+
   .blog-hero-stats {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
