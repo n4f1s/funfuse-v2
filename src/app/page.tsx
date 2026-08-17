@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import {
   Catalogue,
   Closing,
@@ -7,7 +5,6 @@ import {
   FeaturedGames,
   Hero,
   HomeBlog,
-  HomeBlogFallback,
   Origins,
   Studio,
   TrickTable,
@@ -45,9 +42,7 @@ export default function HomePage() {
       <Craft />
       <TrickTable />
       <Catalogue />
-      <Suspense fallback={<HomeBlogFallback />}>
-        <HomeBlog />
-      </Suspense>
+      <HomeBlog />
       <Closing />
     </>
   );

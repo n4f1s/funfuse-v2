@@ -26,10 +26,22 @@ const bricolage = Bricolage_Grotesque({
   display: "swap",
 });
 
-/** Reading surfaces and UI. Covers Cyrillic and Vietnamese for game titles. */
+/**
+ * Reading surfaces and UI. Still covers Cyrillic and Vietnamese for native
+ * game titles — `subsets` controls which files get a `<link rel="preload">`,
+ * not which ones exist. Google serves every subset as its own `@font-face`
+ * with a `unicode-range`, and Next emits all of them regardless; the browser
+ * then fetches a file only when the page actually contains a character in its
+ * range. So Тысяча and Tiến Lên render in Geist exactly as before, on the two
+ * or three pages that need them, while the other forty-seven stop paying
+ * 22.4kB of critical-path preload for glyphs they never draw.
+ *
+ * Bricolage already worked this way: it declares latin + latin-ext and its
+ * Vietnamese file is emitted unpreloaded, which is what proved the mechanism.
+ */
 const geist = Geist({
   variable: "--font-geist",
-  subsets: ["latin", "latin-ext", "cyrillic", "vietnamese"],
+  subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 

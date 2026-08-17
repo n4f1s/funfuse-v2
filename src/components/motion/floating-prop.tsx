@@ -3,7 +3,13 @@
 import { useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
-import { gsap, MOTION_QUERY, registerGsap, useGSAP } from "@/lib/motion/gsap";
+import {
+  gsap,
+  MOTION_QUERY,
+  registerGsap,
+  ScrollTrigger,
+  useGSAP,
+} from "@/lib/motion/gsap";
 import { ease } from "@/lib/motion/tokens";
 
 /**
@@ -109,9 +115,38 @@ export function FloatingProp({
                 })
               : null;
 
+          /**
+           * The bob only runs while the prop is on screen.
+           *
+           * An infinite tween is never "done", so GSAP keeps ticking it for the
+           * life of the page — writing a transform every frame to scenery that
+           * scrolled out of view minutes ago. The homepage carries four of
+           * these and the props sit in bands well below the fold, so on a
+           * landing that cost is paid entirely for things nobody is looking at.
+           *
+           * Same bounds as the drift above, so a prop starts breathing exactly
+           * when it enters and stops when it leaves. Nothing about the motion
+           * while visible changes.
+           */
+          const gate = idle
+            ? ScrollTrigger.create({
+                trigger: root,
+                start: "top bottom",
+                end: "bottom top",
+                onToggle: (self) => {
+                  if (self.isActive) idle.play();
+                  else idle.pause();
+                },
+              })
+            : null;
+
+          // Offscreen at mount is the common case: paused until it is not.
+          if (idle && !gate?.isActive) idle.pause();
+
           return () => {
             travel.scrollTrigger?.kill();
             travel.kill();
+            gate?.kill();
             idle?.kill();
           };
         },

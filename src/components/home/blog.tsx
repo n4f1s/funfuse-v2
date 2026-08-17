@@ -1,44 +1,40 @@
-import { randomInt } from "node:crypto";
-import { connection } from "next/server";
-
 import { BlogCard } from "@/components/blog";
 import { Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
-import { getAllBlogPosts, type BlogPost } from "@/content/blog";
+import { getNewBlogPosts, type BlogPost } from "@/content/blog";
 
 /**
- * A changing selection of guides gives the homepage a reason to reward a
- * return visit without turning the full archive into a second catalogue.
- * `connection()` moves the selection to request time, while the Suspense
- * fallback reserves the section's shape before those cards resolve.
+ * The three guides the homepage leads with.
+ *
+ * This used to reshuffle per visit, which meant `connection()` and which meant
+ * `/` was the one route on the site that could not be prerendered — the whole
+ * homepage re-rendered on every request so that three cards could change
+ * order. That is a poor trade for the site's most important page: it costs
+ * every visitor the origin round trip that the other fifty-five routes avoid,
+ * and it costs them before the hero can paint.
+ *
+ * So the selection is now the first three guides in authored order, which
+ * makes it an editorial choice held in src/content/blog.ts rather than an
+ * arbitrary one. Reordering that file changes which guides lead; no runtime
+ * decision is involved.
+ *
+ * `getNewBlogPosts()` rather than `getAllBlogPosts()` on purpose. The full
+ * list opens with the three posts inherited from WordPress, so taking the
+ * first three of it would have pinned this section to the imported archive
+ * and hidden all seventeen of the guides written for the new site — the ones
+ * the "Explore all guides" button beside this heading is pointing at. The
+ * legacy three keep their own URLs and their place in the blog index; they
+ * are just not what the homepage leads with.
+ *
+ * Deliberately synchronous. Nothing here awaits, so there is nothing for a
+ * Suspense boundary to wait on, and the one that used to wrap this in
+ * app/page.tsx went with the randomness.
  */
-export async function HomeBlog() {
-  await connection();
+const FEATURED_COUNT = 3;
 
-  return <HomeBlogContent posts={pickRandomPosts(getAllBlogPosts(), 3)} />;
-}
-
-/** Keeps the request-time card selection from shifting the page while loading. */
-export function HomeBlogFallback() {
-  return (
-    <Section id="guides" tone="surface">
-      <BlogSectionHeader />
-      <div
-        aria-hidden="true"
-        className="mt-12 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-x-10"
-      >
-        {Array.from({ length: 3 }, (_, index) => (
-          <div key={index} className={index === 2 ? "sm:col-span-2 lg:col-span-1" : ""}>
-            <div className="aspect-wide animate-shimmer rounded-lg bg-surface-muted" />
-            <div className="mt-5 h-3 w-24 rounded-full bg-surface-muted" />
-            <div className="mt-3 h-7 w-4/5 rounded-md bg-surface-muted" />
-            <div className="mt-4 h-4 w-full rounded-full bg-surface-muted" />
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
+export function HomeBlog() {
+  return <HomeBlogContent posts={getNewBlogPosts().slice(0, FEATURED_COUNT)} />;
 }
 
 function HomeBlogContent({ posts }: { posts: readonly BlogPost[] }) {
@@ -84,15 +80,4 @@ function BlogSectionHeader() {
       </Reveal>
     </div>
   );
-}
-
-function pickRandomPosts(posts: readonly BlogPost[], count: number): BlogPost[] {
-  const pool = [...posts];
-  const selection: BlogPost[] = [];
-
-  while (selection.length < count && pool.length > 0) {
-    selection.push(pool.splice(randomInt(pool.length), 1)[0]);
-  }
-
-  return selection;
 }

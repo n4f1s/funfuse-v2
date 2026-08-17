@@ -124,6 +124,7 @@ export function ApplyForm({ roles }: { roles: readonly string[] }) {
           name="portfolio"
           type="url"
           inputMode="url"
+          autoComplete="url"
           maxLength={500}
           defaultValue={values.portfolio}
           error={errors.portfolio}
