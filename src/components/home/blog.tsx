@@ -2,7 +2,7 @@ import { randomInt } from "node:crypto";
 import { connection } from "next/server";
 
 import { BlogCard } from "@/components/blog";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { getAllBlogPosts, type BlogPost } from "@/content/blog";
@@ -64,21 +64,25 @@ function HomeBlogContent({ posts }: { posts: readonly BlogPost[] }) {
 
 function BlogSectionHeader() {
   return (
-    <Reveal as="div" y="lg" className="flex flex-wrap items-end justify-between gap-8">
+    <div className="flex flex-wrap items-end justify-between gap-8">
       <div className="max-w-2xl">
-        <h2 className="text-h2 font-semibold tracking-tightest text-heading">
-          More to learn before the next hand
-        </h2>
-        <p className="mt-4 text-lg text-muted">
+        <WordReveal
+          as="h2"
+          text="More to learn before the next hand"
+          className="text-h2 font-semibold tracking-tightest text-heading"
+        />
+        <Reveal as="p" y="lg" className="mt-4 text-lg text-muted">
           Rules, strategy and useful details for the games we build and the
           tables they come from.
-        </p>
+        </Reveal>
       </div>
 
-      <Button href="/blogs/" variant="secondary">
-        Explore all guides
-      </Button>
-    </Reveal>
+      <Reveal y="lg" className="flex">
+        <Button href="/blogs/" variant="secondary">
+          Explore all guides
+        </Button>
+      </Reveal>
+    </div>
   );
 }
 

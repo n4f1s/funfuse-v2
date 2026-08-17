@@ -2,7 +2,7 @@ import whatWeDoIllustration from "@/assets/decorative/illustrations/what-we-do-c
 import pencil from "@/assets/decorative/props/pencil.png";
 import ludoChallengeArt from "@/assets/games/ludo-challenge/cover.webp";
 import { Media } from "@/components/media";
-import { Parallax, Reveal } from "@/components/motion";
+import { Parallax, Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 
 import { Prop } from "./prop";
@@ -43,13 +43,13 @@ export function Craft() {
             the bottom of it, outside the sticky box, where that space is. */}
         <div className="relative lg:col-span-4">
           <div className="lg:sticky lg:top-[calc(var(--header-height)+3rem)]">
-            <Reveal as="div" y="lg">
-              <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-                What we do
-              </h2>
-              <p className="text-muted mt-5 max-w-sm text-lg">
-                One team takes a title from the rulebook to the store listing.
-              </p>
+            <WordReveal
+              as="h2"
+              text="What we do"
+              className="text-h2 text-heading font-semibold tracking-tightest"
+            />
+            <Reveal as="p" y="lg" className="text-muted mt-5 max-w-sm text-lg">
+              One team takes a title from the rulebook to the store listing.
             </Reveal>
 
             {/* The studio's own character art, wearing the studio's own mark.

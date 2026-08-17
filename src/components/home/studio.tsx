@@ -1,6 +1,6 @@
 import gem from "@/assets/decorative/props/pink-crystal-gem.png";
 import bolt from "@/assets/decorative/props/yellow-lightning-bolt.png";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 import { getAllGames } from "@/content/games";
 
@@ -42,11 +42,15 @@ export function Studio() {
         {/* The heading runs two lines against a five-line column, which leaves
             a hole under it on desktop. The bolt is what stands in that hole. */}
         <div className="relative lg:col-span-7 xl:col-span-6">
-          <Reveal as="div" y="lg">
-            <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-              A studio built around games that already have players
-            </h2>
-          </Reveal>
+          {/* The word reveal is this heading's entrance, so it is not also
+              wrapped in <Reveal>: a block that fades up as one while its words
+              ink in against the scroll is two animations arguing over the same
+              sentence. Everything else in this section keeps its <Reveal>. */}
+          <WordReveal
+            as="h2"
+            text="A studio built around games that already have players"
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
 
           {/* Drift is capped at the height of the hole it sits in. Half of
               `drift` is the travel in each direction, so anything past about

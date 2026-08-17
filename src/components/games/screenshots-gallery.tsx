@@ -1,5 +1,5 @@
 import { Media } from "@/components/media";
-import { Reveal } from "@/components/motion";
+import { WordReveal } from "@/components/motion";
 import { Hand } from "@/components/ui/hand";
 import type { GameArtwork } from "@/content/games";
 
@@ -29,9 +29,11 @@ export function ScreenshotsGallery({
 }) {
   return (
     <div>
-      <Reveal as="h2" y="lg" className="text-h2 text-heading font-semibold tracking-tightest">
-        Screenshots
-      </Reveal>
+      <WordReveal
+        as="h2"
+        text="Screenshots"
+        className="text-h2 text-heading font-semibold tracking-tightest"
+      />
 
       <div className="mt-10">
         <Hand label={`${title} screenshots`} count={slots.length}>

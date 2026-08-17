@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui";
 import { site } from "@/config/site";
 
@@ -46,18 +46,24 @@ export function ContactChannels() {
   return (
     <Section tone="sunken">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
-        <Reveal as="div" y="lg" className="lg:col-span-4">
-          <h2 className="text-h2 text-heading max-w-xs font-semibold tracking-tightest">
-            Other ways round
-          </h2>
+        <div className="lg:col-span-4">
+          <WordReveal
+            as="h2"
+            text="Other ways round"
+            className="text-h2 text-heading max-w-xs font-semibold tracking-tightest"
+          />
 
-          <address className="text-muted mt-6 max-w-xs text-base not-italic">
+          <Reveal
+            as="address"
+            y="lg"
+            className="text-muted mt-6 max-w-xs text-base not-italic"
+          >
             {site.address.street}
             <br />
             {site.address.locality}, {site.address.region}{" "}
             {site.address.postalCode}
-          </address>
-        </Reveal>
+          </Reveal>
+        </div>
 
         <Reveal
           stagger

@@ -1,6 +1,5 @@
 import teamTable from "@/assets/studio/culture/studio-team-table.webp";
-import { Media } from "@/components/media";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { careersContent } from "@/content/careers";
@@ -38,37 +37,42 @@ export function StudioCulture() {
   return (
     <Section tone="accent" id="the-team">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
-        <Reveal as="div" y="lg" className="lg:col-span-6">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            {culture.title}
-          </h2>
-          {culture.body.map((paragraph, index) => (
-            <p
-              key={paragraph}
-              className={
-                index === 0
-                  ? "text-body mt-6 max-w-xl text-lg"
-                  : "text-muted mt-5 max-w-xl text-lg"
-              }
-            >
-              {paragraph}
-            </p>
-          ))}
+        <div className="lg:col-span-6">
+          <WordReveal
+            as="h2"
+            text={culture.title}
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
 
-          {/* The count is a chip rather than part of the label, and hidden
-              from assistive tech: "See open roles 3" is not a sentence. It is
-              read from the careers file, so it cannot advertise a listing that
-              has come down. */}
-          <Button href={culture.cta.href} size="lg" className="mt-8">
-            {culture.cta.label}
-            <span
-              aria-hidden
-              className="bg-surface/20 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums"
-            >
-              {openRoles}
-            </span>
-          </Button>
-        </Reveal>
+          <Reveal as="div" y="lg">
+            {culture.body.map((paragraph, index) => (
+              <p
+                key={paragraph}
+                className={
+                  index === 0
+                    ? "text-body mt-6 max-w-xl text-lg"
+                    : "text-muted mt-5 max-w-xl text-lg"
+                }
+              >
+                {paragraph}
+              </p>
+            ))}
+
+            {/* The count is a chip rather than part of the label, and hidden
+                from assistive tech: "See open roles 3" is not a sentence. It is
+                read from the careers file, so it cannot advertise a listing that
+                has come down. */}
+            <Button href={culture.cta.href} size="lg" className="mt-8">
+              {culture.cta.label}
+              <span
+                aria-hidden
+                className="bg-surface/20 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums"
+              >
+                {openRoles}
+              </span>
+            </Button>
+          </Reveal>
+        </div>
 
         {group ? (
           <Reveal

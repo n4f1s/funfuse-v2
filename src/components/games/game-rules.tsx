@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import type { GameRuleGroup } from "@/content/games/details";
 
 /**
@@ -15,13 +15,11 @@ export function GameRules({
 }) {
   return (
     <div>
-      <Reveal
+      <WordReveal
         as="h2"
-        y="lg"
+        text="Rules"
         className="text-h2 text-heading font-semibold tracking-tightest"
-      >
-        Rules
-      </Reveal>
+      />
 
       <Reveal
         stagger

@@ -1,7 +1,7 @@
 import prototypeTable from "@/assets/studio/process/studio-prototype-table.webp";
 import pencil from "@/assets/studio/props/studio-pencil.png";
 import { Media } from "@/components/media";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 import { studioContent } from "@/content/studio";
 
@@ -33,11 +33,13 @@ export function StudioProcess() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
         <div className="relative lg:col-span-4">
           <div className="lg:sticky lg:top-[calc(var(--header-height)+3rem)]">
-            <Reveal as="div" y="lg">
-              <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-                {process.title}
-              </h2>
-              <p className="text-muted mt-5 max-w-sm text-lg">{process.lead}</p>
+            <WordReveal
+              as="h2"
+              text={process.title}
+              className="text-h2 text-heading font-semibold tracking-tightest"
+            />
+            <Reveal as="p" y="lg" className="text-muted mt-5 max-w-sm text-lg">
+              {process.lead}
             </Reveal>
 
             {/* The prototype plate. Sits under the heading in the tall empty

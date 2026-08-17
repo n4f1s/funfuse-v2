@@ -1,6 +1,6 @@
 import { Media } from "@/components/media";
 import { Link } from "@/components/navigation";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Container } from "@/components/ui/container";
 import { Hand } from "@/components/ui/hand";
 import { Section } from "@/components/ui/section";
@@ -33,15 +33,17 @@ export function FeaturedGames() {
   return (
     <Section id="featured" bleed tone="canvas">
       <Container>
-        <Reveal as="div" y="lg" className="max-w-2xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            Featured games
-          </h2>
-          <p className="text-muted mt-4 text-lg">
+        <div className="max-w-2xl">
+          <WordReveal
+            as="h2"
+            text="Featured games"
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
             {featured.length} of the {getAllGames().length} titles, with the key
             art from their store listings.
-          </p>
-        </Reveal>
+          </Reveal>
+        </div>
       </Container>
 
       {/* No <Reveal> wrapper. The cards animate individually inside <Hand>,

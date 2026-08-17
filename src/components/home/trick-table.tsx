@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 
 import { TrickTableBoard } from "./trick-table-board";
@@ -23,17 +23,19 @@ export function TrickTable() {
   return (
     <Section tone="sunken">
       <div className="lg:flex lg:items-end lg:justify-between lg:gap-x-12">
-        <Reveal as="div" y="lg" className="max-w-xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            What a round feels like
-          </h2>
-          <p className="text-muted mt-4 text-lg">
+        <div className="max-w-xl">
+          <WordReveal
+            as="h2"
+            text="What a round feels like"
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
             Deal, lead, follow, take the trick. The part we spend real time on
             is not the rules, which every player at the table already knows. It
             is how a hand opens, how a card leaves it, and what happens in the
             second after a trick is won.
-          </p>
-        </Reveal>
+          </Reveal>
+        </div>
 
         {/* The legend doubles as the disclaimer. It is the first thing beside
             the heading on a wide screen and the last thing before the table on

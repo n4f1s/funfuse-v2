@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import type { GameDetails } from "@/content/games/details";
 
 import { GameFacts } from "./game-facts";
@@ -19,13 +19,11 @@ export function GameOverview({ details }: { details: GameDetails }) {
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
       <div className="lg:col-span-7">
-        <Reveal
+        <WordReveal
           as="h2"
-          y="lg"
+          text="About the game"
           className="text-h2 text-heading font-semibold tracking-tightest"
-        >
-          About the game
-        </Reveal>
+        />
 
         <Reveal
           stagger

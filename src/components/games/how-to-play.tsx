@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { WordReveal } from "@/components/motion";
 import type { GameDetails } from "@/content/games/details";
 
 import { StepProgress } from "./step-progress";
@@ -14,13 +14,11 @@ import { StepProgress } from "./step-progress";
 export function GameHowToPlay({ details }: { details: GameDetails }) {
   return (
     <div>
-      <Reveal
+      <WordReveal
         as="h2"
-        y="lg"
+        text="How to play"
         className="text-h2 text-heading font-semibold tracking-tightest"
-      >
-        How to play
-      </Reveal>
+      />
 
       <StepProgress className="mt-12 lg:mt-16">
         {details.howToPlay.map((step, index) => (

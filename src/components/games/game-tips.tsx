@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import type { GameTip } from "@/content/games/details";
 
 /**
@@ -10,13 +10,11 @@ import type { GameTip } from "@/content/games/details";
 export function GameTips({ tips }: { tips: readonly GameTip[] }) {
   return (
     <div>
-      <Reveal
+      <WordReveal
         as="h2"
-        y="lg"
+        text="Tips"
         className="text-h2 text-heading font-semibold tracking-tightest"
-      >
-        Tips
-      </Reveal>
+      />
 
       <Reveal
         stagger

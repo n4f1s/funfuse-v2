@@ -1,5 +1,5 @@
 import { Media } from "@/components/media";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Link } from "@/components/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Button, Container } from "@/components/ui";
@@ -164,9 +164,11 @@ export function BlogArticle({
               <p className="text-xs font-semibold uppercase tracking-[0.13em] text-accent-text">
                 Keep reading
               </p>
-              <h2 className="mt-3 text-h2 font-semibold tracking-tight text-balance text-heading">
-                More from the table
-              </h2>
+              <WordReveal
+                as="h2"
+                text="More from the table"
+                className="mt-3 text-h2 font-semibold tracking-tight text-balance text-heading"
+              />
             </div>
             <Reveal
               stagger

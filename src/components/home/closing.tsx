@@ -1,7 +1,7 @@
 import logo from "@/assets/decorative/props/circular-logo.png";
 import boys from "@/assets/decorative/characters/cheerful-boys-pair.png";
 import { Media } from "@/components/media";
-import { Parallax, Reveal } from "@/components/motion";
+import { Parallax, Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { site } from "@/config/site";
@@ -29,10 +29,11 @@ export function Closing() {
           fit="contain"
           className="w-18 sm:w-24 animate-spin [animation-duration:6s]"
         />
-
-        <h2 className="text-h2 text-heading mt-4 font-semibold tracking-tightest">
-          Play one you already know
-        </h2>
+        <WordReveal
+          as="h2"
+          text="Play one you already know"
+          className="text-h2 text-heading font-semibold tracking-tightest mt-4"
+        />
 
         <p className="text-muted mt-4 max-w-lg text-lg">
           Every title is free on Google Play and plays without a connection. For

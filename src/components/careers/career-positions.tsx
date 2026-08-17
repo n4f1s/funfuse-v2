@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button, Section } from "@/components/ui";
 import type { CareerJob } from "@/content/careers";
 
@@ -52,17 +52,17 @@ export function CareerPositions({ jobs }: { jobs: readonly CareerJob[] }) {
 
   return (
     <Section id="open-positions" tone="canvas">
-      <Reveal as="div" y="lg" className="max-w-2xl">
-        <h2
+      <div className="max-w-2xl">
+        <WordReveal
+          as="h2"
           id="positions-heading"
+          text="Open positions"
           className="text-h2 text-heading font-semibold tracking-tightest"
-        >
-          Open positions
-        </h2>
-        <p className="text-muted mt-4 text-lg">
+        />
+        <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
           Choose a role to see what it asks for.
-        </p>
-      </Reveal>
+        </Reveal>
+      </div>
 
       <div className="mt-10 lg:mt-14">
         <RoleSwitcher roles={roles}>

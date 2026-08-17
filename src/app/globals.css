@@ -2772,6 +2772,24 @@
     }
   }
 
+  /* The scrubbed word reveal starts faint, and has to be faint in the first
+     painted frame rather than from the moment its island mounts — a heading
+     that lands in ink and then drops to grey is a flash, not an animation.
+     GSAP owns the inline opacity from there.
+
+     Mirrors `FAINT` in components/motion/word-reveal.tsx; change both
+     together. Reduced motion and a scriptless page get the finished sentence,
+     which is the same end state the animation arrives at. */
+  .will-word-reveal > [data-word] {
+    opacity: 0.3;
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .will-word-reveal > [data-word] {
+      opacity: 1;
+    }
+  }
+
   /* Marks an element that GSAP will transform. Applied for the duration of
      the animation only — a permanent will-change costs a layer forever. */
   .gpu {

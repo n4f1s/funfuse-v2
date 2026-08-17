@@ -1,6 +1,6 @@
 import gem from "@/assets/decorative/props/pink-crystal-gem.png";
 import { Media } from "@/components/media";
-import { FloatingProp, Reveal } from "@/components/motion";
+import { FloatingProp, Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { CareerBenefitGroup } from "@/content/careers";
@@ -34,14 +34,12 @@ export function CareerBenefits({
     <Section tone="sunken">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
         <div className="relative lg:col-span-4">
-          <Reveal as="div" y="lg">
-            <h2
-              id="benefits-heading"
-              className="text-h2 text-heading max-w-sm font-semibold tracking-tightest"
-            >
-              {title}
-            </h2>
-          </Reveal>
+          <WordReveal
+            as="h2"
+            id="benefits-heading"
+            text={title}
+            className="text-h2 text-heading max-w-sm font-semibold tracking-tightest"
+          />
 
           {/* The heading leaves a tall empty strip in this column on a wide
               screen. One prop, drifting against the scroll, is what gives it

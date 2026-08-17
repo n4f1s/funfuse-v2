@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { getAllGames, getGameRegions, regionLabels } from "@/content/games";
@@ -62,16 +62,18 @@ export function Origins() {
   return (
     <Section tone="accent" bleed>
       <Container className="lg:flex lg:items-center lg:justify-between lg:gap-x-12">
-        <Reveal as="div" y="lg" className="max-w-xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            Played at these tables first
-          </h2>
-          <p className="text-muted mt-4 text-lg">
+        <div className="max-w-xl">
+          <WordReveal
+            as="h2"
+            text="Played at these tables first"
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
             None of these games were invented here. Each one belongs to the
             places below, and to the tables that were playing it long before
             there was an app.
-          </p>
-        </Reveal>
+          </Reveal>
+        </div>
 
         {/* From lg only, which is the width at which the copy stops filling
             the row and leaves a hole beside it. Below that there is no hole to

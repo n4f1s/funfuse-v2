@@ -84,6 +84,7 @@ That decision lives in one function, `src/components/home/game-link.ts`.
 
 
 
+
 ```
 funfuse-v2
 ├─ .agents
@@ -109,9 +110,7 @@ funfuse-v2
 ├─ CLAUDE.md
 ├─ README.md
 ├─ docs
-│  ├─ design-system.md
-│  ├─ game-content-sources.md
-│  └─ seo-migration.md
+│  └─ design-system.md
 ├─ eslint.config.mjs
 ├─ next.config.ts
 ├─ package.json
@@ -258,6 +257,10 @@ funfuse-v2
 │  │  │     ├─ cover.webp
 │  │  │     └─ icon.webp
 │  │  └─ studio
+│  │     ├─ craft
+│  │     │  ├─ studio-art-direction.webp
+│  │     │  ├─ studio-game-design.webp
+│  │     │  └─ studio-game-development.webp
 │  │     ├─ culture
 │  │     │  └─ studio-team-table.webp
 │  │     ├─ hero
@@ -375,6 +378,9 @@ funfuse-v2
 │  │  │  ├─ paths.ts
 │  │  │  ├─ route-transition.tsx
 │  │  │  └─ transition-store.ts
+│  │  ├─ not-found
+│  │  │  ├─ index.ts
+│  │  │  └─ not-found-card.tsx
 │  │  ├─ seo
 │  │  │  └─ json-ld.tsx
 │  │  ├─ studio

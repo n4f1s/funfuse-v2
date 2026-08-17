@@ -4,7 +4,7 @@ import craftArtDirection from "@/assets/studio/craft/studio-art-direction.webp";
 import craftGameDesign from "@/assets/studio/craft/studio-game-design.webp";
 import craftGameDevelopment from "@/assets/studio/craft/studio-game-development.webp";
 import { Media } from "@/components/media";
-import { Parallax, Reveal } from "@/components/motion";
+import { Parallax, Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 import { getAllGames } from "@/content/games";
 import { getGameArt } from "@/content/games/art";
@@ -48,12 +48,16 @@ export function StudioCraft() {
 
   return (
     <Section id="what-we-do">
-      <Reveal as="div" y="lg" className="max-w-2xl">
-        <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-          {craft.title}
-        </h2>
-        <p className="text-muted mt-5 text-lg">{craft.lead}</p>
-      </Reveal>
+      <div className="max-w-2xl">
+        <WordReveal
+          as="h2"
+          text={craft.title}
+          className="text-h2 text-heading font-semibold tracking-tightest"
+        />
+        <Reveal as="p" y="lg" className="text-muted mt-5 text-lg">
+          {craft.lead}
+        </Reveal>
+      </div>
 
       <div className="mt-14 flex flex-col gap-16 sm:gap-20 lg:mt-20 lg:gap-24">
         {craft.disciplines.map((discipline, index) => {

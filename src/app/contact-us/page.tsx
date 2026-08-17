@@ -3,7 +3,7 @@ import {
   ContactForm,
   ContactHero,
 } from "@/components/contact";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui";
 import { routes } from "@/config/routes";
 import { contactContent } from "@/content/contact";
@@ -32,12 +32,16 @@ export default function ContactPage() {
       <ContactHero />
 
       <Section id="message" tone="surface">
-        <Reveal as="div" y="lg" className="max-w-xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            {contactContent.formTitle}
-          </h2>
-          <p className="text-muted mt-4 text-lg">{contactContent.formHint}</p>
-        </Reveal>
+        <div className="max-w-xl">
+          <WordReveal
+            as="h2"
+            text={contactContent.formTitle}
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
+            {contactContent.formHint}
+          </Reveal>
+        </div>
 
         <div className="mt-10 lg:mt-14">
           <ContactForm />

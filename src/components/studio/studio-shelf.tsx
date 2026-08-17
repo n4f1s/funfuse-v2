@@ -1,6 +1,6 @@
 import { Media } from "@/components/media";
 import { Link } from "@/components/navigation";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import { gameHref, getAllGames } from "@/content/games";
@@ -30,26 +30,28 @@ export function StudioShelf() {
 
   return (
     <Section tone="surface">
-      <Reveal
-        as="div"
-        y="lg"
-        className="sm:flex sm:items-end sm:justify-between sm:gap-x-8"
-      >
+      <div className="sm:flex sm:items-end sm:justify-between sm:gap-x-8">
         <div className="max-w-xl">
-          <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-            {shelf.title}
-          </h2>
-          <p className="text-muted mt-5 text-lg">{shelf.body}</p>
+          <WordReveal
+            as="h2"
+            text={shelf.title}
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-5 text-lg">
+            {shelf.body}
+          </Reveal>
         </div>
 
-        <Button
-          href={shelf.cta.href}
-          variant="secondary"
-          className="mt-6 w-full shrink-0 sm:mt-0 sm:w-auto"
-        >
-          {shelf.cta.label}
-        </Button>
-      </Reveal>
+        <Reveal y="lg" className="flex shrink-0">
+          <Button
+            href={shelf.cta.href}
+            variant="secondary"
+            className="mt-6 w-full sm:mt-0 sm:w-auto"
+          >
+            {shelf.cta.label}
+          </Button>
+        </Reveal>
+      </div>
 
       <StudioShelfWall className="mt-12 grid grid-cols-3 gap-x-5 gap-y-8 sm:grid-cols-4 sm:gap-x-6 lg:mt-16 lg:grid-cols-6 lg:gap-x-8">
         {games.map((game) => {

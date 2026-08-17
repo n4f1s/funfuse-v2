@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { WordReveal } from "@/components/motion";
 import { Hand } from "@/components/ui/hand";
 import type { Game, GameArtwork } from "@/content/games";
 
@@ -21,9 +21,11 @@ export function RelatedGames({
 
   return (
     <div>
-      <Reveal as="h2" y="lg" className="text-h2 text-heading font-semibold tracking-tightest">
-        More games like {current.title}
-      </Reveal>
+      <WordReveal
+        as="h2"
+        text={`More games like ${current.title}`}
+        className="text-h2 text-heading font-semibold tracking-tightest"
+      />
 
       <div className="mt-10">
         <Hand label="Related games" count={related.length}>

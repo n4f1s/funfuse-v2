@@ -1,6 +1,6 @@
 import { Media } from "@/components/media";
 import { Link } from "@/components/navigation";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button, Container } from "@/components/ui";
 import {
   blogIndexContent,
@@ -63,9 +63,11 @@ export function BlogIndex({ posts }: { posts: readonly BlogPost[] }) {
       <section id="all-guides" className="scroll-mt-28">
         <Container className="pt-16 sm:pt-24">
           <div className="grid gap-6 border-b border-line pb-9 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-12">
-            <h2 className="max-w-2xl text-h2 font-semibold tracking-tight text-balance text-heading">
-              Choose a seat, start a game.
-            </h2>
+            <WordReveal
+              as="h2"
+              text="Choose a seat, start a game."
+              className="max-w-2xl text-h2 font-semibold tracking-tight text-balance text-heading"
+            />
             <p className="max-w-sm text-sm leading-relaxed text-pretty text-muted">
               Rules, scoring and strategy for the games in the FunFuse catalogue.
               Pick a topic to narrow the list.

@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import type { PuzzleMode } from "@/content/games/details";
 
 /**
@@ -15,13 +15,11 @@ import type { PuzzleMode } from "@/content/games/details";
 export function GameModes({ modes }: { modes: readonly PuzzleMode[] }) {
   return (
     <div>
-      <Reveal
+      <WordReveal
         as="h2"
-        y="lg"
+        text="Modes"
         className="text-h2 text-heading font-semibold tracking-tightest"
-      >
-        Modes
-      </Reveal>
+      />
 
       <Reveal
         stagger

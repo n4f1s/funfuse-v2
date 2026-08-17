@@ -1,6 +1,6 @@
 import boy from "@/assets/decorative/characters/casual-boy-red-jacket.png";
 import { Media } from "@/components/media";
-import { Parallax, Reveal } from "@/components/motion";
+import { Parallax, Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui";
 import type { CareerJob } from "@/content/careers";
 
@@ -49,27 +49,30 @@ export function CareerApply({
       </div>
 
       <div className="relative z-1 lg:grid lg:grid-cols-12 lg:gap-x-12">
-        <Reveal as="div" y="lg" className="lg:col-span-5">
-          <h2
+        <div className="lg:col-span-5">
+          <WordReveal
+            as="h2"
             id="apply-heading"
+            text="Apply to join our team"
             className="text-h2 text-heading font-semibold tracking-tightest"
-          >
-            Apply to join our team
-          </h2>
-          <p className="text-muted mt-5 max-w-md text-lg">
-            Pick the role, tell us what you have made, and leave us something we
-            can open. That is the whole application.
-          </p>
+          />
 
-          <p className="text-muted mt-8 text-sm">
-            Would rather attach a file?{" "}
-            <a
-              href={`mailto:${email}`}
-              className="text-accent-text decoration-brand-200 hover:decoration-accent underline decoration-2 underline-offset-4 transition-[text-decoration-color] duration-[var(--duration-hover)] ease-out"
-            >
-              {email}
-            </a>
-          </p>
+          <Reveal as="div" y="lg">
+            <p className="text-muted mt-5 max-w-md text-lg">
+              Pick the role, tell us what you have made, and leave us something
+              we can open. That is the whole application.
+            </p>
+
+            <p className="text-muted mt-8 text-sm">
+              Would rather attach a file?{" "}
+              <a
+                href={`mailto:${email}`}
+                className="text-accent-text decoration-brand-200 hover:decoration-accent underline decoration-2 underline-offset-4 transition-[text-decoration-color] duration-[var(--duration-hover)] ease-out"
+              >
+                {email}
+              </a>
+            </p>
+          </Reveal>
 
           {/* The heading column runs out well before the form does on a wide
               screen, so the band ends on the studio's own art rather than on
@@ -91,7 +94,7 @@ export function CareerApply({
               />
             </Parallax>
           </div>
-        </Reveal>
+        </div>
 
         <div className="mt-10 lg:col-span-7 lg:mt-0">
           <ApplyForm roles={jobs.map((job) => job.title)} />

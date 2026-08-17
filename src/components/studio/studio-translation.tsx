@@ -1,4 +1,4 @@
-import { Parallax, Reveal } from "@/components/motion";
+import { Parallax, Reveal, WordReveal } from "@/components/motion";
 import { Section } from "@/components/ui/section";
 import { getAllGames, regionLabels, type Game } from "@/content/games";
 // Not from the barrel: `./screenshots` pulls the generated static imports, and
@@ -67,13 +67,13 @@ export function StudioTranslation() {
     <Section>
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
         <div className="lg:col-span-5">
-          <Reveal as="div" y="lg">
-            <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-              {translation.title}
-            </h2>
-            <p className="text-muted mt-5 max-w-md text-lg">
-              {translation.body}
-            </p>
+          <WordReveal
+            as="h2"
+            text={translation.title}
+            className="text-h2 text-heading font-semibold tracking-tightest"
+          />
+          <Reveal as="p" y="lg" className="text-muted mt-5 max-w-md text-lg">
+            {translation.body}
           </Reveal>
 
           {/* Term over detail, under a hairline each. Three claims that can be

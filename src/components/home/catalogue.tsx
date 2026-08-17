@@ -1,6 +1,6 @@
 import jeepney from "@/assets/decorative/props/orange-jeepney.png";
 import { Link } from "@/components/navigation";
-import { Reveal } from "@/components/motion";
+import { Reveal, WordReveal } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/section";
 import {
@@ -38,25 +38,25 @@ export function Catalogue() {
           beside it starts in Manila, and six of the nineteen titles are
           Filipino. */}
       <div className="relative">
-        <Reveal
-          as="div"
-          y="lg"
-          className="flex flex-wrap items-end justify-between gap-8"
-        >
+        <div className="flex flex-wrap items-end justify-between gap-8">
           <div className="max-w-xl">
-            <h2 className="text-h2 text-heading font-semibold tracking-tightest">
-              The full catalogue
-            </h2>
-            <p className="text-muted mt-4 text-lg">
+            <WordReveal
+              as="h2"
+              text="The full catalogue"
+              className="text-h2 text-heading font-semibold tracking-tightest"
+            />
+            <Reveal as="p" y="lg" className="text-muted mt-4 text-lg">
               {games.length} titles drawn from {regions.length} traditions, from
               Tongits in Manila to Belote in France. All of them play offline.
-            </p>
+            </Reveal>
           </div>
 
-          <Button href="/games" variant="secondary">
-            Browse all games
-          </Button>
-        </Reveal>
+          <Reveal y="lg" className="flex">
+            <Button href="/games" variant="secondary">
+              Browse all games
+            </Button>
+          </Reveal>
+        </div>
 
         {/* Drives rather than floats. It is the one prop on the page with a
             front, and it is drawn facing left, so it travels right to left as
