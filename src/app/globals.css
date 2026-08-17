@@ -2534,6 +2534,216 @@
     pointer-events: none;
   }
 
+  /* ======================================================================
+     The 404 card
+     ----------------------------------------------------------------------
+     A dead end on a card-game site is a card. One oversized face with a real
+     index in the corners, a second face down behind it, and a shadow on the
+     ground the pair floats over. The choreography is in
+     components/not-found/not-found-card.tsx.
+
+     Everything is sized in `cqw` off the stage, so one set of rules serves a
+     230px slot under the copy on a phone and a 416px column beside it on a
+     desktop at the same visual weight. Type is clamped at both ends: a label
+     at 3.1cqw is 7px in the narrow slot, which reads as a printing fault.
+
+     One transform owner per element. The resting angle is the independent
+     `rotate` property on `.notfound-lean`, which GSAP never touches; the
+     tweens write `transform` on the tilt, float and drift nodes around it. */
+
+  .notfound-stage {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    container-type: inline-size;
+    /* Only does anything once the island applies a 3D rotation, which it does
+       on fine pointers alone. Free everywhere else. */
+    perspective: 1400px;
+  }
+
+  .notfound-tilt,
+  .notfound-lean,
+  .notfound-float,
+  .notfound-back,
+  .notfound-drift {
+    position: absolute;
+    inset: 0;
+  }
+
+  .notfound-lean {
+    rotate: -12deg;
+  }
+
+  .notfound-back {
+    rotate: 17deg;
+  }
+
+  /* Sits outside every transform, so the card floats over it instead of the
+     whole picture moving. That contrast is the entire read of height. */
+  .notfound-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 3cqw;
+    width: 58cqw;
+    height: 8cqw;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      oklch(0.163 0.012 25 / 0.2) 0%,
+      transparent 72%
+    );
+  }
+
+  .notfound-face,
+  .notfound-back-face {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    aspect-ratio: 5 / 7;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Face down: the lattice a card back has, at the one accent hue. Offset up
+     and to the right of the front card so it reads as a second card rather
+     than as a drop shadow with an edge. */
+  .notfound-back-face {
+    width: 58cqw;
+    translate: -34% -54%;
+    border: 1px solid var(--color-line);
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0 1.15cqw,
+        color-mix(in oklch, var(--color-accent) 13%, transparent) 1.15cqw 2.3cqw
+      ),
+      linear-gradient(160deg, var(--color-brand-50) 0%, var(--color-surface) 100%);
+    box-shadow:
+      0 3cqw 7cqw -3cqw oklch(0.163 0.012 25 / 0.18),
+      inset 0 0 0 1cqw oklch(1 0 0 / 0.92);
+  }
+
+  .notfound-face {
+    width: 64cqw;
+    translate: -50% -50%;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    background:
+      radial-gradient(86% 58% at 50% 6%, oklch(1 0 0) 0%, transparent 72%),
+      linear-gradient(158deg, var(--color-surface) 0%, var(--color-ink-50) 100%);
+    box-shadow:
+      0 2cqw 4.5cqw -2cqw oklch(0.163 0.012 25 / 0.12),
+      0 9cqw 17cqw -7cqw oklch(0.163 0.012 25 / 0.22),
+      inset 0 0 0 1px oklch(1 0 0 / 0.9);
+  }
+
+  /* The printed frame. Solid outer, dashed inner, both tinted rather than
+     grey, so the card belongs to the same press as the hero board. */
+  .notfound-frame {
+    position: absolute;
+    inset: 4cqw;
+    border: 1px solid color-mix(in oklch, var(--color-accent) 24%, var(--color-line));
+    border-radius: var(--radius-md);
+  }
+
+  .notfound-frame::after {
+    content: "";
+    position: absolute;
+    inset: 1.4cqw;
+    border: 1px dashed color-mix(in oklch, var(--color-accent) 14%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Warmth under the numerals. A watermark suit here read as a second subject;
+     light does the same job without competing with the index. */
+  .notfound-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      44% 34% at 50% 44%,
+      color-mix(in oklch, var(--color-accent) 13%, transparent) 0%,
+      transparent 72%
+    );
+  }
+
+  /* Rank over suit, printed in both corners the way a real index is. */
+  .notfound-index {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    gap: 0.3cqw;
+    color: var(--color-accent-text);
+    font-family: var(--font-display);
+    font-size: clamp(0.6rem, 4.4cqw, 1.2rem);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Bricolage has no suit glyphs, so the pip falls back mid-lockup. Ask for
+     the text face by name instead of letting the browser choose one. */
+  .notfound-index span:last-child {
+    font-family: var(--font-sans);
+    font-size: 0.82em;
+  }
+
+  .notfound-index--top {
+    left: 7cqw;
+    top: 7cqw;
+  }
+
+  .notfound-index--bottom {
+    right: 7cqw;
+    bottom: 7cqw;
+    rotate: 180deg;
+  }
+
+  .notfound-body {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 3cqw;
+  }
+
+  .notfound-number {
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    /* Wide enough to be the subject, narrow enough that three digits clear the
+       printed frame at every slot width this card is used at. */
+    font-size: clamp(2.5rem, 26cqw, 6.5rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: var(--tracking-tightest);
+    line-height: 0.9;
+  }
+
+  .notfound-label {
+    border: 1px solid color-mix(in oklch, var(--color-accent) 28%, var(--color-line));
+    border-radius: var(--radius-md);
+    background: var(--color-accent-tint);
+    padding: 1.1cqw 2.6cqw;
+    color: var(--color-accent-text);
+    font-size: clamp(0.5625rem, 3.1cqw, 0.8125rem);
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .notfound-pips {
+    display: flex;
+    gap: 2.4cqw;
+    color: var(--color-ink-300);
+    font-size: clamp(0.7rem, 4.2cqw, 1.15rem);
+    line-height: 1;
+  }
+
+  .notfound-pips [data-red] {
+    color: color-mix(in oklch, var(--color-accent) 52%, transparent);
+  }
+
 }
 
 /* ==========================================================================
